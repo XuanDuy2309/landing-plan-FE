@@ -1,0 +1,14 @@
+:where(.css-dev-only-do-not-override-1vtf12y).ant-modal,
+:where(.css-dev-only-do-not-override-1vtf12y).ant-dropdown,
+:where(.css-dev-only-do-not-override-1vtf12y)[class^="ant-dropdown-menu"], 
+:where(.css-dev-only-do-not-override-1vtf12y)[class*=" ant-dropdown-menu"] {
+    font-family: 'SF Pro Display', sans-serif !important;
+}
+.modal-base.ant-modal {
+    width: 900px !important;
+    height: 600px !important;
+}   
+.modal-base .ant-modal-content {
+    padding: 0;
+    border-radius: 0;
+}

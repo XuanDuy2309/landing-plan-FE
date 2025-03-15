@@ -1,0 +1,324 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+#root {
+    font-family: "Open Sans", sans-serif;
+    font-size: 14px;
+    line-height: 22px;
+}
+
+body {
+    margin: 0;
+    font-family: "Open Sans", sans-serif;
+    font-size: 14px;
+    line-height: 22px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #000000;
+    height: 100%;
+    overflow: hidden;
+}
+
+.app {
+    background-color: var(--side-panel-background);
+    display: flex;
+    height: 100%;
+    width: 100%;
+
+    .content {
+        line-height: 1.5;
+        position: relative;
+        flex-grow: 1;
+        width: 100%;
+        height: 100%;
+    }
+
+    h2 {
+        font-size: 30px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: 'Poppins', sans-serif;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.flex-grow-limit {
+    flex-grow: 1;
+    min-height: 0px;
+    min-width: 0px;
+}
+
+.ant-btn {
+    /* background-color: #1087ff; */
+}
+
+.ant-btn-primary {
+    background-color: #1087ff;
+}
+
+p {
+    margin-bottom: 0 !important;
+}
+
+.flex-grow-limit {
+    flex-grow: 1;
+    min-height: 0px;
+    min-width: 0px;
+}
+
+@layer utilities {
+    .scrollbar::-webkit-scrollbar {
+        overflow: visible;
+        width: 7px;
+        background-color: transparent;
+        border-radius: 6px;
+    }
+
+    .scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(172, 172, 173);
+        border-radius: 10rem;
+        border: 1px solid #fff;
+    }
+
+    .scrollbar::-webkit-scrollbar-track-piece:start {
+        background: transparent;
+    }
+
+    .scrollbar::-webkit-scrollbar-track-piece:end {
+        background: transparent;
+    }
+}
+
+.scrollable-view-x {
+    scrollbar-gutter: stable;
+    overflow-x: hidden;
+    overscroll-behavior: auto;
+}
+
+.scrollable-view-x:hover {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.scrollable-view-x::-webkit-scrollbar {
+    height: 7px;
+    background-color: transparent;
+    border-radius: 6px;
+}
+
+.scrollable-view-x::-webkit-scrollbar-thumb {
+    background-color: rgba(172, 172, 173);
+    border-radius: 10rem;
+    border: 1px solid #fff;
+}
+
+.scrollable-view-x::-webkit-scrollbar-track-piece:start {
+    background: transparent;
+}
+
+.scrollable-view-x::-webkit-scrollbar-track-piece:end {
+    background: transparent;
+}
+
+.scrollable-view {
+    scrollbar-gutter: stable;
+    overflow: visible;
+    overscroll-behavior: auto;
+}
+
+.scrollable-view:hover {
+    overflow: auto;
+}
+
+.scrollable-view::-webkit-scrollbar {
+    width: 7px;
+    background-color: transparent;
+    border-radius: 6px;
+}
+
+.scrollable-view::-webkit-scrollbar-thumb {
+    background-color: rgba(172, 172, 173);
+    border-radius: 10rem;
+    border: 1px solid #fff;
+}
+
+.scrollable-view::-webkit-scrollbar-track-piece:start {
+    background: transparent;
+}
+
+.scrollable-view::-webkit-scrollbar-track-piece:end {
+    background: transparent;
+}
+
+.react-calendar__tile--active {
+    background-color: #1087ff;
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+    background-color: transparent;
+}
+
+.react-calendar__navigation__label--hover {
+    background: transparent;
+}
+
+.react-calendar__month-view__days__day--neighboringMonth {
+    /* display: none; */
+}
+
+.video-js .vjs-control-bar {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.containerVideo {
+    width: 100%;
+    height: 100vh;
+}
+
+.ck.ck-editor__editable_inline> :first-child {
+    margin-top: 0 !important;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: 'Poppins', sans-serif;
+}
+
+.borderImage {
+    border: 1px solid #acacad;
+}
+
+.ripple-button {
+    overflow: hidden;
+    /* position: relative; */
+    cursor: pointer;
+}
+
+.ripple-button>.ripple {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    /* background: rgba(255, 255, 255, 0.5); */
+    display: block;
+    content: '';
+    border-radius: 9999px;
+    opacity: 0.5;
+    animation: 0.9s ease 1 forwards ripple-effect;
+}
+
+@keyframes ripple-effect {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(10);
+        opacity: 0.375;
+    }
+
+    100% {
+        transform: scale(35);
+        opacity: 0;
+    }
+}
+
+.ripple-button>.content {
+    position: relative;
+    z-index: 2;
+}
+
+.overide-antd .ant-tabs-nav-operations {
+    width: auto !important;
+}
+
+[class^='borderthin'] {
+    margin: 1em 0;
+    height: 1px;
+}
+
+.borderthin-t {
+    box-shadow: 0 -0.5px 0 #acacad;
+}
+
+.borderthin-b {
+    box-shadow: 0 0.5px 0 #acacad;
+}
+
+.borderthin-r {
+    box-shadow: 0.5px 0 0 #acacad;
+}
+
+.borderthin-l {
+    box-shadow: -0.5px 0 0 #acacad;
+}
+
+.rdrInputRanges {
+    display: none;
+}
+
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+}
+
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar {
+    display: block;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track,
+.overflow-y-auto::-webkit-scrollbar-track {
+    background-color: #f7f7f7 !important;
+    border-radius: 2px !important;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb,
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    border-radius: 6px !important;
+    background-color: #cdcccc !important;
+}
+
+.ReactCollapse--collapse {
+    transition: height 500ms;
+}
+
+textarea {
+    resize: none;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+:where(.css-dev-only-do-not-override-d7wtnm).ant-tabs-top>.ant-tabs-nav {
+    margin: 0;
+}

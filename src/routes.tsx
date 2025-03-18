@@ -8,6 +8,7 @@ import { observer } from "mobx-react";
 import { HomeLayout } from "./layouts/home/home-layout";
 import { SettingsRoutes } from "./pages/settings/routes";
 import { SettingsLayout } from "./layouts/settings/setting-layout";
+import { Spin } from "antd";
 
 
 export const AppRouter = observer(() => {
@@ -24,13 +25,13 @@ export const AppRouter = observer(() => {
                         <Route path="home/*" element={
                             <RequireAuth>
                                 <HomeRoutes />
-                            </RequireAuth>} />
-                        <Route path="settings/" element={<SettingsLayout />}>
-                            <Route path="*" element={
-                                <RequireAuth>
-                                    <SettingsRoutes />
-                                </RequireAuth>
-                            } />
+                            </RequireAuth>
+                        } />
+                        <Route path="settings/*" element={
+                            <RequireAuth>
+                                <SettingsRoutes />
+                            </RequireAuth>
+                        }>
                         </Route>
                     </Route>
                 </Routes>
@@ -51,6 +52,7 @@ const SkipAuth = observer(({ children }: { children: JSX.Element }) => {
 
 const RequireAuth = observer(({ children }: { children: JSX.Element }) => {
     const { sessionStore } = useCoreStores();
+
     if (!sessionStore.session?.access_token) {
         return <Navigate to="/auth/login" />;
     }

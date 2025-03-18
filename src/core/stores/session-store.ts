@@ -1,16 +1,24 @@
-import { makeAutoObservable } from "mobx";
+import { action, makeAutoObservable, runInAction } from "mobx";
 import { UserModel } from "../models";
 import { clearPersistedStore, getPersistedStore, makePersistable } from "mobx-persist-store";
 
 export class ISession {
     access_token?: string;
+    constructor() {
+        makeAutoObservable(this)
+    }
 }
 
 export class SessionStore {
     profile?: UserModel;
     session?: ISession;
     constructor() {
-        makeAutoObservable(this)
+        console.log('SessionStore');
+        makeAutoObservable(this, {
+            setProfile: action,
+            setSession: action,
+            logout: action,
+        })
         makePersistable(this, {
             name: 'SessionStore',
             properties: ['profile', 'session'],
@@ -20,16 +28,25 @@ export class SessionStore {
             // stringify: false,
             // debugMode: true,
         });
-
         getPersistedStore(this).then((data) => {
             if (data) {
-                Object.assign(this, data); // Cập nhật store với dữ liệu đã lưu
+                runInAction(() => {
+                    Object.assign(this, data);
+                });
             }
         });
     }
 
+    setProfile(profile?: UserModel) {
+        this.profile = profile;
+    }
+
+    setSession(session?: ISession) {
+        this.session = session;
+    }
+
     async clearPersistedData() {
-        await clearPersistedStore(this); // Xóa dữ liệu trong localStorage nhưng giữ nguyên giá trị trong RAM
+        await clearPersistedStore(this);
     }
 
     logout() {

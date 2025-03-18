@@ -40,12 +40,10 @@ export const FormLogin = observer(() => {
         const res = await AuthApi.login(params)
         setLoading(false)
         if (res.Status) {
-            sessionStore.session = new ISession();
-            Object.assign(sessionStore.session, {
+            sessionStore.setSession({
                 access_token: res.Data.data.access_token
-            });
-            sessionStore.profile = new UserModel();
-            Object.assign(sessionStore.profile, res.Data.data);
+            })
+            sessionStore.setProfile(res.Data.data)
             setToken(res.Data.data.access_token);
             toast('Login successfully')
             return

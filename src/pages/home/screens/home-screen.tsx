@@ -4,10 +4,7 @@ import { AuthApi } from "../../../core/api";
 
 export const HomeScreen = observer(() => {
     const { sessionStore } = useCoreStores();
-    const handleLogout = async () => {
-        sessionStore.logout();
-    }
     return <div>
-        <button onClick={handleLogout}>logout</button>
+        <button onClick={() => {}}>logout</button>
     </div>;
 })

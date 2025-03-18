@@ -7,19 +7,20 @@ import { IconBase } from "src/components";
 import { useCoreStores } from "src/core/stores";
 import { DropdownSettingHeader } from "./dropdown-setting-header";
 import { values } from "mobx";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const HeaderHome = observer(() => {
     const { sessionStore } = useCoreStores()
     const [activeScreen, setActiveScreen] = useState<number>(0)
     const [activeDropdown, setActiveDropdown] = useState<boolean>(false)
     const { pathname } = useLocation()
+    const navigate = useNavigate()
     const listPages = [
         {
             key: 0,
             title: 'Home',
             icon: 'home-outline',
-            link: '/Home',
+            link: '/home',
         },
         {
             key: 1,
@@ -48,13 +49,18 @@ export const HeaderHome = observer(() => {
     ]
 
     useEffect(() => {
-        setActiveScreen(listPages.findIndex(item => item.link === pathname) || -1)
+        setActiveScreen(listPages.findIndex(item => item.link === pathname))
     }, [pathname])
-
+    
     return (
         <div className="w-full h-14 flex items-center justify-center border-b border-gray-300 bg-white shadow">
             <div className="w-full max-w-[1240px] h-full flex items-center justify-between  ">
-                <span className="cursor-pointer text-3xl font-bold text-blue-400 w-[240px] flex-none">LANDING PLAN</span>
+                <div className="w-[240px] h-full py-1 flex items-center justify-start space-x-2 cursor-pointer"
+                    onClick={() => { navigate('/home') }}
+                >
+                    <img src="/images/logo-landing-plan.png" alt="" className="h-full object-contain bg-blue-300 rounded" />
+                    <span className="text-lg font-medium text-green-900">LANDING PLAN</span>
+                </div>
                 <div className="h-full flex items-center justify-center space-x-2">
                     {
                         listPages.map((item, index) => {

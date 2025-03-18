@@ -22,6 +22,7 @@ export class UserModel {
     password?: string;
     phone_number?: string;
     email?: string;
+    address?: string;
     confirm_password?: string;
     fullname?: string;
     role: Role = Role.user;

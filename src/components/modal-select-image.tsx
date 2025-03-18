@@ -8,21 +8,23 @@ import classNames from "classnames";
 import { set } from "mobx";
 import { SelectFileCase } from "src/core/services";
 import { Spin } from "antd";
+import Icon from "@mdi/react";
 
 interface IProps {
     onSave: (item?: string) => void
     onClose: () => void
+    onDelete?: () => void
 }
 
-export const ModalSelectImage = observer(({ onSave, onClose }: IProps) => {
+export const ModalSelectImage = observer(({ onSave, onClose, onDelete }: IProps) => {
     return (
         <ImageContextProvider>
-            <SelectImage onSave={onSave} onClose={onClose} />
+            <SelectImage onSave={onSave} onClose={onClose} onDelete={onDelete}/>
         </ImageContextProvider>
     )
 });
 
-const SelectImage = observer(({ onSave, onClose }: IProps) => {
+const SelectImage = observer(({ onSave, onClose, onDelete }: IProps) => {
     const { data, loading, onUpload } = useImageContext();
     const [selected, setSelected] = useState<string>();
 
@@ -45,7 +47,10 @@ const SelectImage = observer(({ onSave, onClose }: IProps) => {
         <div className="w-full h-[552px] overflow-y-auto flex flex-col border-b border-gray-200 space-y-4 p-3">
             <div className="w-full flex items-center justify-between">
                 <span className="px-3 text-xl font-semibold text-gray-700">Your Image</span>
-                <ButtonLoading iconLeft="uploadimage-outline" label="Upload new image" template="ActionBlueOutline" size="xs" onClick={handleUpload} />
+                <div className="flex items-center space-x-2">
+                    <ButtonLoading iconLeft="delete-outline" label="Delete image" template="ActionOrange" size="xs" onClick={onDelete} />
+                    <ButtonLoading iconLeft="uploadimage-outline" label="Upload new image" template="ActionBlueOutline" size="xs" onClick={handleUpload} />
+                </div>
             </div>
             {loading ?
                 <div className="w-full h-full flex items-center justify-center">

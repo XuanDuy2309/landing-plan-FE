@@ -70,12 +70,10 @@ export const RegisterScreen = observer(() => {
         const res = await AuthApi.register(params)
         setLoading(false)
         if (res.Status) {
-            sessionStore.session = new ISession();
-            Object.assign(sessionStore.session, {
+            sessionStore.setSession({
                 access_token: res.Data.data.access_token
-            });
-            sessionStore.profile = new UserModel();
-            Object.assign(sessionStore.profile, res.Data.data);
+            })
+            sessionStore.setProfile(res.Data.data)
             setToken(res.Data.data.access_token);
             toast('Sign up successfully')
             return
@@ -83,7 +81,7 @@ export const RegisterScreen = observer(() => {
         console.log('ressss', res)
         setErrorMessage(res.Message)
     }
-    return <div className="w-full h-full flex justify-center overflow-y-auto bg-[url('src/assets/images/bg-auth.png')] bg-contain bg-left-top bg-no-repeat bg-gray-100">
+    return <div className="w-full h-full flex justify-center overflow-y-auto bg-[url('/images/bg-auth.png')] bg-contain bg-left-top bg-no-repeat bg-gray-100">
         <div className="w-[500px] h-full flex flex-col items-center py-12">
             <div className="w-full bg-transparent flex flex-col border rounded-2xl border-gray-300 p-8 text-[16px]">
                 <span className="text-4xl text-gray-900 font-bold">Register</span>
@@ -93,7 +91,7 @@ export const RegisterScreen = observer(() => {
                     <InputForm label="Phone" value={data.phone_number || ''} onChange={(e) => { data.phone_number = e.target.value }} error={data.err_phone_number} />
                     <InputForm label="Username" value={data.username || ''} onChange={(e) => { data.username = e.target.value }} error={data.err_username} />
                     <InputForm label="Password" value={data.password || ''} onChange={(e) => { data.password = e.target.value }} type="password" error={data.err_password} />
-                    <InputForm label="Password" value={data.confirm_password || ''} onChange={(e) => { data.confirm_password = e.target.value }} type="password" error={data.err_confirm_password} />
+                    <InputForm label="Confirm Password" value={data.confirm_password || ''} onChange={(e) => { data.confirm_password = e.target.value }} type="password" error={data.err_confirm_password} />
                 </div>
                 {errMessage && <span className="text-red-500 mt-2 bg-red-50 px-3 py-2 rounded">{errMessage}</span>}
                 <div className="w-full mt-4">

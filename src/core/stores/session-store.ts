@@ -12,6 +12,7 @@ export class ISession {
 export class SessionStore {
     profile?: UserModel;
     session?: ISession;
+    isLoading: boolean = false;
     constructor() {
         console.log('SessionStore');
         makeAutoObservable(this, {
@@ -53,5 +54,13 @@ export class SessionStore {
         this.clearPersistedData();
         this.profile = undefined;
         this.session = undefined;
+    }
+
+    showLoading() {
+        this.isLoading = true;
+    }
+
+    hideLoading() {
+        this.isLoading = false;
     }
 }

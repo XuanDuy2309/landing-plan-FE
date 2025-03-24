@@ -18,14 +18,9 @@ export const SidebarSettingLayout = observer(() => {
         {
             icon: 'resetpassword-outline',
             title: 'Change password',
-            link: '/settings/reset_password'
+            link: '/settings/pass'
         }
     ]
-    useEffect(() => {
-        if (pathname) {
-            setActive(menuSidebar.findIndex(item => item.link === pathname) || 0)
-        }
-    }, [pathname])
     return (
         <div className="w-[360px] h-full flex flex-col bg-white shadow border-r border-gray-300">
             <div className="w-full p-4 border-b border-gray-200 flex-none">

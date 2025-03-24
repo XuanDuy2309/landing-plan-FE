@@ -32,7 +32,7 @@ export const HeaderHome = observer(() => {
             key: 2,
             title: "Profile",
             icon: "profile-outline",
-            link: ''
+            link: '/home/my_post'
         },
         {
             key: 3,
@@ -48,31 +48,28 @@ export const HeaderHome = observer(() => {
         }
     ]
 
-    useEffect(() => {
-        setActiveScreen(listPages.findIndex(item => item.link === pathname))
-    }, [pathname])
-    
     return (
         <div className="w-full h-14 flex items-center justify-center border-b border-gray-300 bg-white shadow">
-            <div className="w-full max-w-[1240px] h-full flex items-center justify-between  ">
+            <div className="w-full max-w-[1440px] h-full flex items-center justify-between px-3">
                 <div className="w-[240px] h-full py-1 flex items-center justify-start space-x-2 cursor-pointer"
                     onClick={() => { navigate('/home') }}
                 >
                     <img src="/images/logo-landing-plan.png" alt="" className="h-full object-contain bg-blue-300 rounded" />
                     <span className="text-lg font-medium text-green-900">LANDING PLAN</span>
                 </div>
-                <div className="h-full flex items-center justify-center space-x-2">
+                <div className="h-full w-full max-w-[680px] flex items-center justify-center space-x-2">
                     {
                         listPages.map((item, index) => {
                             return (
                                 <div
                                     key={index}
-                                    className={classNames("w-[100px] h-13 flex flex-col items-center justify-center space-y-0.5 cursor-pointer  text-[14px] font-medium",
+                                    className={classNames("w-full h-13 flex flex-col items-center justify-center space-y-0.5 cursor-pointer  text-[14px] font-medium",
                                         { 'text-blue-600 border-b-2 border-blue-600': activeScreen === item.key },
                                         { 'text-white rounded hover:bg-gray-200': activeScreen !== item.key }
                                     )}
                                     onClick={(e) => {
                                         setActiveScreen(item.key)
+                                        navigate(item.link, { replace: true })
                                     }}
                                 >
                                     <IconBase icon={item.icon} size={24} color={activeScreen === item.key ? Colors.blue[400] : Colors.gray[700]} />

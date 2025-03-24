@@ -16,7 +16,7 @@ interface IProps {
 export const InputLabel = (props: IProps) => {
 
     return (
-        <div className='w-full flex flex-row space-x-2 items-center'>
+        <div className='w-full flex flex-row space-x-2 items-start'>
             <div className={'w-[130px] flex-none flex flex-row justify-end ' + props.labelClassName}>
                 <span className={classNames({ 'text-llg font-medium': props.size == 'large' })}>{props.label}:</span>
             </div>
@@ -24,7 +24,7 @@ export const InputLabel = (props: IProps) => {
 
                 <input
                     className={classNames(
-                        'font-normal outline-none',
+                        'font-normal outline-none w-full',
                         { 'text-llg font-medium': props.size == 'large' },
                         { 'text-gray-500 font-normal': !props.value }
                     )}
@@ -33,6 +33,7 @@ export const InputLabel = (props: IProps) => {
                     autoFocus={!props.value ? true : false}
                     onChange={(e) => { props.onChange(e.target.value) }}
                     onBlur={() => { }}
+                    type={props.type}
                     disabled={props.disabled}
                 />
                 <div className='flex flex-col space-y-1'>

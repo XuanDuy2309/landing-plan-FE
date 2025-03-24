@@ -4,15 +4,33 @@ import { AuthApi } from "../api";
 import { toast } from "react-toastify";
 import { SessionStore, useCoreStores } from "../stores";
 import { setToken } from "../config";
+import { hideLoading, showLoading } from "../services";
+import moment from "moment";
+import { makeAutoObservable } from "mobx";
+
+class IPass {
+    old_password?: string;
+    new_password?: string;
+    confirm_password?: string;
+    err_old_password?: string;
+    err_new_password?: string;
+    err_confirm_password?: string;
+    constructor() {
+        makeAutoObservable(this)
+    }
+}
 
 export class UserContextType {
     data: UserModel = new UserModel();
+    pass: IPass = new IPass();
     listImage: string[] = [];
     loading: boolean = false;
     onUpdateAvatar = (image: string) => { };
     onUpdateBackground = (image: string) => { };
     onDeleteAvatar = () => { };
     onDeleteBackground = () => { };
+    onUpdateInfo = () => { };
+    onUpdatePass = () => { };
 }
 
 export const UserContext = React.createContext<UserContextType>(new UserContextType());
@@ -21,20 +39,23 @@ interface IProps {
     children: React.ReactNode
 }
 
+
+
 export const UserContextProvider = ({ children }: IProps) => {
     const [data, setData] = React.useState<UserModel>(new UserModel());
     const [listImage, setListImage] = React.useState<string[]>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
     const { sessionStore } = useCoreStores();
+    const [pass, setPass] = React.useState<IPass>(new IPass());
 
     const fetchData = async () => {
         setLoading(true)
         const res = await AuthApi.getProfile();
         setLoading(false)
         if (res.Status) {
-            console.log('ressss', res.Data.data)
             const use = new UserModel();
             Object.assign(use, res.Data.data);
+            use.dob = moment(res.Data.data.dob);
             sessionStore.setProfile(use);
             sessionStore.setSession({ access_token: res.Data.data.access_token });
             setData(use);
@@ -87,21 +108,84 @@ export const UserContextProvider = ({ children }: IProps) => {
             })
     }
 
+    const onUpdateInfo = async () => {
+        const params = {
+            ...data,
+            dob: data.dob ? data.dob.format('YYYY-MM-DD') : ''
+        }
+        showLoading();
+        await AuthApi.updateInfo(params).then(res => {
+            toast('Update info successfully')
+            fetchData();
+        }).catch(err => {
+            toast('Update info failed')
+        })
+        hideLoading();
+    }
+
+    const validatePass = () => {
+        pass.err_confirm_password = ''
+        pass.err_new_password = ''
+        pass.err_old_password = ''
+        let isValid = true;
+        if (!pass.old_password) {
+            pass.err_old_password = 'Vui lòng nhập mật khẩu'
+            isValid = false;
+        }
+        if (!pass.new_password) {
+            pass.err_new_password = 'Vui lòng nhập mật khẩu mới'
+            isValid = false;
+        }
+        if (!pass.confirm_password) {
+            pass.err_confirm_password = 'Vui lòng nhập lại mật khẩu'
+            isValid = false;
+        }
+        if (pass.new_password !== pass.confirm_password) {
+            pass.err_confirm_password = 'Mật khẩu không khớp'
+            isValid = false;
+        }
+        if (pass.old_password === pass.new_password) {
+            pass.err_new_password = 'Mật khẩu đã được sử dụng'
+            isValid = false;
+        }
+        return isValid
+    }
+
+    const onUpdatePass = async () => {
+        if (!validatePass()) { return }
+        const params = {
+            ...pass
+        }
+        showLoading();
+        await AuthApi.updatePassword(params).then(res => {
+            toast('Update password successfully')
+            setPass(new IPass())
+        }).catch(err => {
+            toast('Update password failed')
+            pass.err_old_password = err.Message
+        })
+        hideLoading()
+    }
+
     useEffect(() => {
-        if (sessionStore.session?.access_token) { 
+        if (sessionStore.session?.access_token) {
             setToken(sessionStore.session?.access_token);
-            fetchData(); }
+            fetchData();
+        }
     }, [sessionStore.session?.access_token])
 
     return (
         <UserContext.Provider value={{
             data,
+            pass,
             listImage,
             loading,
             onUpdateAvatar,
             onUpdateBackground,
             onDeleteAvatar,
-            onDeleteBackground
+            onDeleteBackground,
+            onUpdateInfo,
+            onUpdatePass
         }}>
             {children}
         </UserContext.Provider>

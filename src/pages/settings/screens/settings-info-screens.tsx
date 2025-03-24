@@ -1,29 +1,16 @@
 import { Dropdown, MenuProps, Spin } from "antd";
 import classNames from "classnames";
 import { observer } from "mobx-react"
+import moment from "moment";
 import { useRef, useState } from "react";
 import { Colors } from "src/assets";
-import { ButtonLoading, IconBase, InputEditing, InputLabel, ModalBase, ModalSelectImage, RadioGroup } from "src/components";
-import { Gender, Role } from "src/core/models";
+import { ButtonLoading, DatePickerAnt, IconBase, InputEditing, InputLabel, ModalBase, ModalSelectImage, RadioGroup } from "src/components";
+import { Gender, Role, Status } from "src/core/models";
 import { useUserContext } from "src/core/modules";
+import { BannerSettingInfo } from "../containers/settings-info/banner-setting-info";
 
 export const SettingsInfoScreen = observer(() => {
-    const { data, loading, onUpdateAvatar, onUpdateBackground, onDeleteAvatar, onDeleteBackground } = useUserContext();
-    const imageModalRef = useRef<any>(null);
-    const [changeAvatar, setChangeAvatar] = useState<boolean>(false);
-    const { open, close } = imageModalRef?.current || {};
-
-    const handleSelectImage = (image?: string) => {
-        close();
-        if (!image) return;
-        onUpdateAvatar(image);
-    }
-
-    const handleChangeBackground = (image?: string) => {
-        close();
-        if (!image) return;
-        onUpdateBackground(image);
-    }
+    const { data, loading, onUpdateInfo } = useUserContext();
 
     return (<>
         {!data && loading ?
@@ -32,39 +19,7 @@ export const SettingsInfoScreen = observer(() => {
             </div> :
             <div className="w-full p-4 ">
                 <div className="w-full h-full bg-white flex flex-col rounded overflow-hidden">
-                    <div className="w-full h-[320px] bg-linear-to-b from-white to-gray-500 relative">
-                        {data.background && <img src={data.background} alt="" className="w-full h-full object-cover" />}
-                        <div className="absolute bottom-0 left-0 right-0 w-full h-10 flex items-end justify-between p-3">
-                            <div className="size-[120px] relative flex items-center justify-center bg-white rounded-full">
-
-                                <div className='size-[110px] rounded-full flex items-center bg-gray-200 hover:opacity-70 justify-center overflow-hidden'>
-                                    {
-                                        loading ?
-                                            <div className="w-full h-full flex items-center justify-center">
-                                                <Spin />
-                                            </div>
-                                            : (data && data?.avatar ?
-                                                <img src={data.avatar} alt="" className="size-full object-cover" />
-                                                :
-                                                <span className="text-7xl font-bold text-gray-900">{data?.fullname?.charAt(0).toUpperCase()}</span>)
-
-                                    }
-                                </div>
-                                <div
-                                    onClick={() => { open(), setChangeAvatar(true) }}
-                                    className="size-9  absolute bottom-0 right-0 rounded-full flex items-center justify-center bg-gray-700 cursor-pointer">
-                                    <IconBase icon='camera-outline' size={20} color={Colors.white} />
-                                </div>
-                            </div>
-                            <ButtonLoading
-                                size="xs"
-                                label="Edit background"
-                                className="flex items-center justify-center rounded cursor-pointer"
-                                template="ActionBase"
-                                iconLeft="edit-outline"
-                                onClick={(e) => { open(), setChangeAvatar(false) }} />
-                        </div>
-                    </div>
+                    <BannerSettingInfo />
                     <div className="w-full p-3 flex flex-col">
                         <span className="text-lg font-medium text-gray-700">Thông tin cá nhân</span>
                         <InputLabel
@@ -104,6 +59,20 @@ export const SettingsInfoScreen = observer(() => {
                         </div>
                         <div className='w-full flex flex-row space-x-2 items-center'>
                             <div className={'w-[130px] flex-none flex flex-row justify-end '}>
+                                <span >{'Ngày sinh'}:</span>
+                            </div>
+                            <div className='w-full'>
+                                <DatePickerAnt
+                                    value={data.dob ? moment(data.dob) : undefined}
+                                    onChange={(value) => { data.dob = value }}
+                                    placeholder={'dd/mm/yyyy'}
+                                    className='p-0 border-none'
+                                    format={"DD/MM/YYYY"}
+                                />
+                            </div>
+                        </div>
+                        <div className='w-full flex flex-row space-x-2 items-center'>
+                            <div className={'w-[130px] flex-none flex flex-row justify-end '}>
                                 <span >{'Vai trò'}:</span>
                             </div>
                             <div className='w-full'>
@@ -111,23 +80,21 @@ export const SettingsInfoScreen = observer(() => {
                             </div>
                         </div>
 
+                        <div className='w-full flex flex-row space-x-2 items-center'>
+                            <div className={'w-[130px] flex-none flex flex-row justify-end '}>
+                                <span >{'Trạng thái'}:</span>
+                            </div>
+                            <div className='w-full'>
+                                <span>{data.status === Status.active ? 'Hoạt động' : 'Khoá'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="w-full p-3 flex items-center justify-end space-x-2">
+                        <ButtonLoading label="Cập nhật" size="xs" template="ActionBlue" onClick={() => {
+                            onUpdateInfo();
+                        }} />
                     </div>
                 </div>
-                <ModalBase
-                    ref={imageModalRef}
-                >
-                    <ModalSelectImage onSave={(item) => {
-                        if (changeAvatar) { handleSelectImage(item); return }
-                        handleChangeBackground(item);
-                    }}
-                        onClose={close}
-                        onDelete={() => {
-                            close();
-                            if (changeAvatar) { onDeleteAvatar(); return }
-                            onDeleteBackground();
-                        }}
-                    />
-                </ModalBase>
             </div>}
     </>)
 })

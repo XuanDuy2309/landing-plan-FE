@@ -2,6 +2,11 @@ import { action, makeAutoObservable, runInAction } from "mobx";
 import { UserModel } from "../models";
 import { clearPersistedStore, getPersistedStore, makePersistable } from "mobx-persist-store";
 
+export class ILocation {
+    lat: number = 0;
+    lng: number = 0;
+}
+
 export class ISession {
     access_token?: string;
     constructor() {
@@ -9,12 +14,12 @@ export class ISession {
     }
 }
 
+
 export class SessionStore {
     profile?: UserModel;
     session?: ISession;
-    isLoading: boolean = false;
+    location: ILocation = new ILocation(); // Thêm thông tin vị trí
     constructor() {
-        console.log('SessionStore');
         makeAutoObservable(this, {
             setProfile: action,
             setSession: action,
@@ -36,6 +41,7 @@ export class SessionStore {
                 });
             }
         });
+        this.requestLocation();
     }
 
     setProfile(profile?: UserModel) {
@@ -54,13 +60,28 @@ export class SessionStore {
         this.clearPersistedData();
         this.profile = undefined;
         this.session = undefined;
+        this.location = new ILocation()
     }
 
-    showLoading() {
-        this.isLoading = true;
+    setLocation(lat: number, lng: number) {
+        this.location = { lat, lng };
     }
 
-    hideLoading() {
-        this.isLoading = false;
+    requestLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    runInAction(() => {
+                        this.setLocation(position.coords.latitude, position.coords.longitude);
+                    });
+                },
+                (error) => {
+                    console.error("Lỗi lấy vị trí: ", error);
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            console.warn("Trình duyệt không hỗ trợ Geolocation");
+        }
     }
 }

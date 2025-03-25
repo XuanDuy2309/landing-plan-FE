@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import "tailwindcss";
 
 #root {
     font-family: "Open Sans", sans-serif;
@@ -321,4 +321,8 @@ input[type='number'] {
 
 :where(.css-dev-only-do-not-override-d7wtnm).ant-tabs-top>.ant-tabs-nav {
     margin: 0;
+}
+
+button {
+    cursor: pointer;
 }

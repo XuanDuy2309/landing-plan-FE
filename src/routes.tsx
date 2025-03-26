@@ -16,7 +16,7 @@ export const AppRouter = observer(() => {
         <div className="w-screen h-screen">
             <Router>
                 <Routes>
-                    <Route path="/landing_map" element={<LandingMapRoutes />} />
+                    <Route path="/" element={<LandingMapRoutes />} />
                     <Route path="auth/*" element={
                         <SkipAuth>
                             <AuthRoutes />

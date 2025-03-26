@@ -62,11 +62,11 @@ const SelectImage = observer(({ onSave, onClose, onDelete }: IProps) => {
                         data.map((item, index) => {
                             return (
                                 <div className={classNames("w-full h-[240px] rounded-md overflow-hidden relative cursor-pointer",
-                                    { 'border-2 border-blue-400': selected === item.link }
-                                )} key={index} onClick={() => { setSelected(item.link) }}>
-                                    <img src={item.link} alt="" className="w-full h-full object-cover" />
+                                    { 'border-2 border-blue-400': selected === item.image_link }
+                                )} key={index} onClick={() => { setSelected(item.image_link) }}>
+                                    <img src={item.image_link} alt="" className="w-full h-full object-cover" />
                                     <div className="absolute bottom-3 right-3 rounded-full flex items-center justify-center hover:bg-gray-300">
-                                        <IconBase icon={selected === item.link ? "active" : "round"} size={24} color={Colors.blue[400]} />
+                                        <IconBase icon={selected === item.image_link ? "active" : "round"} size={24} color={Colors.blue[400]} />
                                     </div>
                                 </div>
                             )

@@ -18,7 +18,7 @@ export class ISession {
 export class SessionStore {
     profile?: UserModel;
     session?: ISession;
-    location: ILocation = new ILocation(); // Thêm thông tin vị trí
+    location: ILocation = new ILocation();
     constructor() {
         makeAutoObservable(this, {
             setProfile: action,
@@ -27,7 +27,7 @@ export class SessionStore {
         })
         makePersistable(this, {
             name: 'SessionStore',
-            properties: ['profile', 'session', "location"],
+            properties: ['profile', 'session', 'location'],
             storage: window.localStorage,
             expireIn: 63115200000,
             // removeOnExpiration: true,

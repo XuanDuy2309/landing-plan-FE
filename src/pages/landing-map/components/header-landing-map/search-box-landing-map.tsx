@@ -56,17 +56,22 @@ export const SearchBoxLandingMap = observer(() => {
 
                     <div className="flex flex-col h-full ">
                         {
-                            listResultSearch.map((item, index) => (
-                                <button
-                                    onClick={() => {
-                                        setKeyWord("")
-                                        setListResultSearch([])
-                                        setPlacement(item)
-                                    }}
-                                    className='flex items-center justify-start p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors'>
-                                    <span>{item.display_name}</span>
-                                </button>
-                            ))
+                            listResultSearch.map((item, index) => {
+
+                                return (
+                                    <button
+                                        key={index}
+                                        onClick={() => {
+                                            setKeyWord("")
+                                            setListResultSearch([])
+                                            setPlacement(item)
+                                            console.log(item)
+                                        }}
+                                        className='flex items-center justify-start p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors'>
+                                        <span>{item.display_name}</span>
+                                    </button>
+                                )
+                            })
                         }
                     </div>
                 </div>

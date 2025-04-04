@@ -6,11 +6,11 @@ import { NominatimResult, SelectedLocationModel } from 'src/core/models';
 import { useManagementLandingPlan } from 'src/core/modules';
 import { useCoreStores } from 'src/core/stores';
 import './leaflet-map-container.css';
+import { Colors } from 'src/assets';
 
 export const LeafletMapContainer = observer(() => {
     const { location } = useCoreStores().sessionStore
-    const { placement, polygon, selectedLocation, setSelectedLocation, isDraw } = useManagementLandingPlan()
-
+    const { placement, polygon, selectedLocation, setSelectedLocation, isDraw, coordinates } = useManagementLandingPlan()
     return (
         <MapContainer
             style={{ width: '100%', height: '100%', zIndex: 0 }}
@@ -44,7 +44,7 @@ export const LeafletMapContainer = observer(() => {
                 maxZoom={18}
                 opacity={1}
                 zIndex={999}
-                // opacity={opacit}
+            // opacity={opacit}
             />
 
             {selectedLocation.lat && selectedLocation.lng && (
@@ -69,6 +69,7 @@ export const LeafletMapContainer = observer(() => {
                 </Marker>
             )}
             {polygon && <Polygon pathOptions={{ fillColor: 'transparent', weight: 5 }} positions={polygon} />}
+            {coordinates.points && <Polygon pathOptions={{ fillColor: Colors.red[200], weight: 5, color:Colors.red[300] }} positions={coordinates.points} />}
         </MapContainer>
 
     )
@@ -102,7 +103,7 @@ interface IProps3 {
 }
 const MapEvents = observer(({ setSelectedLocation }: IProps3) => {
     const map = useMap();
-
+    const { searchCoordinatesLocation } = useManagementLandingPlan()
     useMapEvents({
 
         moveend: async (e) => {
@@ -111,6 +112,7 @@ const MapEvents = observer(({ setSelectedLocation }: IProps3) => {
             const { lat, lng } = e.latlng;
             map.setView([lat, lng], map.getZoom());
             setSelectedLocation({ lat, lng })
+            searchCoordinatesLocation(lat, lng)
         },
     });
 

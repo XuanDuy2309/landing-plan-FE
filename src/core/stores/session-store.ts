@@ -27,7 +27,7 @@ export class SessionStore {
         })
         makePersistable(this, {
             name: 'SessionStore',
-            properties: ['profile', 'session'],
+            properties: ['profile', 'session', "location"],
             storage: window.localStorage,
             expireIn: 63115200000,
             // removeOnExpiration: true,

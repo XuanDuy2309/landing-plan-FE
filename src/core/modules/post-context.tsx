@@ -2,10 +2,18 @@ import { observer } from "mobx-react";
 import React, { use, useEffect } from "react";
 import { AuthApi } from "../api";
 import { PostModel } from "../models";
+import { makeAutoObservable, makeObservable } from "mobx";
+import { IBaseContextType, IContextFilter, useBaseContextProvider } from "../context";
 
-export class PostContextType {
-    data: PostModel[] = [];
-    loading: boolean = false
+
+export class FilterPostContextType extends IContextFilter {
+    constructor() {
+        super();
+        makeObservable(this)
+    }
+}
+
+export class PostContextType extends IBaseContextType<PostModel, FilterPostContextType> {
 }
 
 export const PostContext = React.createContext<PostContextType>(new PostContextType());
@@ -15,24 +23,27 @@ interface IProps {
 }
 
 export const PostContextProvider = observer(({ children }: IProps) => {
-    const [data, setData] = React.useState<PostModel[]>([]);
-    const [loading, setLoading] = React.useState<boolean>(false);
+    const context = useBaseContextProvider<FilterPostContextType, PostModel>(new FilterPostContextType(), request)
 
-    const fetchData = async () => {
-        setLoading(true)
-        // const res = await AuthApi.getListImage();
-        setLoading(false)
-        // if (res.Status) {
-        //     setData(res.Data.data);
-        // }
+    async function request(
+        filter: FilterPostContextType,
+        index: number,
+        pageSize: number
+    ): Promise<{ count: number; list: PostModel[]; offset: number }> {
+
+        return {
+            count: 0,
+            list: [],
+            offset: 0
+        }
     }
 
     useEffect(() => {
-        fetchData();
+        context.onRefresh()
     }, [])
 
     return (
-        <PostContext.Provider value={{ data, loading }}>
+        <PostContext.Provider value={{ ...context }}>
             {children}
         </PostContext.Provider>
     )

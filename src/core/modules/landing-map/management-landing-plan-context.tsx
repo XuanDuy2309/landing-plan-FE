@@ -32,6 +32,7 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
   const [coordinates, setCoordinates] = useState<CoordinateSearchLocationModel>(new CoordinateSearchLocationModel());
 
   const [polygon, setPolygon] = useState<any>(null);
+  const [placementInfo, setPlacementInfo] = useState<any>(null);
   const [isDraw, setIsDraw] = useState<boolean>(false);
 
   useEffect(() => {

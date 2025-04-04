@@ -7,6 +7,7 @@ import { setToken } from "../config";
 import { hideLoading, showLoading } from "../services";
 import moment from "moment";
 import { makeAutoObservable } from "mobx";
+import { observer } from "mobx-react";
 
 class IPass {
     old_password?: string;
@@ -41,7 +42,7 @@ interface IProps {
 
 
 
-export const UserContextProvider = ({ children }: IProps) => {
+export const UserContextProvider = observer(({ children }: IProps) => {
     const [data, setData] = React.useState<UserModel>(new UserModel());
     const [listImage, setListImage] = React.useState<string[]>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
@@ -190,7 +191,7 @@ export const UserContextProvider = ({ children }: IProps) => {
             {children}
         </UserContext.Provider>
     )
-}
+})
 
 export const useUserContext = () => {
     return React.useContext(UserContext);

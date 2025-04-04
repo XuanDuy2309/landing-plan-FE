@@ -1,7 +1,7 @@
 import 'leaflet/dist/leaflet.css';
 import { observer } from 'mobx-react';
 import { useEffect } from 'react';
-import { LayersControl, MapContainer, Marker, Polygon, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+import { LayersControl, MapContainer, Marker, Polygon, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import { NominatimResult, SelectedLocationModel } from 'src/core/models';
 import { useManagementLandingPlan } from 'src/core/modules';
 import { useCoreStores } from 'src/core/stores';
@@ -42,30 +42,18 @@ export const LeafletMapContainer = observer(() => {
                 // pane="overlayPane"
                 minZoom={12}
                 maxZoom={18}
-                opacity={1}
+                opacity={0.8}
                 zIndex={999}
             // opacity={opacit}
             />
 
             {selectedLocation.lat && selectedLocation.lng && (
                 <Marker position={[Number(selectedLocation.lat), Number(selectedLocation.lng)]}>
-                    {/* <Popup>
+                    <Popup>
                         <div>
-                            <h3 style={{ fontWeight: 600 }}>
-                                Tỉnh {locationInfo?.provinceName}, Huyện {locationInfo?.districtName}
-                            </h3>
-                            <p>
-                                Vị trí: {locationInfo?.lat.toFixed(5)}, {locationInfo?.lng.toFixed(5)}
-                            </p>
-                            <button
-                                className="button--share"
-                                onClick={() => handleShareClick(locationInfo?.lat, locationInfo?.lng)}
-                            >
-                                <FaShareAlt />
-                                Chia sẻ
-                            </button>
+                            {/* <span>{placementInfo?.display_name}</span> */}
                         </div>
-                    </Popup> */}
+                    </Popup>
                 </Marker>
             )}
             {polygon && <Polygon pathOptions={{ fillColor: 'transparent', weight: 5 }} positions={polygon} />}
@@ -102,6 +90,7 @@ interface IProps3 {
     setSelectedLocation: (selectedLocation: SelectedLocationModel) => void
 }
 const MapEvents = observer(({ setSelectedLocation }: IProps3) => {
+    // const { getInfoPlacement } = useManagementLandingPlan()
     const map = useMap();
     const { searchCoordinatesLocation } = useManagementLandingPlan()
     useMapEvents({

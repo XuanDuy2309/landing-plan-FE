@@ -18,20 +18,7 @@ export class NominatimResult {
     class?: string; // Loại đối tượng (ví dụ?: "place", "highway")
     type?: string; // Loại cụ thể hơn (ví dụ?: "city", "residential")
     importance?: number;
-    address?: {
-        house_number?: string;
-        road?: string;
-        neighbourhood?: string;
-        suburb?: string;
-        city?: string;
-        town?: string;
-        village?: string;
-        county?: string;
-        state?: string;
-        country?: string;
-        country_code?: string;
-        postcode?: string;
-    };
+    address?: AddressNominationModel
     boundingbox?: [string, string, string, string]; // [lat_min, lat_max, lon_min, lon_max]
     geojson?: {
         type: any;
@@ -49,4 +36,38 @@ export class SelectedLocationModel {
     constructor() {
         makeAutoObservable(this)
     }
+}
+
+export class CoordinateSearchLocationModel {
+    id?: number
+    points?: any
+    owner_name?: string
+    content?: string
+    area?: number
+    address?: AddressNominationModel
+    display_name?: string
+    name?: string
+    constructor() {
+        makeAutoObservable(this)
+    }
+}
+
+export class AddressNominationModel {
+    house_number?: string;
+    road?: string;
+    quarter?: string;
+    suburb?: string;
+    neighbourhood?: string;
+    city?: string;
+    town?: string;
+    village?: string;
+    county?: string;
+    state?: string;
+    country?: string;
+    country_code?: string;
+    postcode?: string;
+
+    constructor() {
+        makeAutoObservable(this)
+    }   
 }

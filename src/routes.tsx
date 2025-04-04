@@ -21,7 +21,7 @@ export const AppRouter = observer(() => {
                         <SkipAuth>
                             <AuthRoutes />
                         </SkipAuth>} />
-                    <Route path="/" element={<HomeLayout />}>
+                    <Route path="/*" element={<HomeLayout />}>
                         <Route path="home/*" element={
                             <RequireAuth>
                                 <HomeRoutes />

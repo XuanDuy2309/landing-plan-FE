@@ -19,6 +19,7 @@ export class SessionStore {
     profile?: UserModel;
     session?: ISession;
     location: ILocation = new ILocation();
+    isLoading: boolean = false;
     constructor() {
         makeAutoObservable(this, {
             setProfile: action,
@@ -83,5 +84,13 @@ export class SessionStore {
         } else {
             console.warn("Trình duyệt không hỗ trợ Geolocation");
         }
+    }
+
+    showLoading() {
+        this.isLoading = true;
+    }
+
+    hideLoading() {
+        this.isLoading = false;
     }
 }

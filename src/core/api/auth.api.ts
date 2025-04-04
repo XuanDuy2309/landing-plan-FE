@@ -8,8 +8,8 @@ export const AuthApi = {
     updateBackground: (params?: any) => server.put('/user/change_background', params),
     deleteAvatar: (params?: any) => server.delete('/user/delete_avatar', params),
     deleteBackground: (params?: any) => server.delete('/user/delete_background', params),
-    getListImage: (params?: any) => server.get('/auth/list_image', params),
-    uploadImage: (params?: any) => server.multipartPost('/auth/upload_image', params),
+    getListUpload: (params?: any) => server.get('/auth/list_upload', params),
+    upload: (params?: any) => server.multipartPost('/auth/upload', params),
     updateInfo: (params?: any) => server.put('/user/update', params),
     updatePassword: (params?: any) => server.put('/user/change_password', params),
 }

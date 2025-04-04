@@ -20,7 +20,7 @@ export const ImageContextProvider = observer(({ children }: IProps) => {
 
     const fetchData = async () => {
         setLoading(true)
-        const res = await AuthApi.getListImage();
+        const res = await AuthApi.getListUpload({type: 'image'});
         setLoading(false)
         if (res.Status) {
             setData(res.Data.data);
@@ -29,8 +29,9 @@ export const ImageContextProvider = observer(({ children }: IProps) => {
 
     const onUpload = async (file: File) => {
         const form = new FormData();
-        form.append('image', file, file.name);
-        const res = await AuthApi.uploadImage(form);
+        form.append('files', file, file.name);
+        form.append('type', 'image');
+        const res = await AuthApi.upload(form);
         if (res.Status) {
             fetchData();
         }

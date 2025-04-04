@@ -5,13 +5,12 @@ import { IconBase, ModalBase } from "src/components";
 import { Colors } from "src/assets";
 import { useNavigate } from "react-router-dom";
 import { ModalCreatePost } from "src/components/modal-create-post";
-// import { ModalCreatePost } from "src/components/modal-create-post";
 
 export const CreatePostContainer = observer(() => {
     const { data } = useUserContext()
     const navigate = useNavigate()
     const modalRef = useRef<any>(null);
-    const [typePost, setTypePost] = useState<'1' | '2'>()
+    const [typePost, setTypePost] = useState<any>()
 
     const listTypePost = [
         {
@@ -20,13 +19,13 @@ export const CreatePostContainer = observer(() => {
             icon: "sale-outline"
         },
         {
-            label: "Cho thầu",
+            label: "Đấu thầu",
             value: '2',
             icon: "money"
         },
         {
             label: "Đấu giá",
-            value: '3',
+            value: '2',
             icon: "money"
         },
     ]
@@ -61,9 +60,9 @@ export const CreatePostContainer = observer(() => {
                         return (
                             <div
                                 key={index}
-                                className="w-full h-full py-1 flex items-center justify-center space-x-2 cursor-pointer rounded-md hover:bg-gray-200"
+                                className="w-full h-full py-3 flex items-center justify-center space-x-2 cursor-pointer rounded-md hover:bg-gray-200"
                                 onClick={() => {
-                                    // setTypePost(item.value)
+                                    setTypePost(item.value)
                                     modalRef.current.open()
                                 }}
                             >
@@ -77,7 +76,7 @@ export const CreatePostContainer = observer(() => {
             <ModalBase
                 ref={modalRef}
             >
-                <ModalCreatePost  />
+                <ModalCreatePost />
             </ModalBase>
         </div>
     );

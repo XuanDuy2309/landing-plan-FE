@@ -1,10 +1,10 @@
 import React, { use, useEffect } from "react";
-import { UserModel } from "../models";
-import { AuthApi } from "../api";
+import { UserModel } from "../../../models";
+import { AuthApi } from "../../../api";
 import { toast } from "react-toastify";
-import { SessionStore, useCoreStores } from "../stores";
-import { setToken } from "../config";
-import { hideLoading, showLoading } from "../services";
+import { SessionStore, useCoreStores } from "../../../stores";
+import { setToken } from "../../../config";
+import { hideLoading, showLoading } from "../../../services";
 import moment from "moment";
 import { makeAutoObservable } from "mobx";
 import { observer } from "mobx-react";

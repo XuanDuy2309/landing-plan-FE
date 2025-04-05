@@ -93,7 +93,7 @@ export const RegisterScreen = observer(() => {
                     <InputForm label="Password" value={data.password || ''} onChange={(e) => { data.password = e.target.value }} type="password" error={data.err_password} />
                     <InputForm label="Confirm Password" value={data.confirm_password || ''} onChange={(e) => { data.confirm_password = e.target.value }} type="password" error={data.err_confirm_password} />
                 </div>
-                {errMessage && <span className="text-red-500 mt-2 bg-red-50 px-3 py-2 rounded">{errMessage}</span>}
+                {errMessage && <span className="text-red-400 mt-2 bg-red-50 px-3 py-2 rounded">{errMessage}</span>}
                 <div className="w-full mt-4">
                     <CheckBox label="I agree to the terms and conditions" checked={agree} onChange={(value, e) => { setAgree(value) }} />
                 </div>

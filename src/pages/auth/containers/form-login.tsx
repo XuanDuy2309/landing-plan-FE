@@ -59,7 +59,7 @@ export const FormLogin = observer(() => {
                 <InputForm label="Password" value={inputPassValue} onChange={(e) => { setInputPassValue(e.target.value) }} type="password" />
             </div>
 
-            {err && <span className="text-red-500 mt-2 bg-red-50 px-3 py-2 rounded">{err}</span>}
+            {err && <span className="text-red-400 mt-2 bg-red-50 px-3 py-2 rounded">{err}</span>}
             <ButtonLoading label="Login" className="h-14 w-full flex items-center justify-center rounded-full mt-10 text-xl" template="ActionBlue" onClick={handleLogin} loading={loading} />
         </div>
         <ButtonLoading

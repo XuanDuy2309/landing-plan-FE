@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import React, { use, useEffect } from "react";
-import { AuthApi } from "../api";
+import { AuthApi } from "src/core/api";
 
 export class ImageContextType {
     data: any = [];

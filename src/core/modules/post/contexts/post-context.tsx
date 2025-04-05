@@ -1,9 +1,9 @@
 import { observer } from "mobx-react";
 import React, { use, useEffect } from "react";
-import { AuthApi } from "../api";
-import { PostModel } from "../models";
+import { AuthApi } from "../../../api";
+import { PostModel } from "../../../models";
 import { makeAutoObservable, makeObservable } from "mobx";
-import { IBaseContextType, IContextFilter, useBaseContextProvider } from "../context";
+import { IBaseContextType, IContextFilter, useBaseContextProvider } from "../../../context";
 
 
 export class FilterPostContextType extends IContextFilter {

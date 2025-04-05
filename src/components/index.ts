@@ -9,3 +9,5 @@ export * from './radio-group';
 export * from './date-picker'
 export * from './loading-system'
 export * from './overlay-system'
+export * from './input-unit'
+export * from './modal-create-post'

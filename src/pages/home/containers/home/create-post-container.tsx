@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { IconBase, ModalBase } from "src/components";
 import { Colors } from "src/assets";
 import { useNavigate } from "react-router-dom";
-import { ModalCreatePost } from "src/components/modal-create-post";
+import { ModalCreatePost } from "src/components/modal-create-post/modal-create-post";
 
 export const CreatePostContainer = observer(() => {
     const { data } = useUserContext()
@@ -19,7 +19,7 @@ export const CreatePostContainer = observer(() => {
             icon: "sale-outline"
         },
         {
-            label: "Đấu thầu",
+            label: "Cho thuê",
             value: '2',
             icon: "money"
         },
@@ -76,7 +76,7 @@ export const CreatePostContainer = observer(() => {
             <ModalBase
                 ref={modalRef}
             >
-                <ModalCreatePost />
+                <ModalCreatePost onClose={() => { modalRef.current.close() }} onSave={(item) => { modalRef.current.close() }}/>
             </ModalBase>
         </div>
     );

@@ -57,7 +57,6 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
     }
     const res = await LandingPlanApi.searchCoordinatesLocation(params)
     const res2 = await SearchLandingPlanReverseApi.searchInterval(params)
-    console.log('res2', res2)
     if (res.Status) {
       const temp = drawCoordinates(res.Data.data.points)
       setCoordinates({

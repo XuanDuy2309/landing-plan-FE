@@ -11,6 +11,7 @@ interface IProps {
     onChange: (value?: string) => void;
     disabled?: boolean;
     labelClassName?: string;
+    classNamesInput?: string
 }
 
 export const InputLabel = (props: IProps) => {
@@ -24,7 +25,7 @@ export const InputLabel = (props: IProps) => {
 
                 <input
                     className={classNames(
-                        'font-normal outline-none w-full',
+                        'font-normal outline-none w-full border-b border-gray-200 ' + props.classNamesInput,
                         { 'text-llg font-medium': props.size == 'large' },
                         { 'text-gray-500 font-normal': !props.value }
                     )}
@@ -37,7 +38,7 @@ export const InputLabel = (props: IProps) => {
                     disabled={props.disabled}
                 />
                 <div className='flex flex-col space-y-1'>
-                    {props.error && <span className=' font-normal text-lsm text-red-300'>{props.error}</span>}
+                    {props.error && <span className=' font-normal text-lsm text-red-400'>{props.error}</span>}
                 </div>
             </div>
         </div>

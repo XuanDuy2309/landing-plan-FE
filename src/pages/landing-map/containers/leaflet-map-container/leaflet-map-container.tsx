@@ -1,16 +1,25 @@
 import 'leaflet/dist/leaflet.css';
 import { observer } from 'mobx-react';
-import { useEffect } from 'react';
-import { LayersControl, MapContainer, Marker, Polygon, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+import { useEffect, useMemo, useState } from 'react';
+import { LayersControl, MapContainer, Marker, Polygon, Polyline, Popup, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import { NominatimResult, SelectedLocationModel } from 'src/core/models';
 import { useManagementLandingPlan } from 'src/core/modules';
 import { useCoreStores } from 'src/core/stores';
 import './leaflet-map-container.css';
 import { Colors } from 'src/assets';
+import { isValidPolygon } from 'src/core/base';
+import L, { point } from "leaflet";
+import * as turf from '@turf/turf';
 
 export const LeafletMapContainer = observer(() => {
     const { location } = useCoreStores().sessionStore
-    const { placement, polygon, selectedLocation, setSelectedLocation, isDraw, coordinates } = useManagementLandingPlan()
+    const { placement, polygon, selectedLocation, setSelectedLocation, isDraw, coordinates, pointsArea } = useManagementLandingPlan()
+
+    const calculateDistance = useMemo(() => {
+        return pointsArea.calculateDistance() || 0
+    }, [pointsArea.currentMousePos, pointsArea.points]);
+
+
     return (
         <MapContainer
             style={{ width: '100%', height: '100%', zIndex: 0 }}
@@ -56,8 +65,69 @@ export const LeafletMapContainer = observer(() => {
                     </Popup>
                 </Marker>
             )}
-            {polygon && <Polygon pathOptions={{ fillColor: 'transparent', weight: 5 }} positions={polygon} />}
-            {coordinates.points && <Polygon pathOptions={{ fillColor: Colors.red[200], weight: 5, color:Colors.red[300] }} positions={coordinates.points} />}
+            {isValidPolygon(polygon) && <Polygon pathOptions={{ fillColor: 'transparent', weight: 5 }} positions={polygon as any} />}
+            {isValidPolygon(coordinates.points) && <Polygon pathOptions={{ fillColor: Colors.red[200], weight: 5, color: Colors.red[300] }} positions={coordinates.points} />}
+            {pointsArea.points.length >= 2 &&
+                pointsArea.points.slice(0, -1).map((pt, i) => {
+                    const next = pointsArea.points[i + 1];
+                    return (
+                        <Polyline key={i} positions={[[pt[1], pt[0]], [next[1], next[0]]]} color="red">
+                            <Tooltip permanent direction="center">
+                                {(pointsArea.segmentLengths[i] * 1000).toFixed(0)} m
+                            </Tooltip>
+                        </Polyline>
+                    );
+                })}
+
+            {/* Polygon và diện tích */}
+            {pointsArea.points.length >= 3 && !pointsArea.isDraw && (
+                <>
+                    <Polygon positions={pointsArea.points.map(([lng, lat]) => [lat, lng])} color="red" weight={2} >
+                        {/* Label diện tích ở giữa polygon */}
+                        {pointsArea.areaLabelPosition && (
+                            <Tooltip
+                                direction="center"
+                                permanent
+                                // position={[pointsArea.areaLabelPosition[0], pointsArea.areaLabelPosition[1]]}
+                                offset={[0, 0]}
+                                className="area-tooltip"
+                            >
+                                {(pointsArea.area).toFixed(0)} m²
+                            </Tooltip>
+                        )}
+                    </Polygon>
+                </>
+            )}
+
+            {/* Marker hình tròn tại điểm được vẽ */}
+            {pointsArea.points.length > 0 &&
+                pointsArea.points.map(([lng, lat], index) => (
+                    <Marker
+                        key={index}
+                        position={[lat, lng]}
+                        icon={L.divIcon({
+                            className: "custom-marker",
+                            html: `<div style="width: 14px; height: 14px; background: red; border-radius: 50%; border: 2px solid white;"></div>`,
+                        })}
+                    />
+                ))}
+
+            {pointsArea.points.length > 0 && pointsArea.currentMousePos && pointsArea.isDraw && (
+                <Polyline
+                    positions={[
+                        [pointsArea.points[pointsArea.points.length - 1][1], pointsArea.points[pointsArea.points.length - 1][0]],
+                        [pointsArea.currentMousePos.lat, pointsArea.currentMousePos.lng]
+                    ]}
+                    color={"red"}
+                    weight={2}
+                    dashArray={"5, 10"}
+                >
+                    {/* Tooltip sẽ di chuyển theo con trỏ chuột */}
+                    <Tooltip position={[pointsArea.currentMousePos.lat, pointsArea.currentMousePos.lng]} direction="center" permanent>
+                        {calculateDistance.toFixed(0)} m
+                    </Tooltip>
+                </Polyline>
+            )}
         </MapContainer>
 
     )
@@ -92,17 +162,25 @@ interface IProps3 {
 const MapEvents = observer(({ setSelectedLocation }: IProps3) => {
     // const { getInfoPlacement } = useManagementLandingPlan()
     const map = useMap();
-    const { searchCoordinatesLocation } = useManagementLandingPlan()
+    const { searchCoordinatesLocation, pointsArea } = useManagementLandingPlan()
     useMapEvents({
 
         moveend: async (e) => {
         },
         click: async (e) => {
             const { lat, lng } = e.latlng;
-            map.setView([lat, lng], map.getZoom());
-            setSelectedLocation({ lat, lng })
-            searchCoordinatesLocation(lat, lng)
+            if (!pointsArea.isDraw) {
+                map.setView([lat, lng], map.getZoom());
+                setSelectedLocation({ lat, lng })
+                searchCoordinatesLocation(lat, lng)
+                return
+            }
+            pointsArea.addPoint([lng, lat])
         },
+        mousemove: (e) => {
+            if (!pointsArea.isDraw) return
+            pointsArea.currentMousePos = e.latlng;
+        }
     });
 
     return null;

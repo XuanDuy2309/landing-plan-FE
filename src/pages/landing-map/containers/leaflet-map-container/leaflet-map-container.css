@@ -1,3 +1,18 @@
 .leaflet-control-zoom {
     display: none !important;
 }
+
+.leaflet-tooltip {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    color: #141414 !important;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow:
+        -1px -1px 0 white,
+        1px -1px 0 white,
+        -1px 1px 0 white,
+        1px 1px 0 white;
+}

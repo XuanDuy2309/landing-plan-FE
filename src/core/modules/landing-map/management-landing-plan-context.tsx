@@ -1,8 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react'
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { LandingPlanApi, SearchLandingPlanReverseApi } from 'src/core/api'
-import { CoordinateSearchLocationModel, NominatimResult, SelectedLocationModel } from 'src/core/models'
+import { CoordinateSearchLocationModel, NominatimResult, PointsMapModel, SelectedLocationModel } from 'src/core/models'
 
 export class ManagementLandingPlanContextType {
   setPlacement = (placement: NominatimResult) => { }
@@ -16,6 +16,8 @@ export class ManagementLandingPlanContextType {
   searchCoordinatesLocation = async (lat: number, lon: number) => { }
   coordinates = new CoordinateSearchLocationModel()
   setCoordinates = (coordinates: CoordinateSearchLocationModel) => { }
+  pointsArea = new PointsMapModel()
+  setPointsArea = (pointsArea: PointsMapModel) => { }
 }
 
 export const ManagementLandingPlanContext = createContext<ManagementLandingPlanContextType>(
@@ -35,10 +37,20 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
   const [placementInfo, setPlacementInfo] = useState<any>(null);
   const [isDraw, setIsDraw] = useState<boolean>(false);
 
+  const [pointsArea, setPointsArea] = useState<PointsMapModel>(new PointsMapModel());
+
   useEffect(() => {
-    if (placement.geojson && placement.geojson.coordinates && Array.isArray(placement.geojson?.coordinates[0])) {
-      const temp = placement.geojson?.coordinates[0].map((coord) => [coord[1], coord[0]])
+    if (
+      placement.geojson &&
+      placement.geojson.coordinates &&
+      placement.geojson.coordinates.length > 0 &&
+      Array.isArray(placement.geojson.coordinates) &&
+      Array.isArray(placement.geojson.coordinates[0])
+    ) {
+      const temp = placement.geojson.coordinates[0].map((coord) => [coord[1], coord[0]]);
       setPolygon(temp);
+    } else {
+      setPolygon(null);
     }
   }, [placement]);
 
@@ -57,7 +69,6 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
     }
     const res = await LandingPlanApi.searchCoordinatesLocation(params)
     const res2 = await SearchLandingPlanReverseApi.searchInterval(params)
-    console.log('res2', res2)
     if (res.Status) {
       const temp = drawCoordinates(res.Data.data.points)
       setCoordinates({
@@ -85,7 +96,9 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
         setIsDraw,
         searchCoordinatesLocation,
         coordinates,
-        setCoordinates
+        setCoordinates,
+        pointsArea,
+        setPointsArea,
       }}
     >
       {children}

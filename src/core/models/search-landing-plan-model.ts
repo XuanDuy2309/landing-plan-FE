@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import * as turf from '@turf/turf'
 
 export class SearchLandingPlanModel {
 
@@ -69,5 +70,82 @@ export class AddressNominationModel {
 
     constructor() {
         makeAutoObservable(this)
-    }   
+    }
+}
+
+export class PointsMapModel {
+    points: [number, number][] = [];
+    area: number = 0;
+    isDraw: boolean = false;
+    segmentLengths: number[] = [];
+    areaLabelPosition: [number, number] | null = null;
+    currentMousePos?: L.LatLng
+
+    constructor() {
+        makeAutoObservable(this);
+    }
+
+
+
+    addPoint = (lngLat: [number, number]) => {
+        if (!this.isDraw) {
+            this.reset();
+        }
+
+        const last = this.points[this.points.length - 1];
+        this.points.push(lngLat);
+
+        // Nếu có điểm trước đó, tính chiều dài đoạn đường từ điểm trước đó đến điểm hiện tại
+        if (last) {
+            const dist = turf.distance(
+                turf.point([last[0], last[1]]),  // Longtitude, Latitude
+                turf.point([lngLat[0], lngLat[1]]), // Longtitude, Latitude
+                // { units: "meters" } // Đơn vị là mét
+            );
+            this.segmentLengths.push(dist); // Thêm chiều dài đoạn vào mảng segmentLengths
+        }
+
+        // Nếu có ít nhất 3 điểm, kiểm tra xem có cần đóng polygon không
+        if (this.points.length >= 3) {
+            const first = this.points[0];
+            const dist = turf.distance(
+                turf.point([first[0], first[1]]),  // Longtitude, Latitude
+                turf.point([lngLat[0], lngLat[1]])  // Longtitude, Latitude
+            );
+            if (dist < 0.01) { // Nếu khoảng cách giữa điểm cuối và điểm đầu nhỏ hơn 10m
+                this.isDraw = false;
+                this.points[this.points.length - 1] = first;
+                this.segmentLengths[this.segmentLengths.length - 1] = turf.distance(
+                    turf.point([last[0], last[1]]),
+                    turf.point([first[0], first[1]]),
+                    // { units: "meters" }
+                );
+
+                // Tính diện tích của polygon
+                const polygon = turf.polygon([this.points.concat([this.points[0]])]);
+                this.area = turf.area(polygon); // Diện tích polygon
+
+                // Tính vị trí của nhãn diện tích
+                const center = turf.centerOfMass(polygon).geometry.coordinates;
+                this.areaLabelPosition = [center[1], center[0]]; // [lat, lng]
+            }
+        }
+    }
+
+    reset = () => {
+        this.points = [];
+        this.area = 0;
+        this.isDraw = false;
+        this.segmentLengths = []; // Reset lại chiều dài các đoạn
+    };
+
+    calculateDistance = () => {
+        if(this.points.length === 0) return 0
+        return turf.distance(
+            turf.point([this.points[this.points.length - 1][0], this.points[this.points.length - 1][1]]),
+            turf.point([this.currentMousePos?.lng || 0, this.currentMousePos?.lat || 0]),
+            { units: "meters" }
+        );
+    }
+
 }

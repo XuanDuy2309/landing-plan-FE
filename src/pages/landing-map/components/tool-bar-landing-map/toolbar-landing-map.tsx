@@ -5,41 +5,51 @@ import { Colors } from 'src/assets';
 import { IconBase } from 'src/components';
 import { useManagementLandingPlan } from 'src/core/modules';
 import { Collapse } from 'react-collapse';
+import { point } from 'leaflet';
+import { ToolbarButton } from './button-toolbar-landing-map';
+import { Tooltip } from 'antd';
 
 export const ToolbarLandingMap = observer(() => {
     const [isOpen, setIsOpen] = useState(false);
-    const { isDraw, setIsDraw } = useManagementLandingPlan()
+    const { pointsArea } = useManagementLandingPlan()
+
+    const handleToggleDraw = () => {
+        pointsArea.isDraw = !pointsArea.isDraw;
+        if (pointsArea.isDraw) {
+            pointsArea.points = [];
+            pointsArea.area = 0;
+            pointsArea.isDraw = true;
+        }
+    };
+    const handleReset = () => {
+        pointsArea.reset();
+    };
+
+    const buttons = [
+        { onClick: handleToggleDraw, icon: 'pin-outline', title: 'Đo đạc khu vực', active: pointsArea.isDraw },
+        { onClick: handleReset, icon: 'delete-outline', title: 'Đặt lại khu vực', active: false },
+        { onClick: () => { }, icon: 'more-outline', title: 'Tùy chọn thêm', active: false },
+        { onClick: () => { }, icon: 'more-outline', title: 'Tùy chọn thêm', active: false },
+    ];
+
 
     return (
         <div className='absolute z-[9999] bottom-3 right-3'>
             <div className="flex flex-col bg-white rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),0_-1px_0px_rgba(0,0,0,0.02)]">
                 <Collapse isOpened={isOpen}>
                     <div className="w-10 flex flex-col gap-2 bg-white rounded-2xl ">
-                        <button
-                            onClick={() => setIsDraw(!isDraw)}
-                            className={classNames('size-10 rounded-full  active:border border-gray-500', {
-                                "text-blue-400": isDraw,
-                                "text-gray-900": !isDraw
-                            })}>
-                            <IconBase icon='pin-outline' size={20} color={"currentColor"} />
-                        </button>
-                        <button
-
-                            className='size-10 bg-white rounded-full active:border border-gray-500'>
-                            <IconBase icon='more-outline' size={20} color={Colors.gray[900]} />
-                        </button>
-                        <button
-
-                            className='size-10 bg-white rounded-full active:border border-gray-500'>
-                            <IconBase icon='more-outline' size={20} color={Colors.gray[900]} />
-                        </button>
-                        <button
-
-                            className='size-10 bg-white rounded-full active:border border-gray-500'>
-                            <IconBase icon='more-outline' size={20} color={Colors.gray[900]} />
-                        </button>
+                        {buttons.map((btn, index) => (
+                            <ToolbarButton
+                                key={index}
+                                onClick={btn.onClick}
+                                icon={btn.icon}
+                                title={btn.title}
+                                active={btn.active}
+                            />
+                        ))}
                     </div>
                 </Collapse>
+
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className='size-10 bg-white rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),0_-1px_0px_rgba(0,0,0,0.02)] active:border border-gray-500'>

@@ -7,7 +7,6 @@ import { useManagementLandingPlan } from 'src/core/modules'
 export const PopupDetailCoordinatesLocationContainer = observer(() => {
   const { coordinates } = useManagementLandingPlan()
   const [_, forceUpdate] = React.useReducer(x => x + 1, 0)
-  console.log('coordinates', coordinates)
 
   if (!coordinates.id) return null
 

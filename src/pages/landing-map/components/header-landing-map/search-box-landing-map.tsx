@@ -18,7 +18,7 @@ export const SearchBoxLandingMap = observer(() => {
                 "h-[72px]": listResultSearch.length === 0,
                 "h-[454px]": listResultSearch.length > 0
             })}>
-                <div className={classNames("h-full flex flex-col shadow-[0_2px_4px_rgba(0,0,0,0.2),0_-1px_0px_rgba(0,0,0,0.02)] bg-white", {
+                <div className={classNames("h-full flex flex-col shadow-[0_2px_4px_rgba(0,0,0,0.2),0_-1px_0px_rgba(0,0,0,0.02)] bg-white overflow-hidden", {
                     "rounded-full": listResultSearch.length === 0,
                     "rounded-[28px]": listResultSearch.length > 0
                 })}>
@@ -54,7 +54,7 @@ export const SearchBoxLandingMap = observer(() => {
                         <IconBase icon='search-outline' size={24} color={Colors.gray[500]} />
                     </button> */}
 
-                    <div className="flex flex-col h-full ">
+                    <div className="flex flex-col h-full overflow-y-auto">
                         {
                             listResultSearch.map((item, index) => {
 
@@ -65,7 +65,6 @@ export const SearchBoxLandingMap = observer(() => {
                                             setKeyWord("")
                                             setListResultSearch([])
                                             setPlacement(item)
-                                            console.log(item)
                                         }}
                                         className='flex items-center justify-start p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors'>
                                         <span>{item.display_name}</span>

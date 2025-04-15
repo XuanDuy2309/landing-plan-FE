@@ -1,5 +1,5 @@
 import axios from "axios";
-import { server } from "../config";
+import { server, viet_map_server } from "../config";
 
 const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org/search?';
 const NOMINATIM_REVERSE_BASE_URL = 'https://nominatim.openstreetmap.org/reverse?'
@@ -28,4 +28,8 @@ export const SearchLandingPlanReverseApi = {
 
 export const LandingPlanApi = {
     searchCoordinatesLocation: (params) => server.get("/landing-plan/coordinates", params)
+}
+
+export const SearchVietMapApi = {
+    searchInterval: (params: any) => viet_map_server.get('/search/v3', params)
 }

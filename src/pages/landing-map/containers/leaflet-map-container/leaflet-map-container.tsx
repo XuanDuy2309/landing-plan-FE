@@ -19,6 +19,7 @@ export const LeafletMapContainer = observer(() => {
         return pointsArea.calculateDistance() || 0
     }, [pointsArea.currentMousePos, pointsArea.points]);
 
+    console.log("location", location)
 
     return (
         <MapContainer
@@ -137,6 +138,14 @@ export const LeafletMapContainer = observer(() => {
                     </Tooltip>
                 </Polyline>
             )}
+
+            {/* <Marker
+                position={[location.lat, location.lng]}
+                icon={L.divIcon({
+                    className: "custom-marker",
+                    html: `<div style="width: 14px; height: 14px; background: red; border-radius: 50%; border: 2px solid white;"></div>`,
+                })}
+            /> */}
         </MapContainer>
 
     )

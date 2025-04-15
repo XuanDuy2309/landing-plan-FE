@@ -6,6 +6,7 @@ import { SearchLandingPlanApi } from 'src/core/api'
 import { IContextFilter } from 'src/core/context'
 import { NominatimResult } from 'src/core/models'
 import { useManagementLandingPlan } from './management-landing-plan-context'
+import { viet_map_server } from 'src/core/config'
 
 export class FilterSearchBoxLandingPlanContextType {
     query?: string
@@ -39,8 +40,11 @@ export const ListSearchBoxLandingPlanProvider = observer(({ children }: IProps) 
             setLoading(true)
             if (!query) return
             let params = { q: query }
-            const res = await SearchLandingPlanApi.searchInterval(params)
-            setListResultSearch(res.data)
+            // const res = await SearchLandingPlanApi.searchInterval(params)
+            // setListResultSearch(res.data)
+
+            const res = await viet_map_server.get("/autocomplete/v3", { text: query })
+            console.log("res", res)
         } catch (error) {
             console.log(error)
         } finally {

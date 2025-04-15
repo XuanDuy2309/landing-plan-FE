@@ -1,11 +1,19 @@
 import { observer } from "mobx-react"
 import { RadioGroup } from "../radio-group"
-import { useCreatePostContext } from "src/core/modules"
-import { useState } from "react"
+import { useCreatePostContext, useUserContext } from "src/core/modules"
+import { use, useEffect, useState } from "react"
 import { InputLabel } from "../input-label"
 
 export const InfoOwner = observer(() => {
     const { data } = useCreatePostContext()
+    const { data: user } = useUserContext()
+
+    useEffect(() => {
+        if (user) {
+            data.create_by_name = user.fullname
+            data.create_by_phone = user.phone_number
+        }
+    }, [user])
     return <div className="w-full flex flex-col space-y-2 px-3">
         <span className="text-xl font-medium text-gray-900">Thông tin liên hệ:</span>
         <div className="w-full flex items-center space-x-2">

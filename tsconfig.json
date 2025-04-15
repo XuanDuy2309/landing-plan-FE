@@ -5,26 +5,20 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
+    "module": "esnext",  
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "noEmit": true,
     "jsx": "react-jsx",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "useDefineForClassFields": true,
+    "useDefineForClassFields": false,
     "paths": {
-      "src/*": [
-        "./src/*"
-      ]
+      "src/*": ["./src/*"]
     },
     "target": "esnext",
     "noImplicitReturns": true,
@@ -34,19 +28,14 @@
     "strictNullChecks": true,
     "noUnusedLocals": false,
     "baseUrl": "./",
-    "types": [
-      "vite/client"
-    ],
+    "types": ["vite/client"],
+    "skipDefaultLibCheck": true
   },
-  "include": [
-    "src",
-    "../core/src/based/common/util/code-gernerate.ts",
-    "env.ts",
-  ],
+  "include": ["src", "env.ts"],
   "exclude": [
     "node_modules",
     "./node_modules",
     "./node_modules/*",
-    "./node_modules/@types/node/index.d.ts",
+    "./node_modules/@types/node/index.d.ts"
   ]
 }

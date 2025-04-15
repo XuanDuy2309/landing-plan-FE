@@ -6,23 +6,24 @@ import { Colors } from "src/assets"
 import { Dropdown, MenuProps } from "antd"
 import { ModalSelectImage } from "../modal-select-image"
 import { ModalBase } from "../modal/modal-base"
-import { useRef } from "react"
-import { Type_Post } from "src/core/models"
+import { use, useEffect, useRef } from "react"
+import { Purpose_Post, Type_Post } from "src/core/models"
 import { ContentCreatePost } from "./content-create-post"
 
 interface IProps {
+    type?: Purpose_Post
     onSave: (item?: string) => void
     onClose: () => void
 }
 
-export const ModalCreatePost = observer(({ onSave, onClose }: IProps) => {
+export const ModalCreatePost = observer(({ type, onSave, onClose }: IProps) => {
     return <CreatePostContextProvider>
-        <CreatePostContainer onSave={onSave} onClose={onClose} />
+        <CreatePostContainer type={type} onSave={onSave} onClose={onClose} />
     </CreatePostContextProvider>
 })
 
-const CreatePostContainer = observer(({ onSave, onClose }: IProps) => {
-    const { data, onSubmit } = useCreatePostContext()
+const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
+    const { data, onSubmit, onClear } = useCreatePostContext()
     const { data: user } = useUserContext()
 
     const items: MenuProps['items'] = [
@@ -49,6 +50,12 @@ const CreatePostContainer = observer(({ onSave, onClose }: IProps) => {
         3: { label: 'Chỉ mình tôi', icon: 'user-outline' },
     }
 
+    useEffect(() => {
+        if (type) {
+            data.purpose = type
+        }
+    }, [type])
+
     return <div className="w-full h-[600px] bg-white flex-none flex flex-col">
         <div className="relative w-full h-14 flex-none border-b border-gray-200 flex items-center justify-center">
             <span className="text-2xl font-semibold text-gray-700">Tạo bài viết</span>
@@ -56,6 +63,7 @@ const CreatePostContainer = observer(({ onSave, onClose }: IProps) => {
                 className="absolute right-3 size-9 text-gray-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-200"
                 onClick={() => {
                     onClose()
+                    onClear()
                 }}
             >
                 <IconBase icon='close-outline' size={24} />
@@ -93,7 +101,7 @@ const CreatePostContainer = observer(({ onSave, onClose }: IProps) => {
                 template="ActionBlue"
                 className="h-10 w-32 flex items-center justify-center text-xl font-medium"
                 onClick={onSubmit}
-                 />
+            />
         </div>
 
     </div>

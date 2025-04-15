@@ -76,7 +76,7 @@ export const InfoAsset = observer(() => {
 
     ]
 
-    const typeAssetPost = {
+    const directionLand = {
         1: { label: 'Bắc', icon: 'user-outline' },
         2: { label: 'Nam', icon: 'user-outline' },
         3: { label: 'Đông', icon: 'user-outline' },
@@ -108,22 +108,35 @@ export const InfoAsset = observer(() => {
                 <Dropdown trigger={["click"]} menu={{ items }}>
                     <div className="flex items-center border-b border-gray-200 cursor-pointer space-x-1"
                     >
-                        <span>{typeAssetPost[data.direction_land].label}</span>
+                        <span>{directionLand[data.direction_land].label}</span>
                         <IconBase icon='arrowdown' size={16} color={Colors.gray[700]} />
                     </div>
                 </Dropdown>
             </div>
             {conditions() &&
                 <>
-                    <InputLabel label='Số tầng'
-                        value={data.number_floors ? data.number_floors.toString() : ''}
-                        onChange={(value) => {
-                            data.number_floors = Number(value)
-                        }}
-                        placeholder="0"
-                        classNamesInput="!w-[50px] text-center"
-                        error={data.err_number_floors}
-                    />
+                    {
+                        data.type_asset === Type_Asset_Enum.Apartment &&
+                        <InputLabel label='Số phòng'
+                            value={data.room_number ? data.room_number.toString() : ''}
+                            onChange={(value) => {
+                                data.room_number = Number(value)
+                            }}
+                            placeholder="0"
+                            classNamesInput="!w-[50px] text-center"
+                        />
+                    }
+                    {
+                        data.type_asset !== Type_Asset_Enum.Apartment &&
+                        <InputLabel label='Số tầng'
+                            value={data.number_floors ? data.number_floors.toString() : ''}
+                            onChange={(value) => {
+                                data.number_floors = Number(value)
+                            }}
+                            placeholder="0"
+                            classNamesInput="!w-[50px] text-center"
+                            error={data.err_number_floors}
+                        />}
                     <InputLabel label='Số phòng ngủ'
                         value={data.number_bedrooms ? data.number_bedrooms.toString() : ''}
                         onChange={(value) => {

@@ -1,7 +1,8 @@
 import { LocationApi } from "src/core/api";
 import { ListDataProvider2 } from "src/core/providers";
 
-export class ProvinceProvider extends ListDataProvider2<any, any, any> {
+export class WardProvider extends ListDataProvider2<any, any, any> {
+    id?: number
 
     constructor() {
         super();
@@ -28,7 +29,7 @@ export class ProvinceProvider extends ListDataProvider2<any, any, any> {
 
 
     async fetchInternal(filter: any, page: number, page_size: 100): Promise<{ count: number; offset: number; list: any[]; }> {
-        const res = await LocationApi.getListProvince({...filter,page,page_size})
+        const res = await LocationApi.getListWard({ ...filter, page, page_size, id: this.id })
         return {
             list: res.Data.data,
             count: res.Data.total,

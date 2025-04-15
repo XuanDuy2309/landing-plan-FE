@@ -5,6 +5,7 @@ import { InputLabel } from "../input-label"
 import { IconBase } from "../icon-base"
 import { Colors } from "src/assets"
 import { Purpose_Post } from "src/core/models"
+import { currencyFormat, currencyFormatToInt } from "src/core/base"
 
 export const AreaAndPriceAsset = observer(() => {
     const { data } = useCreatePostContext()
@@ -96,21 +97,48 @@ export const AreaAndPriceAsset = observer(() => {
                 {data.purpose == Purpose_Post.For_Sell && <InputUnit
                     label="Tổng giá bán nguyên căn (lô)"
                     unit={'VNĐ'}
-                    value={data.price_for_buy}
+                    value={currencyFormat(data.price_for_buy)}
                     onChange={(value) => {
-                        data.price_for_buy = value
+                        data.price_for_buy = currencyFormatToInt(value)
                     }}
                     err={data.err_price_for_buy}
                 />}
                 {data.purpose == Purpose_Post.For_Rent && <InputUnit
                     label="Tổng giá thuê nguyên căn (lô)/tháng"
                     unit={'VNĐ'}
-                    value={data.price_for_rent}
+                    value={currencyFormat(data.price_for_rent)}
                     onChange={(value) => {
-                        data.price_for_rent = value
+                        data.price_for_rent = currencyFormatToInt(value)
                     }}
                     err={data.err_price_for_rent}
                 />}
+                {data.purpose === Purpose_Post.For_Auction && <InputUnit
+                    label="Giá khởi điểm"
+                    unit={'VNĐ'}
+                    value={currencyFormat(data.price_start)}
+                    onChange={(value) => {
+                        data.price_start = currencyFormatToInt(value)
+                    }}
+                />}
+                {data.purpose === Purpose_Post.For_Auction && <div className="w-full flex items-center space-x-2">
+                    <InputUnit
+                        label="Bước giá"
+                        unit={'VNĐ'}
+                        value={currencyFormat(data.bid_step)}
+                        onChange={(value) => {
+                            data.bid_step = currencyFormatToInt(value)
+                        }}
+                        err={data.err_step_bid}
+                    />
+                    <InputUnit
+                        label="Bước giá tối đa"
+                        unit={'VNĐ'}
+                        value={currencyFormat(data.max_bid)}
+                        onChange={(value) => {
+                            data.max_bid = currencyFormatToInt(value)
+                        }}
+                    />
+                </div>}
             </div>
         </div>
     )

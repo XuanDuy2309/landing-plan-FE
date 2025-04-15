@@ -1,18 +1,26 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
-
-const __dirname = path.dirname('./');
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [
-    react(),
-    tailwindcss(),
+    react({
+      babel: {
+        presets: [
+          '@babel/preset-typescript'
+        ],
+        plugins: [
+          ['@babel/plugin-proposal-decorators', { legacy: true }],
+          ['@babel/plugin-proposal-class-properties', { loose: true }]
+        ]
+      }
+    }),
+    tailwindcss()
   ],
   resolve: {
     alias: {
-      src: path.resolve(__dirname, "src"),
+      src: path.resolve('./', 'src'),
     },
   },
-})
+});

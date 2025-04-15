@@ -36,6 +36,7 @@ export const SidebarSettingLayout = observer(() => {
                                 key={index}
                                 onClick={() => {
                                     navigate(item.link, { replace: true })
+                                    setActive(index)
                                 }}
                             >
                                 <div className={classNames("size-10 rounded-full flex items-center justify-center cursor-pointer bg-gray-200 group-hover:bg-gray-300",

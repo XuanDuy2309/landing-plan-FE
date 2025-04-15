@@ -15,32 +15,34 @@ export const SettingPassScreen = observer(() => {
             </div> :
             <div className="w-full p-4 ">
                 <div className="w-full h-full bg-white flex flex-col rounded overflow-hidden">
-                    <div className="w-full p-3 flex flex-col">
+                    <div className="w-full p-3 flex flex-col space-y-3">
                         <span className="text-lg font-medium text-gray-700">Cập nhật mật khẩu</span>
-                        <InputLabel
-                            label="Mật khẩu hiện tại"
-                            value={pass.old_password || ''}
-                            onChange={(value) => { pass.old_password = value }}
-                            placeholder="Nhập mật khẩu"
-                            error={pass.err_old_password}
-                            type="password"
-                        />
-                        <InputLabel
-                            label="Mật khẩu mới"
-                            value={pass.new_password || ''}
-                            onChange={(value) => { pass.new_password = value }}
-                            placeholder="Nhập mật khẩu"
-                            error={pass.err_new_password}
-                            type="password"
-                        />
-                        <InputLabel
-                            label="Xác nhận mật khẩu"
-                            value={pass.confirm_password || ''}
-                            onChange={(value) => { pass.confirm_password = value }}
-                            placeholder="Nhập lại mật khẩu mới"
-                            error={pass.err_confirm_password}
-                            type="password"
-                        />
+                        <div className="w-1/2 flex flex-col space-y-1">
+                            <InputLabel
+                                label="Mật khẩu hiện tại"
+                                value={pass.old_password || ''}
+                                onChange={(value) => { pass.old_password = value }}
+                                placeholder="Nhập mật khẩu"
+                                error={pass.err_old_password}
+                                type="password"
+                            />
+                            <InputLabel
+                                label="Mật khẩu mới"
+                                value={pass.new_password || ''}
+                                onChange={(value) => { pass.new_password = value }}
+                                placeholder="Nhập mật khẩu"
+                                error={pass.err_new_password}
+                                type="password"
+                            />
+                            <InputLabel
+                                label="Xác nhận mật khẩu"
+                                value={pass.confirm_password || ''}
+                                onChange={(value) => { pass.confirm_password = value }}
+                                placeholder="Nhập lại mật khẩu mới"
+                                error={pass.err_confirm_password}
+                                type="password"
+                            />
+                        </div>
                         <div className="w-full p-3 flex items-center justify-end space-x-2">
                             <ButtonLoading label="Cập nhật" size="xs" template="ActionBlue" onClick={() => {
                                 onUpdatePass();

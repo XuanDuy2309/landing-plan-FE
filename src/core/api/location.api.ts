@@ -2,6 +2,6 @@ import { server } from "../config";
 
 export const LocationApi = {
     getListProvince: (params) => server.get('/province',params),
-    getListDistrict: (id,params) => server.get('/district/'+id,params),
-    getListWard: (id,params) => server.get('/ward/'+id,params),
+    getListDistrict: (params) => server.get('/district/'+params.id,params),
+    getListWard: (params) => server.get('/ward/'+params.id,params),
 }

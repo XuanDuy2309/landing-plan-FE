@@ -48,7 +48,6 @@ export abstract class ListDataProvider2<T extends { id?: string | number, update
 
   @action
   refreshData = async (): Promise<number> => {
-    //TODO cancel current getting data if need
     this.isRefreshing = true;
     this.page = 1;
     await this.clear();
@@ -81,7 +80,6 @@ export abstract class ListDataProvider2<T extends { id?: string | number, update
 
   async create(c: C): Promise<T> {
     let res = await this.createInternal(c);
-    //sync newest data
     const needDataSize = Math.round(this.data.length / 10) * 10;
     const listRes = await this.fetchInternal(this.filter, needDataSize, 0);
     runInAction(() => {
@@ -95,6 +93,7 @@ export abstract class ListDataProvider2<T extends { id?: string | number, update
 
     return res;
   }
+
   async update(u: U): Promise<T> {
     let res = await this.updateInternal(u);
     runInAction(() => {
@@ -106,15 +105,13 @@ export abstract class ListDataProvider2<T extends { id?: string | number, update
     });
     return res;
   }
+
   async delete(ids: (number | string)[]): Promise<boolean> {
     let res = await this.deleteInternal(ids);
     runInAction(() => {
       for (let i = 0; i < this.data.length; i++) {
-        console.log('check', this.filter, ids, (this.data[i] as any).id, ids.indexOf((this.data[i] as any).id!));
-        if (ids.indexOf((this.data[i] as any).id!) >= 0) {
-          console.log('delete', i, (this.data[i] as any).id);
+        if (ids.indexOf(this.data[i].id!) >= 0) {
           this.data.splice(i, 1);
-          console.log('after delete', this.data);
           i--;
         }
       }
@@ -132,6 +129,7 @@ export class StaticDataProvider2<T extends { id: string | number }> extends List
   constructor(private list: T[]) {
     super();
   }
+
   async fetchInternal(filter: any, take: number, offset: number): Promise<{ count: number; offset: number; list: T[]; }> {
     return {
       list: this.list,
@@ -139,25 +137,30 @@ export class StaticDataProvider2<T extends { id: string | number }> extends List
       offset: 0
     }
   }
+
   createInternal(c: any): Promise<T> {
-    throw 'Not support';
+    throw new Error('Create not supported');
   }
+
   updateInternal(u: any): Promise<T> {
-    throw 'Not support';
+    throw new Error('Update not supported');
   }
+
   deleteInternal(id: (number | string)[]): Promise<boolean> {
-    throw 'Not support';
+    throw new Error('Delete not supported');
   }
 }
 
 export abstract class SelectListDataProviderBased<T> extends ListDataProvider2<SelectionType<T>, null, null> {
   createInternal(c: any): Promise<SelectionType<T>> {
-    throw 'Not support';
+    throw new Error('Create not supported');
   }
+
   updateInternal(u: any): Promise<SelectionType<T>> {
-    throw 'Not support';
+    throw new Error('Update not supported');
   }
+
   deleteInternal(id: (number | string)[]): Promise<boolean> {
-    throw 'Not support';
+    throw new Error('Delete not supported');
   }
 }

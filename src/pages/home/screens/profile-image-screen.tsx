@@ -22,14 +22,14 @@ export const ProfileImageScreen = observer(() => {
 
 
 const SelectImage = observer(() => {
-    const { data, loading, onUpload } = useImageContext();
+    const { data, dataVideo, loading, onUpload } = useImageContext();
     const { onUpdateAvatar, onUpdateBackground } = useUserContext();
 
-    const handleUpload = async () => {
-        const input = new SelectFileCase('image', false);
+    const handleUpload = async (type: string) => {
+        const input = new SelectFileCase(type, false);
         await input.process()
             .then(res => {
-                if (res.length > 0) { onUpload(res[0]); }
+                if (res.length > 0) { onUpload(res[0], type); }
             })
             .catch(err => console.log(err));
     }
@@ -41,11 +41,11 @@ const SelectImage = observer(() => {
     }
 
     return (
-        <div className="w-full flex flex-col items-center py-4">
+        <div className="w-full flex flex-col items-center space-y-3 py-4">
             <div className="w-full h-full max-w-[1240px] bg-white rounded-xl flex flex-col">
                 <div className="w-full h-16 px-3 flex items-center justify-between border-b border-gray-200 flex-none">
                     <span className="text-2xl font-semibold text-gray-700">Ảnh của bạn</span>
-                    <ButtonLoading iconLeft="uploadimage-outline" label="Upload new image" template="ActionBlueOutline" size="xs" onClick={handleUpload} />
+                    <ButtonLoading iconLeft="uploadimage-outline" label="Thêm ảnh mới" template="ActionBlueOutline" size="xs" onClick={() => handleUpload('image')} />
                 </div>
                 <div className="w-full flex flex-col border-b border-gray-200 space-y-4 p-3">
                     {loading ?
@@ -58,6 +58,28 @@ const SelectImage = observer(() => {
                                 data.map((item, index) => {
                                     return (
                                         <ItemMyImage key={index} item={item} action={actionItemImage} />
+                                    )
+                                })
+                            }
+                        </div>}
+                </div>
+            </div>
+            <div className="w-full h-full max-w-[1240px] bg-white rounded-xl flex flex-col">
+                <div className="w-full h-16 px-3 flex items-center justify-between border-b border-gray-200 flex-none">
+                    <span className="text-2xl font-semibold text-gray-700">Video của bạn</span>
+                    <ButtonLoading iconLeft="uploadimage-outline" label="Thêm video mới" template="ActionBlueOutline" size="xs" onClick={() => handleUpload('video')} />
+                </div>
+                <div className="w-full flex flex-col border-b border-gray-200 space-y-4 p-3">
+                    {loading ?
+                        <div className="w-full h-full flex items-center justify-center">
+                            <Spin />
+                        </div>
+                        :
+                        <div className="w-full  grid-cols-5 grid gap-3">
+                            {
+                                dataVideo.map((item, index) => {
+                                    return (
+                                        <ItemMyImage key={index} item={item} action={actionItemImage} type="video"/>
                                     )
                                 })
                             }

@@ -55,6 +55,15 @@ export const LeafletMapContainer = observer(() => {
                 zIndex={999}
             // opacity={opacit}
             />
+            <TileLayer
+                url={`https://s3-hn-2.cloud.cmctelecom.vn/guland7/land/ha-noi/{z}/{x}/{y}.png`}
+                // pane="overlayPane"
+                minZoom={12}
+                maxZoom={18}
+                opacity={0.8}
+                zIndex={999}
+            // opacity={opacit}
+            />
 
             {selectedLocation.lat && selectedLocation.lng && (
                 <Marker position={[Number(selectedLocation.lat), Number(selectedLocation.lng)]}>

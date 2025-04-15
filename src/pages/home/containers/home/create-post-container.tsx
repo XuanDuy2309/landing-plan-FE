@@ -15,18 +15,18 @@ export const CreatePostContainer = observer(() => {
     const listTypePost = [
         {
             label: "Đăng bán",
-            value: '1',
+            value: 1,
             icon: "sale-outline"
         },
         {
             label: "Cho thuê",
-            value: '2',
-            icon: "money"
+            value: 2,
+            icon: "approved2-outline"
         },
         {
             label: "Đấu giá",
-            value: '2',
-            icon: "money"
+            value: 3,
+            icon: "auction-outline"
         },
     ]
 
@@ -76,7 +76,7 @@ export const CreatePostContainer = observer(() => {
             <ModalBase
                 ref={modalRef}
             >
-                <ModalCreatePost onClose={() => { modalRef.current.close() }} onSave={(item) => { modalRef.current.close() }}/>
+                <ModalCreatePost type={typePost} onClose={() => { modalRef.current.close() }} onSave={(item) => { modalRef.current.close() }} />
             </ModalBase>
         </div>
     );

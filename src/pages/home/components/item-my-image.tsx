@@ -7,9 +7,10 @@ import { IconBase } from "src/components";
 interface IProps {
     item: any
     action: any
+    type?: string
 }
 
-export const ItemMyImage = observer(({ item, action }: IProps) => {
+export const ItemMyImage = observer(({ item, action, type }: IProps) => {
     const items: MenuProps['items'] = [
         {
             key: '1',
@@ -33,14 +34,27 @@ export const ItemMyImage = observer(({ item, action }: IProps) => {
             }
         },
     ]
+    if (type === 'video') {
+        return (
+            <div className={classNames("size-full rounded-md overflow-hidden relative cursor-pointer flex-none",
+            )} >
+                <video src={item.link} className="w-full h-full object-cover" controls/>
+                {action &&
+                    <div className="absolute top-3 right-3 rounded-full p-1 flex items-center justify-center bg-gray-100 hover:bg-gray-300">
+                        <IconBase icon={"more-2"} size={24} color={Colors.blue[400]} />
+                    </div>
+                }
+            </div>
+        )
+    }
     return (
         <div className={classNames("size-full rounded-md overflow-hidden relative cursor-pointer flex-none",
         )} >
             <img src={item.link} alt="" className="w-full h-full object-cover" />
-            <Dropdown menu={{ items }} trigger={["click"]}>
+            {action && <Dropdown menu={{ items }} trigger={["click"]}>
                 <div className="absolute top-3 right-3 rounded-full p-1 flex items-center justify-center bg-gray-100 hover:bg-gray-300">
                     <IconBase icon={"more-2"} size={24} color={Colors.blue[400]} />
                 </div>
-            </Dropdown>
+            </Dropdown>}
         </div>)
 })

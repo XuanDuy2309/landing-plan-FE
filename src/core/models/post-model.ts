@@ -15,9 +15,9 @@ export enum Purpose_Post {
 }
 
 export enum Status_Post {
-    Waiting = 1,
-    Accept = 2,
-    Reject = 3
+    Coming_Soon = 1,
+    Process = 2,
+    End = 3
 }
 
 export enum Direction_Land_Enum {
@@ -42,24 +42,35 @@ export enum Type_Asset_Enum {
     Other = 8
 }
 
+export class BIDModel {
+    id?: number
+    post_id?: number
+    price?: number
+    create_by_name?: string
+    create_by?: number
+    create_at?: string
+}
+
 export class PostModel {
     id?: number;
     type: Type_Post = Type_Post.Public;
     purpose: Purpose_Post = Purpose_Post.For_Sell;
     type_asset: Type_Asset_Enum = Type_Asset_Enum.Home;
-    status: Status_Post = Status_Post.Waiting;
+    status: Status_Post = Status_Post.Coming_Soon;
     image_links: string[] = []
     video_links: string[] = []
-    contract_links: string[] = []
     coordinates?: any
     direction_land: Direction_Land_Enum = Direction_Land_Enum.North
     area?: string
     width?: string
     height?: string
-    price_for_buy?: string
-    price_for_rent?: string
-    price_start?: string
-    price_current?: string
+    price_for_buy?: number
+    price_for_rent?: number
+    price_start?: number
+    price_current?: number
+    bid_step?: number
+    max_bid?: number
+    bids: BIDModel[] = []
     date_start?: moment.Moment
     date_end?: moment.Moment
     number_floors?: number
@@ -78,15 +89,18 @@ export class PostModel {
     province_name?: string
     district_name?: string
     ward_name?: string
-    is_owner: boolean = false
+    is_owner: boolean = true
     owner_name?: string
     owner_phone?: string
     group_id?: number
     create_by_id?: number
     create_by_name?: string
     create_by_phone?: string
+    create_by_avatar?: string
     create_at?: moment.Moment
     update_at?: moment.Moment
+    number_share?: number
+    like_by_ids: number[] = []
 
     err_create_by_name?: string
     err_create_by_phone?: string
@@ -94,7 +108,7 @@ export class PostModel {
     err_image?: string
     err_lng?: string
     err_lat?: string
-    err_coordinate?:string
+    err_coordinate?: string
     err_area?: string
     err_width?: string
     err_height?: string
@@ -109,6 +123,7 @@ export class PostModel {
     err_number_bathrooms?: string
     err_owner_name?: string
     err_owner_phone?: string
+    err_step_bid?: string;      
 
 
     constructor() {

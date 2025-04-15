@@ -4,14 +4,13 @@ import { observer } from "mobx-react"
 import moment from "moment";
 import { useRef, useState } from "react";
 import { Colors } from "src/assets";
-import { ButtonLoading, DatePickerAnt, IconBase, InputEditing, InputLabel, ModalBase, ModalSelectImage, RadioGroup } from "src/components";
+import { ButtonLoading, DatePickerAnt, DropdownSelectAddress, IconBase, InputEditing, InputLabel, ModalBase, ModalSelectImage, RadioGroup } from "src/components";
 import { Gender, Role, Status } from "src/core/models";
 import { useUserContext } from "src/core/modules";
 import { BannerSettingInfo } from "../containers/settings-info/banner-setting-info";
 
 export const SettingsInfoScreen = observer(() => {
     const { data, loading, onUpdateInfo } = useUserContext();
-
     return (<>
         {!data && loading ?
             <div className="w-full h-full flex items-center justify-center">
@@ -20,7 +19,7 @@ export const SettingsInfoScreen = observer(() => {
             <div className="w-full p-4 ">
                 <div className="w-full h-full bg-white flex flex-col rounded overflow-hidden">
                     <BannerSettingInfo />
-                    <div className="w-full p-3 flex flex-col">
+                    <div className="w-2/3 p-3 flex flex-col">
                         <span className="text-lg font-medium text-gray-700">Thông tin cá nhân</span>
                         <InputLabel
                             label="Họ và tên"
@@ -37,11 +36,16 @@ export const SettingsInfoScreen = observer(() => {
                             value={data?.email || ''}
                             onChange={(value) => { data.email = value }}
                             placeholder="Nhập email" />
-                        <InputLabel
-                            label="Địa chỉ"
-                            value={data?.address || ''}
-                            onChange={(value) => { data.address = value }}
-                            placeholder="Nhập địa chi" />
+                        <div className='w-full flex flex-row space-x-2 items-center'>
+                            <div className={'w-[130px] flex-none flex flex-row justify-end '}>
+                                <span >{'Địa chỉ'}:</span>
+                            </div>
+                            <div className='w-full'>
+                                <DropdownSelectAddress value={data.address || ''} onChange={(value) => {
+                                    data.address = value.ward_name + ', ' + value.district_name + ', ' + value.province_name
+                                }} />
+                            </div>
+                        </div>
                         <div className='w-full flex flex-row space-x-2 items-center'>
                             <div className={'w-[130px] flex-none flex flex-row justify-end '}>
                                 <span >{'Giới tính'}:</span>
@@ -63,7 +67,7 @@ export const SettingsInfoScreen = observer(() => {
                             </div>
                             <div className='w-full'>
                                 <DatePickerAnt
-                                    value={data.dob ? moment(data.dob) : undefined}
+                                    value={data.dob? moment(data.dob) : undefined}
                                     onChange={(value) => { data.dob = value }}
                                     placeholder={'dd/mm/yyyy'}
                                     className='p-0 border-none'

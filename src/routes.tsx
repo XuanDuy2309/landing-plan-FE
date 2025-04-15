@@ -1,6 +1,6 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthRoutes } from "./pages/auth/routes";
-import { JSX } from "react";
+import { JSX, use, useEffect } from "react";
 import { useCoreStores } from "./core/stores";
 import { LandingMapRoutes } from "./pages/landing-map/routes";
 import { HomeRoutes } from "./pages/home/routes";
@@ -9,6 +9,8 @@ import { HomeLayout } from "./layouts/home/home-layout";
 import { SettingsRoutes } from "./pages/settings/routes";
 import { SettingsLayout } from "./layouts/settings/setting-layout";
 import { Spin } from "antd";
+import { ProfileDetail } from "./pages/home/screens/profile-detail";
+import { PostDetailScreen } from "./pages/home/screens/post-detail";
 
 
 export const AppRouter = observer(() => {
@@ -31,9 +33,19 @@ export const AppRouter = observer(() => {
                             <RequireAuth>
                                 <SettingsRoutes />
                             </RequireAuth>
-                        }>
-                        </Route>
+                        } />
+                        <Route path="profile/*" element={
+                            <RequireAuth>
+                                <ProfileDetail />
+                            </RequireAuth>
+                        } />
                     </Route>
+                    <Route path="post/:id" element={
+                        <RequireAuth>
+                            <PostDetailScreen />
+                        </RequireAuth>
+                    } />
+                    {/* <Route path="*" element={<Navigate to="/home" replace />} /> */}
                 </Routes>
             </Router>
         </div>

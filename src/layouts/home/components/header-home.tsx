@@ -23,12 +23,6 @@ export const HeaderHome = observer(() => {
             link: '/home',
         },
         {
-            key: 1,
-            title: 'Search',
-            icon: "search-outline",
-            link: ''
-        },
-        {
             key: 2,
             title: "Profile",
             icon: "profile-outline",
@@ -80,6 +74,13 @@ export const HeaderHome = observer(() => {
                     }
                 </div>
                 <div className="w-[240px] flex items-center justify-end space-x-2 flex-none h-full">
+                    <div className="size-10 rounded-full flex flex-col items-center justify-center space-y-1 cursor-pointer hover:bg-gray-300 bg-gray-200"
+                        onClick={() => {
+                            navigate('/')
+                        }}
+                    >
+                        <IconBase icon="allocation-outline" size={28} color={Colors.gray[700]} />
+                    </div>
                     <div className="size-10 rounded-full flex flex-col items-center justify-center space-y-1 cursor-pointer hover:bg-gray-300 bg-gray-200">
                         <IconBase icon="notification-outline" size={28} color={Colors.gray[700]} />
                     </div>

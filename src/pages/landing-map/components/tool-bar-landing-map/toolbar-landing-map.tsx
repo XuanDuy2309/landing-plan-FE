@@ -25,11 +25,23 @@ export const ToolbarLandingMap = observer(() => {
         pointsArea.reset();
     };
 
+    const handleGoToMyLocation = () => {
+        const event = new CustomEvent('go-to-current-location');
+        window.dispatchEvent(event);
+    };
+
+    const handleToggleRouting = () => {
+        pointsArea.isRouting = !pointsArea.isRouting
+        if (pointsArea.isRouting) {
+            pointsArea.routeTo = [0, 0]
+        }
+    }
+
     const buttons = [
         { onClick: handleToggleDraw, icon: 'pin-outline', title: 'Đo đạc khu vực', active: pointsArea.isDraw },
         { onClick: handleReset, icon: 'delete-outline', title: 'Đặt lại khu vực', active: false },
-        { onClick: () => { }, icon: 'more-outline', title: 'Tùy chọn thêm', active: false },
-        { onClick: () => { }, icon: 'more-outline', title: 'Tùy chọn thêm', active: false },
+        { onClick: handleToggleRouting, icon: 'location-outline', title: 'Chỉ đường', active: pointsArea.isRouting },
+        { onClick: handleGoToMyLocation, icon: 'map-outline1', title: 'Định vị', active: false },
     ];
 
 

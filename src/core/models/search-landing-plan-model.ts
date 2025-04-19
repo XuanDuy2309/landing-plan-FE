@@ -9,7 +9,7 @@ export class SearchLandingPlanModel {
 }
 
 export class NominatimResult {
-    place_id?: number;
+    place_id?: number | string;
     licence?: string;
     osm_type?: "node" | "way" | "relation";
     osm_id?: number;
@@ -25,6 +25,7 @@ export class NominatimResult {
         type: any;
         coordinates: any;
     }
+    isVietMapSearch?: boolean = false
     constructor() {
         makeAutoObservable(this)
     }
@@ -80,6 +81,8 @@ export class PointsMapModel {
     segmentLengths: number[] = [];
     areaLabelPosition: [number, number] | null = null;
     currentMousePos?: L.LatLng
+    isRouting?: boolean
+    routeTo: [number, number] = [0, 0];
 
     constructor() {
         makeAutoObservable(this);
@@ -87,7 +90,7 @@ export class PointsMapModel {
 
 
 
-    addPoint = (lngLat: [number, number]) => {
+    addPoint = (lngLat: [number, number], isMarkerClick?: boolean) => {
         if (!this.isDraw) {
             this.reset();
         }
@@ -112,7 +115,7 @@ export class PointsMapModel {
                 turf.point([first[0], first[1]]),  // Longtitude, Latitude
                 turf.point([lngLat[0], lngLat[1]])  // Longtitude, Latitude
             );
-            if (dist < 0.01) { // Nếu khoảng cách giữa điểm cuối và điểm đầu nhỏ hơn 10m
+            if (dist < 0.001 || isMarkerClick) { // Nếu khoảng cách giữa điểm cuối và điểm đầu nhỏ hơn 10m
                 this.isDraw = false;
                 this.points[this.points.length - 1] = first;
                 this.segmentLengths[this.segmentLengths.length - 1] = turf.distance(
@@ -137,15 +140,16 @@ export class PointsMapModel {
         this.area = 0;
         this.isDraw = false;
         this.segmentLengths = []; // Reset lại chiều dài các đoạn
+        this.isRouting = false
+        this.routeTo = [0, 0]
     };
 
     calculateDistance = () => {
-        if(this.points.length === 0) return 0
+        if (this.points.length === 0) return 0
         return turf.distance(
             turf.point([this.points[this.points.length - 1][0], this.points[this.points.length - 1][1]]),
             turf.point([this.currentMousePos?.lng || 0, this.currentMousePos?.lat || 0]),
             { units: "meters" }
         );
     }
-
 }

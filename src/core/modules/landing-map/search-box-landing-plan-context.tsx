@@ -21,6 +21,7 @@ export class ListSearchBoxLandingPlanContextType {
     listResultSearch: NominatimResult[] = []
     setListResultSearch!: (listResultSearch: NominatimResult[]) => void
     loading: boolean = false
+    handleReverseVietMap!: (placeId: string) => Promise<any>
 }
 export const ListSearchBoxLandingPlanContext = createContext<ListSearchBoxLandingPlanContextType>(
     new ListSearchBoxLandingPlanContextType()
@@ -36,19 +37,42 @@ export const ListSearchBoxLandingPlanProvider = observer(({ children }: IProps) 
     const { setPlacement, placement } = useManagementLandingPlan()
     const [loading, setLoading] = useState<boolean>(false)
     const handleSearch = async (query) => {
+        setLoading(true)
+        if (!query) return
+        let params = { q: query }
         try {
-            setLoading(true)
-            if (!query) return
-            let params = { q: query }
-            // const res = await SearchLandingPlanApi.searchInterval(params)
-            // setListResultSearch(res.data)
-
             const res = await viet_map_server.get("/autocomplete/v3", { text: query })
-            console.log("res", res)
+            // if (res.Data.length > 0) {
+            //     const temp: NominatimResult[] = []
+            //     res.Data.forEach(item => {
+            //         temp.push({ display_name: item.address, isVietMapSearch: true, place_id: item.ref_id })
+            //     })
+            //     setListResultSearch(temp)
+            //     return
+            // }
+            const resV2 = await SearchLandingPlanApi.searchInterval(params)
+            setListResultSearch(resV2.data)
         } catch (error) {
+            const resV2 = await SearchLandingPlanApi.searchInterval(params)
+            setListResultSearch(resV2.data)
             console.log(error)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleReverseVietMapApi = async (place_id) => {
+        try {
+            const res = await viet_map_server.get("/place/v3", { refid: place_id })
+            if (res.Data.length > 0) {
+                const temp = new NominatimResult()
+                temp.lat = res.Data.lat
+                temp.lon = res.Data.lon
+                temp.display_name = res.Data.display
+                setPlacement(temp)
+            }
+        } catch (error) {
+            console.log(error)
         }
     }
 
@@ -58,7 +82,8 @@ export const ListSearchBoxLandingPlanProvider = observer(({ children }: IProps) 
             handleSearch,
             listResultSearch,
             setListResultSearch,
-            loading
+            loading,
+            handleReverseVietMap: handleReverseVietMapApi
         }}>{children}</ListSearchBoxLandingPlanContext.Provider>
     )
 })

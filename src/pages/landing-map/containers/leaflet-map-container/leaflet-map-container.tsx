@@ -1,25 +1,24 @@
+import L from "leaflet";
+import 'leaflet-routing-machine'; // Thêm import này
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import 'leaflet/dist/leaflet.css';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { LayersControl, MapContainer, Marker, Polygon, Polyline, Popup, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
+import { Colors } from 'src/assets';
+import { isValidPolygon } from 'src/core/base';
 import { NominatimResult, SelectedLocationModel } from 'src/core/models';
 import { useManagementLandingPlan } from 'src/core/modules';
 import { useCoreStores } from 'src/core/stores';
 import './leaflet-map-container.css';
-import { Colors } from 'src/assets';
-import { isValidPolygon } from 'src/core/base';
-import L, { point } from "leaflet";
-import * as turf from '@turf/turf';
+
 
 export const LeafletMapContainer = observer(() => {
     const { location } = useCoreStores().sessionStore
     const { placement, polygon, selectedLocation, setSelectedLocation, isDraw, coordinates, pointsArea } = useManagementLandingPlan()
-
     const calculateDistance = useMemo(() => {
         return pointsArea.calculateDistance() || 0
     }, [pointsArea.currentMousePos, pointsArea.points]);
-
-    console.log("location", location)
 
     return (
         <MapContainer
@@ -30,20 +29,22 @@ export const LeafletMapContainer = observer(() => {
         >
             <MapEvents setSelectedLocation={setSelectedLocation} />
             <MapViewUpdater placement={placement} setSelectedLocation={setSelectedLocation} />
+            {pointsArea.routeTo && <RoutingMachine from={[location.lat, location.lng]} to={[pointsArea.routeTo[0], pointsArea.routeTo[1]]} />}
             <LayersControl>
-                <LayersControl.BaseLayer checked name="Map vệ tinh">
+                <LayersControl.BaseLayer checked name="Map mặc định">
                     <TileLayer
-                        url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
+                        url="https://{s}.google.com/vt/lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
                         subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
                         maxZoom={30}
                         attribution="&copy; <a href='https://www.google.com/maps'>Google Maps</a> contributors"
                     />
                 </LayersControl.BaseLayer>
-                <LayersControl.BaseLayer name="Map mặc định">
+                <LayersControl.BaseLayer name="Map vệ tinh">
                     <TileLayer
-                        maxZoom={22}
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
+                        subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+                        maxZoom={30}
+                        attribution="&copy; <a href='https://www.google.com/maps'>Google Maps</a> contributors"
                     />
                 </LayersControl.BaseLayer>
             </LayersControl>
@@ -56,7 +57,7 @@ export const LeafletMapContainer = observer(() => {
                 zIndex={999}
             // opacity={opacit}
             />
-            <TileLayer
+            {/* <TileLayer
                 url={`https://s3-hn-2.cloud.cmctelecom.vn/guland7/land/ha-noi/{z}/{x}/{y}.png`}
                 // pane="overlayPane"
                 minZoom={12}
@@ -64,7 +65,7 @@ export const LeafletMapContainer = observer(() => {
                 opacity={0.8}
                 zIndex={999}
             // opacity={opacit}
-            />
+            /> */}
 
             {selectedLocation.lat && selectedLocation.lng && (
                 <Marker position={[Number(selectedLocation.lat), Number(selectedLocation.lng)]}>
@@ -119,6 +120,11 @@ export const LeafletMapContainer = observer(() => {
                             className: "custom-marker",
                             html: `<div style="width: 14px; height: 14px; background: red; border-radius: 50%; border: 2px solid white;"></div>`,
                         })}
+                        eventHandlers={{
+                            click: () => {
+                                pointsArea.addPoint([lng, lat], true);
+                            }
+                        }}
                     />
                 ))}
 
@@ -139,13 +145,13 @@ export const LeafletMapContainer = observer(() => {
                 </Polyline>
             )}
 
-            {/* <Marker
+            <Marker
                 position={[location.lat, location.lng]}
                 icon={L.divIcon({
                     className: "custom-marker",
-                    html: `<div style="width: 14px; height: 14px; background: red; border-radius: 50%; border: 2px solid white;"></div>`,
+                    html: `<div style="width: 14px; height: 14px; background: blue; border-radius: 50%; border: 2px solid white;"></div>`,
                 })}
-            /> */}
+            />
         </MapContainer>
 
     )
@@ -159,6 +165,7 @@ interface IProps2 {
 
 const MapViewUpdater = observer(({ placement, setSelectedLocation }: IProps2) => {
     const map = useMap();
+    const { location } = useCoreStores().sessionStore;
 
     useEffect(() => {
         if (placement?.lat && placement?.lon) {
@@ -170,6 +177,22 @@ const MapViewUpdater = observer(({ placement, setSelectedLocation }: IProps2) =>
             setSelectedLocation({ lat: Number(placement.lat), lng: Number(placement.lon) })
         }
     }, [placement.lat, placement.lon, map]);
+
+    useEffect(() => {
+        const handleGoToLocation = () => {
+            if (location?.lat && location?.lng) {
+                map.flyTo([location.lat, location.lng], 18, {
+                    animate: true,
+                    duration: 1,
+                });
+            }
+        };
+
+        window.addEventListener('go-to-current-location', handleGoToLocation);
+        return () => {
+            window.removeEventListener('go-to-current-location', handleGoToLocation);
+        };
+    }, [map, location.lat, location.lng]);
 
     return null;
 });
@@ -187,14 +210,19 @@ const MapEvents = observer(({ setSelectedLocation }: IProps3) => {
         },
         click: async (e) => {
             const { lat, lng } = e.latlng;
-            if (!pointsArea.isDraw) {
+            if (!pointsArea.isDraw && !pointsArea.isRouting) {
                 map.setView([lat, lng], map.getZoom());
                 setSelectedLocation({ lat, lng })
                 searchCoordinatesLocation(lat, lng)
                 return
             }
+            if (pointsArea.isRouting) {
+                pointsArea.routeTo = [lat, lng]
+                return
+            }
             pointsArea.addPoint([lng, lat])
         },
+
         mousemove: (e) => {
             if (!pointsArea.isDraw) return
             pointsArea.currentMousePos = e.latlng;
@@ -204,3 +232,53 @@ const MapEvents = observer(({ setSelectedLocation }: IProps3) => {
     return null;
 });
 
+interface RoutingProps {
+    from: [number, number];
+    to: [number, number];
+}
+
+const RoutingMachine = observer(({ from, to }: RoutingProps) => {
+    const map = useMap();
+
+    useEffect(() => {
+        if (!map || !from || !to) return;
+        console.log("form, to", from, to);
+
+        // Tạo routing control
+        const routingControl = L.Routing.control({
+            waypoints: [
+                L.latLng(from[0], from[1]),
+                L.latLng(to[0], to[1])
+            ],
+            // lineOptions: {
+            //     styles: [{ color: 'blue', weight: 4 }]
+            // },
+            // createMarker: function (i, waypoint, n) {
+            //     // Tùy chỉnh marker nếu cần
+            //     return L.marker(waypoint.latLng, {
+            //         icon: L.divIcon({
+            //             className: "routing-marker",
+            //             html: `<div style="width: 14px; height: 14px; background: ${i === 0 ? 'green' : 'red'}; border-radius: 50%; border: 2px solid white;"></div>`,
+            //         })
+            //     });
+            // },
+            // addWaypoints: false,
+            // routeWhileDragging: false,
+            // draggableWaypoints: false,
+            // showAlternatives: false,
+            // altLineOptions: {
+            //     styles: [
+            //         { color: 'gray', opacity: 0.4, weight: 3 }
+            //     ]
+            // },
+            // fitSelectedRoutes: true,
+        }).addTo(map);
+
+        // Clean up khi component unmount
+        return () => {
+            map.removeControl(routingControl);
+        };
+    }, [from, to]);
+
+    return null;
+});

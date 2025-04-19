@@ -6,11 +6,31 @@ import { Colors } from 'src/assets'
 import { IconBase } from 'src/components'
 import { NominatimResult } from 'src/core/models'
 import { useListSearchBoxLandingPlan, useManagementLandingPlan } from 'src/core/modules'
+import { hideLoading, showLoading } from 'src/core/services'
 
 export const SearchBoxLandingMap = observer(() => {
-    const { filter, handleSearch, listResultSearch, setListResultSearch, loading } = useListSearchBoxLandingPlan()
+    const { filter, handleSearch, listResultSearch, setListResultSearch, loading, handleReverseVietMap } = useListSearchBoxLandingPlan()
     const [keyWord, setKeyWord] = useState("")
     const { placement, setPlacement } = useManagementLandingPlan()
+
+    const handleSelect = async (item: NominatimResult) => {
+        if (!item.isVietMapSearch) {
+            setKeyWord("")
+            setListResultSearch([])
+            setPlacement(item)
+            return
+        }
+        try {
+            showLoading()
+            await handleReverseVietMap(String(item.place_id))
+            hideLoading()
+        } catch (error) {
+            setKeyWord("")
+            setListResultSearch([])
+            setPlacement(item)
+            console.log(error)
+        }
+    }
 
     return (
         <>
@@ -33,7 +53,7 @@ export const SearchBoxLandingMap = observer(() => {
                             value={keyWord}
                             onChange={(e) => { setKeyWord(e.target.value) }}
                             onBlur={(e) => { if (!keyWord) setListResultSearch([]) }}
-                            className='placeholder:text-gray-500 w-full outline-none'
+                            className='placeholder:text-gray-500 w-full h-full outline-none'
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     handleSearch(keyWord)
@@ -61,13 +81,9 @@ export const SearchBoxLandingMap = observer(() => {
                                 return (
                                     <button
                                         key={index}
-                                        onClick={() => {
-                                            setKeyWord("")
-                                            setListResultSearch([])
-                                            setPlacement(item)
-                                        }}
+                                        onClick={() => handleSelect(item)}
                                         className='flex items-center justify-start p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors'>
-                                        <span>{item.display_name}</span>
+                                        <span className='text-start'>{item.display_name}</span>
                                     </button>
                                 )
                             })

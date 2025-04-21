@@ -27,7 +27,10 @@ export const SearchLandingPlanReverseApi = {
 }
 
 export const LandingPlanApi = {
-    searchCoordinatesLocation: (params) => server.get("/landing-plan/coordinates", params)
+    searchCoordinatesLocation: (params) => server.get("/landing-plan/coordinates", params),
+
+    // ban do quy haoch
+    searchLandingPlan: (params) => server.get("/landing-plan", params),
 }
 
 export const SearchVietMapApi = {

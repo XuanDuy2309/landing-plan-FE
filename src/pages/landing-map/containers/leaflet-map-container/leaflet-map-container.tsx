@@ -15,7 +15,7 @@ import './leaflet-map-container.css';
 
 export const LeafletMapContainer = observer(() => {
     const { location } = useCoreStores().sessionStore
-    const { placement, polygon, selectedLocation, setSelectedLocation, isDraw, coordinates, pointsArea } = useManagementLandingPlan()
+    const { placement, polygon, selectedLocation, setSelectedLocation, isDraw, coordinates, pointsArea, landingPlanMap, opacity } = useManagementLandingPlan()
     const calculateDistance = useMemo(() => {
         return pointsArea.calculateDistance() || 0
     }, [pointsArea.currentMousePos, pointsArea.points]);
@@ -29,7 +29,7 @@ export const LeafletMapContainer = observer(() => {
         >
             <MapEvents setSelectedLocation={setSelectedLocation} />
             <MapViewUpdater placement={placement} setSelectedLocation={setSelectedLocation} />
-            {pointsArea.routeTo && <RoutingMachine from={[location.lat, location.lng]} to={[pointsArea.routeTo[0], pointsArea.routeTo[1]]} />}
+            {pointsArea.routeTo && pointsArea.isRouting && <RoutingMachine from={[location.lat, location.lng]} to={[pointsArea.routeTo[0], pointsArea.routeTo[1]]} />}
             <LayersControl>
                 <LayersControl.BaseLayer checked name="Map mặc định">
                     <TileLayer
@@ -48,15 +48,15 @@ export const LeafletMapContainer = observer(() => {
                     />
                 </LayersControl.BaseLayer>
             </LayersControl>
-            <TileLayer
-                url={`http://localhost:3000/tiles/{z}/{x}/{y}.png`}
+            {landingPlanMap && landingPlanMap.folder_path && <TileLayer
+                url={`http://localhost:3000/${landingPlanMap?.folder_path}/{z}/{x}/{y}.png`}
                 // pane="overlayPane"
                 minZoom={12}
                 maxZoom={18}
-                opacity={0.8}
+                opacity={opacity}
                 zIndex={999}
-            // opacity={opacit}
-            />
+                tms={true}
+            />}
             {/* <TileLayer
                 url={`https://s3-hn-2.cloud.cmctelecom.vn/guland7/land/ha-noi/{z}/{x}/{y}.png`}
                 // pane="overlayPane"
@@ -250,28 +250,56 @@ const RoutingMachine = observer(({ from, to }: RoutingProps) => {
                 L.latLng(from[0], from[1]),
                 L.latLng(to[0], to[1])
             ],
-            // lineOptions: {
-            //     styles: [{ color: 'blue', weight: 4 }]
-            // },
-            // createMarker: function (i, waypoint, n) {
-            //     // Tùy chỉnh marker nếu cần
-            //     return L.marker(waypoint.latLng, {
-            //         icon: L.divIcon({
-            //             className: "routing-marker",
-            //             html: `<div style="width: 14px; height: 14px; background: ${i === 0 ? 'green' : 'red'}; border-radius: 50%; border: 2px solid white;"></div>`,
-            //         })
-            //     });
-            // },
+            lineOptions: {
+                styles: [{ color: 'blue', weight: 4 }],
+                extendToWaypoints: true,
+                missingRouteTolerance: 10
+            },
+            // plan: L.Routing.plan(
+            //     [
+            //         L.latLng(from[0], from[1]),
+            //         L.latLng(to[0], to[1])
+            //     ],
+            //     {
+            //         createMarker: function (i, waypoint) {
+            //             return L.marker(waypoint.latLng, {
+            //                 icon: L.divIcon({
+            //                     className: "routing-marker",
+            //                     html: `<div style="width: 14px; height: 14px; background: ${i === 0 ? 'green' : 'red'}; border-radius: 50%; border: 2px solid white;"></div>`,
+            //                 })
+            //             });
+            //         }
+            //     }
+            // ),
             // addWaypoints: false,
-            // routeWhileDragging: false,
+            // routeWhileDragging: fal  se,
             // draggableWaypoints: false,
             // showAlternatives: false,
-            // altLineOptions: {
-            //     styles: [
-            //         { color: 'gray', opacity: 0.4, weight: 3 }
-            //     ]
-            // },
-            // fitSelectedRoutes: true,
+            altLineOptions: {
+                styles: [
+                    { color: 'gray', opacity: 0.4, weight: 3 }
+                ],
+                extendToWaypoints: true,
+                missingRouteTolerance: 10
+            },
+            router: L.Routing.osrmv1({
+                serviceUrl: `https://router.project-osrm.org/route/v1`,
+                language: 'vi' // Dù có set nhưng thường OSRM chỉ hỗ trợ 1 số ngôn ngữ
+            }),
+            // formatter: new L.Routing.Formatter({
+            //     // Đây là nơi bạn có thể tùy chỉnh text hướng dẫn
+            //     language: "vi",
+            //     formatInstruction: function (instr) {
+            //         return instr.text
+            //             .replace("Turn right", "Rẽ phải")
+            //             .replace("Turn left", "Rẽ trái")
+            //             .replace("Continue straight", "Đi thẳng")
+            //             .replace("Take the first exit", "Rẽ ra ở lối ra đầu tiên")
+            //             .replace("at the roundabout", "ở vòng xoay")
+            //             .replace("You have reached your destination", "Bạn đã đến nơi");
+            //     },
+            // }),
+            fitSelectedRoutes: true,
         }).addTo(map);
 
         // Clean up khi component unmount

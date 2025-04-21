@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react'
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { LandingPlanApi, SearchLandingPlanReverseApi } from 'src/core/api'
-import { CoordinateSearchLocationModel, NominatimResult, PointsMapModel, SelectedLocationModel } from 'src/core/models'
+import { CoordinateSearchLocationModel, LandingPlanModel, NominatimResult, PointsMapModel, SelectedLocationModel } from 'src/core/models'
 
 export class ManagementLandingPlanContextType {
   setPlacement = (placement: NominatimResult) => { }
@@ -18,6 +18,10 @@ export class ManagementLandingPlanContextType {
   setCoordinates = (coordinates: CoordinateSearchLocationModel) => { }
   pointsArea = new PointsMapModel()
   setPointsArea = (pointsArea: PointsMapModel) => { }
+  landingPlanMap: LandingPlanModel | undefined = undefined
+  setLandingPlanMap = (landingPlanMap: LandingPlanModel | undefined) => { }
+  opacity = 1
+  setOpacity = (opacity: number) => { }
 }
 
 export const ManagementLandingPlanContext = createContext<ManagementLandingPlanContextType>(
@@ -38,6 +42,9 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
   const [isDraw, setIsDraw] = useState<boolean>(false);
 
   const [pointsArea, setPointsArea] = useState<PointsMapModel>(new PointsMapModel());
+  const [landingPlanMap, setLandingPlanMap] = useState<LandingPlanModel | undefined>(undefined)
+
+  const [opacity, setOpacity] = useState<number>(1);
 
   useEffect(() => {
     if (
@@ -83,6 +90,26 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
     setCoordinates(new CoordinateSearchLocationModel())
   }
 
+  const searchLandingPlan = async (lat: number, lon: number) => {
+    const params = {
+      lat: lat,
+      lon: lon
+    }
+    const res = await LandingPlanApi.searchLandingPlan(params)
+    if (res.Status) {
+      setLandingPlanMap(res.Data.data)
+      return
+    }
+    setLandingPlanMap(undefined)
+  }
+
+
+  useEffect(() => {
+    if (selectedLocation && selectedLocation.lat && selectedLocation.lng) {
+      searchLandingPlan(selectedLocation.lat, selectedLocation.lng)
+    }
+  }, [selectedLocation])
+
   return (
     <ManagementLandingPlanContext.Provider
       value={{
@@ -99,6 +126,10 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
         setCoordinates,
         pointsArea,
         setPointsArea,
+        landingPlanMap,
+        setLandingPlanMap,
+        opacity,
+        setOpacity,
       }}
     >
       {children}

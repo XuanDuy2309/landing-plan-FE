@@ -153,3 +153,19 @@ export class PointsMapModel {
         );
     }
 }
+
+export class LandingPlanModel {
+    id?: number
+    name?: string
+    description?: string
+    folder_path?: string
+    bounds: number[][] = []
+    province_id?: number
+    district_id?: number
+    ward_id?: number
+    created_at?: string
+
+    constructor() {
+        makeAutoObservable(this)
+    }
+} 

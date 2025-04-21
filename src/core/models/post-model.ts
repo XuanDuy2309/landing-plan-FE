@@ -1,5 +1,5 @@
 import moment from "moment";
-import { Status } from "./user-model";
+import { Status, UserModel } from "./user-model";
 import { makeAutoObservable } from "mobx";
 
 export enum Type_Post {
@@ -49,6 +49,9 @@ export class BIDModel {
     create_by_name?: string
     create_by?: number
     create_at?: string
+    constructor() {
+        makeAutoObservable(this)
+    }
 }
 
 export class PostModel {
@@ -61,9 +64,9 @@ export class PostModel {
     video_links: string[] = []
     coordinates?: any
     direction_land: Direction_Land_Enum = Direction_Land_Enum.North
-    area?: string
-    width?: string
-    height?: string
+    area?: number
+    width?: number
+    height?: number
     price_for_buy?: number
     price_for_rent?: number
     price_start?: number
@@ -80,8 +83,8 @@ export class PostModel {
     in_alley: number = 1
     title?: string
     description?: string
-    lng?: string
-    lat?: string
+    lng?: number
+    lat?: number
     address?: string
     province_id?: number
     district_id?: number
@@ -97,6 +100,7 @@ export class PostModel {
     create_by_name?: string
     create_by_phone?: string
     create_by_avatar?: string
+    create_by_email?: string
     create_at?: moment.Moment
     update_at?: moment.Moment
     number_share?: number

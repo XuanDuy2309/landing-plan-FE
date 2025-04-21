@@ -27,7 +27,7 @@ export const AreaAndPriceAsset = observer(() => {
                             label="Long"
                             value={data.lng}
                             onChange={(value) => {
-                                data.lng = value
+                                data.lng = value ? Number(value) : undefined
                             }}
                             placeholder="0"
                             labelClassName="!w-[60px]"
@@ -37,7 +37,7 @@ export const AreaAndPriceAsset = observer(() => {
                             label="Lat"
                             value={data.lat}
                             onChange={(value) => {
-                                data.lat = value
+                                data.lat = value ? Number(value) : undefined
                             }}
                             placeholder="0"
                             labelClassName="!w-[60px]"
@@ -67,7 +67,7 @@ export const AreaAndPriceAsset = observer(() => {
                     unit={'m2'}
                     value={data.area ? data.area.toString() : ''}
                     onChange={(value) => {
-                        data.area = value
+                        data.area = value ? Number(value) : undefined
                     }}
                     measure
                     err={data.err_area}
@@ -78,7 +78,7 @@ export const AreaAndPriceAsset = observer(() => {
                         unit={'m'}
                         value={data.width}
                         onChange={(value) => {
-                            data.width = value
+                            data.width = value ? Number(value) : undefined
                         }}
                         measure
                         err={data.err_width}
@@ -88,7 +88,7 @@ export const AreaAndPriceAsset = observer(() => {
                         unit={'m'}
                         value={data.height}
                         onChange={(value) => {
-                            data.height = value
+                            data.height = value ? Number(value) : undefined
                         }}
                         measure
                         err={data.err_height}

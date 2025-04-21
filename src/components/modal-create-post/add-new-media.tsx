@@ -1,14 +1,11 @@
 import { observer } from "mobx-react"
-import { useCreatePostContext } from "src/core/modules"
 import { ItemImageCreate } from "./item-image-create"
 import { ButtonLoading } from "../Button"
 import { AuthApi } from "src/core/api"
 import { SelectFileCase } from "src/core/services"
 import { Colors } from "src/assets"
 import { IconBase } from "../icon-base"
-import { PostModel } from "src/core/models"
 import { ItemVideoCreate } from "./item-video-create-post"
-import { SpaceContext } from "antd/es/space"
 
 interface IProps {
     type?: string

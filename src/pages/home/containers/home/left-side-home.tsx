@@ -90,7 +90,7 @@ export const LeftSideHome = observer(() => {
                     <div className="w-full flex items-center rounded-full bg-gray-200">
                         <ButtonIcon icon="search-outline" iconSize={'16'} size={'medium'} color={Colors.gray[700]} />
                         <input type="text"
-                            value={filter.query}
+                            value={filter.query || ''}
                             onChange={(e) => { filter.query = e.target.value }}
                             placeholder="Tìm kiếm"
                             className="w-full outline-none bg-transparent"

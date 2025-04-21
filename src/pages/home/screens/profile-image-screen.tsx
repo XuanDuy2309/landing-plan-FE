@@ -39,7 +39,6 @@ const SelectImage = observer(() => {
         updateBackground: (image: string) => onUpdateBackground(image),
         deleteImage: (id: number) => { console.log(id) }
     }
-
     return (
         <div className="w-full flex flex-col items-center space-y-3 py-4">
             <div className="w-full h-full max-w-[1240px] bg-white rounded-xl flex flex-col">
@@ -57,7 +56,7 @@ const SelectImage = observer(() => {
                             {
                                 data.map((item, index) => {
                                     return (
-                                        <ItemMyImage key={index} item={item} action={actionItemImage} />
+                                        <ItemMyImage key={index} item={item.link} action={actionItemImage} />
                                     )
                                 })
                             }
@@ -79,7 +78,7 @@ const SelectImage = observer(() => {
                             {
                                 dataVideo.map((item, index) => {
                                     return (
-                                        <ItemMyImage key={index} item={item} action={actionItemImage} type="video"/>
+                                        <ItemMyImage key={index} item={item.link} action={actionItemImage} type="video"/>
                                     )
                                 })
                             }

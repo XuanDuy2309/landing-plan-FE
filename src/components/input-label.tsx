@@ -6,7 +6,7 @@ interface IProps {
     label: string;
     size?: 'large' | 'medium';
     placeholder: string;
-    value?: string;
+    value?: string | number | undefined;
     error?: string;
     onChange: (value?: string) => void;
     disabled?: boolean;

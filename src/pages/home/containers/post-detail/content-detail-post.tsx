@@ -2,6 +2,7 @@ import { Dropdown, MenuProps } from "antd"
 import classNames from "classnames"
 import { observer } from "mobx-react"
 import moment from "moment"
+import { useNavigate } from "react-router-dom"
 import { Colors } from "src/assets"
 import { IconBase } from "src/components"
 import { ButtonIcon } from "src/components/button-icon"
@@ -13,7 +14,16 @@ import { usePostDetailContext } from "src/core/modules/post"
 export const ContentDetailPost = observer(() => {
     const { data } = usePostDetailContext()
     const { data: user } = useUserContext()
+    const navigate = useNavigate()
     const listOption: MenuProps['items'] = [
+        {
+            key: '1',
+            label: 'Tham gia đấu giá',
+            onClick: () => {
+                navigate(`/auction/${data.id}`)
+            },
+            disabled: Number(data.purpose) !== Purpose_Post.For_Auction
+        },
         {
             key: '2',
             label: 'Ẩn bài viết',
@@ -46,8 +56,8 @@ export const ContentDetailPost = observer(() => {
     }
 
     const typeAlley = {
-        1: { label: 'Trong hẻm', icon: 'user-outline' },
-        2: { label: 'Mặt đường', icon: 'user-outline' },
+        0: { label: 'Trong hẻm', icon: 'user-outline' },
+        1: { label: 'Mặt đường', icon: 'user-outline' },
     }
     const renderUnit = () => {
         if (data.purpose === Purpose_Post.For_Sell) {
@@ -199,6 +209,14 @@ export const ContentDetailPost = observer(() => {
                             <div className="w-full flex items-center space-x-2">
                                 <span className=" w-[140px]">Giá hiện tại:</span>
                                 <span>{formatMoney(data.price_current, 1, 'vn')} VND</span>
+                            </div>
+                            <div className="w-full flex items-center space-x-2">
+                                <span className=" w-[140px]">Bước giá:</span>
+                                <span>{formatMoney(data.bid_step, 1, 'vn')} VND</span>
+                            </div>
+                            <div className="w-full flex items-center space-x-2">
+                                <span className=" w-[140px]">Bước giá tối đa:</span>
+                                <span>{formatMoney(data.max_bid, 1, 'vn')} VND</span>
                             </div>
                         </>
                     }

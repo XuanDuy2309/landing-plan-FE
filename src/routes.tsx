@@ -11,6 +11,7 @@ import { SettingsLayout } from "./layouts/settings/setting-layout";
 import { Spin } from "antd";
 import { ProfileDetail } from "./pages/home/screens/profile-detail";
 import { PostDetailScreen } from "./pages/home/screens/post-detail";
+import { AuctionScreen } from "./pages/home/screens/auction-screen";
 
 
 export const AppRouter = observer(() => {
@@ -43,6 +44,11 @@ export const AppRouter = observer(() => {
                     <Route path="post/:id" element={
                         <RequireAuth>
                             <PostDetailScreen />
+                        </RequireAuth>
+                    } />
+                    <Route path="auction/:id" element={
+                        <RequireAuth>
+                            <AuctionScreen />
                         </RequireAuth>
                     } />
                     {/* <Route path="*" element={<Navigate to="/home" replace />} /> */}

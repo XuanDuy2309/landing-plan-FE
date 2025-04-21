@@ -3,21 +3,26 @@ import { observer } from "mobx-react";
 import moment from "moment";
 import { Colors } from "src/assets";
 import { ButtonIcon } from "src/components/button-icon";
-import { PostModel, Purpose_Post } from "src/core/models";
+import { Purpose_Post } from "src/core/models";
 import { ItemMyImage } from "../item-my-image";
 import { IconBase } from "src/components";
 import { useNavigate } from "react-router-dom";
 import { formatMoney } from "src/core/base";
 import classNames from "classnames";
 import { useUserContext } from "src/core/modules";
+import { use, useEffect, useState } from "react";
 
 interface IProps {
-    item: PostModel
+    item: any
+    onLike: (id: number) => void
+    onUnlike: (id: number) => void
 }
 
-export const ItemPost = observer(({ item }: IProps) => {
+export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
     const navigate = useNavigate();
     const { data: user } = useUserContext();
+    const [listImage, setListImage] = useState<string[]>([])
+    const [listVideo, setListVideo] = useState<string[]>([])
 
     const renderPurpose = {
         1: { label: "Bán", color: Colors.green[400] },
@@ -31,12 +36,6 @@ export const ItemPost = observer(({ item }: IProps) => {
             label: 'Chi tiết',
             onClick: () => {
                 navigate(`/post/${item.id}`);
-            },
-        },
-        {
-            key: '2',
-            label: 'Ẩn bài viết',
-            onClick: () => {
             },
         },
         {
@@ -72,6 +71,14 @@ export const ItemPost = observer(({ item }: IProps) => {
         }
         return item.price_current
     }
+    useEffect(() => {
+        if (item.image_links) {
+            setListImage(JSON.parse(item.image_links))
+        }
+        if (item.video_links) {
+            setListVideo(JSON.parse(item.video_links))
+        }
+    }, [item.image_links, item.video_links])
     return (
         <div className="w-full p-3 flex flex-col bg-white rounded-xl space-y-2">
             <div className="w-full flex items-center space-x-2 border-gray-200 relative">
@@ -117,10 +124,10 @@ export const ItemPost = observer(({ item }: IProps) => {
             </div>
 
             {
-                item.image_links && item.image_links.length > 0 &&
+                listImage.length > 0 &&
                 <div className="w-full grid-cols-2 grid gap-3">
                     {
-                        item.image_links.map((item, index) => {
+                        listImage.map((item, index) => {
                             return (
                                 <ItemMyImage key={index} item={item} action={undefined} />
                             )
@@ -133,19 +140,21 @@ export const ItemPost = observer(({ item }: IProps) => {
                     { 'text-gray-700': !item.like_by_ids?.includes(user.id || 0) },
                     { 'text-blue-800': item.like_by_ids?.includes(user.id || 0) }
                 )}
-                onClick={() => {
-                    if (item.like_by_ids?.includes(user.id || 0)) {
-                        item.like_by_ids = item.like_by_ids.filter((id: number) => id !== user.id);
-                    }
-                    else {
-                        item.like_by_ids.push(user.id || 0);
-                    }
-                }}
+                    onClick={() => {
+                        if (item.like_by_ids?.includes(user.id || 0)) {
+                            item.like_by_ids = item.like_by_ids.filter((id: number) => id !== user.id);
+                            onUnlike(item.id);
+                        }
+                        else {
+                            onLike(item.id);
+                            item.like_by_ids.push(user.id || 0);
+                        }
+                    }}
                 >
-                    <IconBase 
-                    icon={item.like_by_ids.includes(user.id || 0) ? 'like' : 'like-outline'} 
-                    size={20} 
-                    color={!item.like_by_ids.includes(user.id || 0) ? Colors.gray[700] : Colors.blue[600]} />
+                    <IconBase
+                        icon={item.like_by_ids.includes(user.id || 0) ? 'like' : 'like-outline'}
+                        size={20}
+                        color={!item.like_by_ids.includes(user.id || 0) ? Colors.gray[700] : Colors.blue[600]} />
                     <span>Thích</span>
                 </div>
                 <div className="w-full h-10 flex items-center justify-center space-x-2 rounded hover:bg-gray-200">

@@ -4,32 +4,34 @@ import { PostDetailContextProvider, usePostDetailContext } from "src/core/module
 import { SliderDetailMediaPost } from "../containers/post-detail/slider-detail-media-post";
 import classNames from "classnames";
 import { ContentDetailPost } from "../containers/post-detail/content-detail-post";
+import { ContentAuctionContainer } from "../containers/auction/content-auction-container";
 
-export const PostDetailScreen = observer(() => {
-    const { id } = useParams();
+export const AuctionScreen = observer(() => {
+    const { id } = useParams<{ id: string }>();
     return (
         <PostDetailContextProvider id={id ? Number(id) : undefined}>
-            <PostDetail />
+            <Auction />
         </PostDetailContextProvider>
     )
 })
 
-const PostDetail = observer(() => {
+const Auction = observer(() => {
     const { zoom } = usePostDetailContext()
     return (
         <div className="w-full h-full flex bg-gray-200">
-            <div className={classNames("h-full flex items-center overflow-x-hidden transition-discrete ease-linear duration-500",
-                { 'w-full': zoom },
-                { 'w-2/3': !zoom },
+
+            <div className={classNames("h-full flex flex-col transition-discrete ease-linear duration-500",
+                { 'w-1/3': zoom },
+                { 'w-0': !zoom },
             )}>
-                <SliderDetailMediaPost />
+                {zoom && <ContentDetailPost />}
             </div>
-            {
-                !zoom &&
-                <div className="w-1/3 h-full flex flex-col">
-                    <ContentDetailPost />
-                </div>
-            }
+
+            <div className={classNames("w-full h-full flex items-center overflow-x-hidden ",
+
+            )}>
+                <ContentAuctionContainer />
+            </div>
         </div>
     )
 }

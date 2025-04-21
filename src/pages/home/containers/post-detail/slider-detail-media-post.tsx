@@ -55,7 +55,7 @@ export const SliderDetailMediaPost = observer(() => {
                                     width: widthContainer,
                                 }}
                             >
-                                <img key={index} src={'http://localhost:3000/uploads/1743271793930-228510595-avt.jpg'} alt="" className="h-full object-contain" />
+                                <img key={index} src={item} alt="" className="h-full object-contain" />
                             </div>
                         )
                     })
@@ -69,7 +69,7 @@ export const SliderDetailMediaPost = observer(() => {
                                     width: widthContainer,
                                 }}
                             >
-                                <video key={index} src={'http://localhost:3000/uploads/1743793873811-37283651-demo.mov'} className="h-full object-contain" controls />
+                                <video key={index} src={item} className="h-full object-contain" controls />
                             </div>
                         )
                     })

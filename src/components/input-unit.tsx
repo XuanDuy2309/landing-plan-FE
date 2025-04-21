@@ -8,7 +8,7 @@ interface IProps {
     className?: string
     onChange?: (value?: string) => void
     measure?: boolean
-    value?: string
+    value?: string | number | undefined
     unit?: string
     err?: string
 }
@@ -18,7 +18,7 @@ export const InputUnit = ({ label, className, onChange, value, unit, err, measur
         <div className="w-full flex flex-col text-base">
             <div className="w-full flex items-center space-x-3">
                 <span>{label}:</span>
-                {measure && 
+                {measure &&
                     <div className="flex items-center space-x-2 cursor-pointer">
                         <IconBase icon='location-outline' size={16} color={Colors.blue[600]} />
                         <span className="text-blue-600">Đo trên bản đồ</span>

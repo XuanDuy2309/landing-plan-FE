@@ -1,4 +1,4 @@
-import { CreatePostContextProvider, useCreatePostContext, useUserContext } from "src/core/modules"
+import { CreatePostContextProvider, useCreatePostContext, usePostContext, useUserContext } from "src/core/modules"
 import { IconBase } from "../icon-base"
 import { ButtonLoading } from "../Button"
 import { observer } from "mobx-react"
@@ -9,6 +9,7 @@ import { ModalBase } from "../modal/modal-base"
 import { use, useEffect, useRef } from "react"
 import { Purpose_Post, Type_Post } from "src/core/models"
 import { ContentCreatePost } from "./content-create-post"
+import { toast } from "react-toastify"
 
 interface IProps {
     type?: Purpose_Post
@@ -24,6 +25,7 @@ export const ModalCreatePost = observer(({ type, onSave, onClose }: IProps) => {
 
 const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
     const { data, onSubmit, onClear } = useCreatePostContext()
+    const { onRefresh } = usePostContext()
     const { data: user } = useUserContext()
 
     const items: MenuProps['items'] = [
@@ -100,7 +102,16 @@ const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
                 label="Đăng"
                 template="ActionBlue"
                 className="h-10 w-32 flex items-center justify-center text-xl font-medium"
-                onClick={onSubmit}
+                onClick={async () => {
+                    const res = onSubmit && await onSubmit()
+                    if (res?.Status) {
+                        toast.success(res.Message)
+                        onSave()
+                        onRefresh()
+                        return
+                    }
+                    toast.error(res?.Message)
+                }}
             />
         </div>
 

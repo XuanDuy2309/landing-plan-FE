@@ -76,7 +76,8 @@ export const CreatePostContainer = observer(() => {
             <ModalBase
                 ref={modalRef}
             >
-                <ModalCreatePost type={typePost} onClose={() => { modalRef.current.close() }} onSave={(item) => { modalRef.current.close() }} />
+                <ModalCreatePost    type={typePost} onClose={() => { modalRef.current.close() }} onSave={(item) => { modalRef.current.close() }} />
+                
             </ModalBase>
         </div>
     );

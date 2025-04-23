@@ -8,6 +8,12 @@ import { BaseResponse } from "src/core/config";
 export class CreatePostContextType {
     data: PostModel = new PostModel();
     loading: boolean = false
+    openMap: boolean = false
+    action: ActionMap | undefined
+    message: string = ''
+    setOpenMap: (openMap: boolean) => void = (openMap: boolean) => { }
+    setAction: (action: ActionMap | undefined) => void = (action: ActionMap | undefined) => { }
+    setMessage: (message: string) => void = (message: string) => { }
     onSubmit?: () => Promise<BaseResponse | undefined>
     onClear: () => void = () => { }
 }
@@ -18,9 +24,18 @@ interface IProps {
     children: React.ReactNode
 }
 
+export const enum ActionMap {
+    Select_location = 1,
+    Select_coordinate = 2,
+    Get_width_height = 3
+}
+
 export const CreatePostContextProvider = observer(({ children }: IProps) => {
     const [data, setData] = React.useState<PostModel>(new PostModel());
     const [loading, setLoading] = React.useState<boolean>(false);
+    const [openMap, setOpenMap] = React.useState<boolean>(false);
+    const [action, setAction] = React.useState<ActionMap>();
+    const [message, setMessage] = React.useState<string>('');
 
     const isValidate = () => {
         let isValid = true;
@@ -223,10 +238,13 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
 
     const onClear = () => {
         setData(new PostModel())
+        setOpenMap(false)
+        setAction(undefined)
+        setMessage('')
     }
 
     return (
-        <CreatePostContext.Provider value={{ data, loading, onSubmit, onClear }}>
+        <CreatePostContext.Provider value={{ data, loading, openMap, action, message, setOpenMap, setAction, setMessage, onSubmit, onClear }}>
             {children}
         </CreatePostContext.Provider>
     )

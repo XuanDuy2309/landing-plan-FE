@@ -6,13 +6,6 @@ import { Colors } from "src/assets";
 import { IconBase } from "../icon-base";
 import { Dropdown, MenuProps } from "antd";
 import { AreaAndPriceAsset } from "./area-and-price-asset";
-import { ItemMyImage } from "src/pages/home/components/item-my-image";
-import { ItemImageCreate } from "./item-image-create";
-import { ButtonIcon } from "../button-icon";
-import { ButtonLoading } from "../Button";
-import { SelectFileCase } from "src/core/services";
-import { AuthApi } from "src/core/api";
-import { ItemVideoCreate } from "./item-video-create-post";
 import { AddNewMedia } from "./add-new-media";
 import { InfoOwner } from "./info-owner";
 import { InfoAsset } from "./info-asset";
@@ -162,7 +155,7 @@ export const ContentCreatePost = observer(() => {
                     </Dropdown>
                 </div>
             </div>
-            <TitleDescription/>
+            <TitleDescription />
             <AddNewMedia label="Thêm hình ảnh" type='image'
                 data={data.image_links}
                 onChange={(newData) => {

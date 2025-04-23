@@ -5,6 +5,9 @@ import { clearPersistedStore, getPersistedStore, makePersistable } from "mobx-pe
 export class ILocation {
     lat: number = 0;
     lng: number = 0;
+    constructor() {
+        makeAutoObservable(this)
+    }
 }
 
 export class ISession {
@@ -25,6 +28,8 @@ export class SessionStore {
             setProfile: action,
             setSession: action,
             logout: action,
+            setLocation: action,
+            requestLocation: action
         })
         makePersistable(this, {
             name: 'SessionStore',

@@ -38,7 +38,7 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
   const [coordinates, setCoordinates] = useState<CoordinateSearchLocationModel>(new CoordinateSearchLocationModel());
 
   const [polygon, setPolygon] = useState<any>(null);
-  const [placementInfo, setPlacementInfo] = useState<any>(null);
+  const [placementInfo, setPlacementInfo] = useState<any>();
   const [isDraw, setIsDraw] = useState<boolean>(false);
 
   const [pointsArea, setPointsArea] = useState<PointsMapModel>(new PointsMapModel());
@@ -86,6 +86,9 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
         name: res2.data.name
       })
       return
+    }
+    if (res2) {
+      setPlacementInfo(res2)
     }
     setCoordinates(new CoordinateSearchLocationModel())
   }

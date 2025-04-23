@@ -157,5 +157,6 @@ export const InfoAsset = observer(() => {
                     />
                 </>}
         </div>
+        
     </div>
 })  

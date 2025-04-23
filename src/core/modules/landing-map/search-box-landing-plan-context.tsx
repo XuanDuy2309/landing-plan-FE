@@ -38,18 +38,11 @@ export const ListSearchBoxLandingPlanProvider = observer(({ children }: IProps) 
     const [loading, setLoading] = useState<boolean>(false)
     const handleSearch = async (query) => {
         setLoading(true)
-        if (!query) return
+        if (!query) {
+            setLoading(false)
+            return}
         let params = { q: query }
         try {
-            const res = await viet_map_server.get("/autocomplete/v3", { text: query })
-            // if (res.Data.length > 0) {
-            //     const temp: NominatimResult[] = []
-            //     res.Data.forEach(item => {
-            //         temp.push({ display_name: item.address, isVietMapSearch: true, place_id: item.ref_id })
-            //     })
-            //     setListResultSearch(temp)
-            //     return
-            // }
             const resV2 = await SearchLandingPlanApi.searchInterval(params)
             setListResultSearch(resV2.data)
         } catch (error) {

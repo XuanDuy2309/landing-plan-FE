@@ -4,9 +4,7 @@ import { ButtonLoading } from "../Button"
 import { observer } from "mobx-react"
 import { Colors } from "src/assets"
 import { Dropdown, MenuProps } from "antd"
-import { ModalSelectImage } from "../modal-select-image"
-import { ModalBase } from "../modal/modal-base"
-import { use, useEffect, useRef } from "react"
+import {  useEffect } from "react"
 import { Purpose_Post, Type_Post } from "src/core/models"
 import { ContentCreatePost } from "./content-create-post"
 import { toast } from "react-toastify"
@@ -96,6 +94,8 @@ const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
                 </div>
             </div>
             <ContentCreatePost />
+
+
         </div>
         <div className="w-full h-14 flex-none px-3 border-t border-gray-200 flex items-center justify-end">
             <ButtonLoading

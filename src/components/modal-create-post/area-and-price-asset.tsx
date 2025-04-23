@@ -1,22 +1,32 @@
 import { observer } from "mobx-react"
 import { InputUnit } from "../input-unit"
-import { useCreatePostContext } from "src/core/modules"
+import { ActionMap, useCreatePostContext } from "src/core/modules"
 import { InputLabel } from "../input-label"
 import { IconBase } from "../icon-base"
 import { Colors } from "src/assets"
 import { Purpose_Post } from "src/core/models"
 import { currencyFormat, currencyFormatToInt } from "src/core/base"
+import { ModalMapContainer } from "../modal-map"
+import { useState } from "react"
+import { set } from "mobx"
+import { SpaceContext } from "antd/es/space"
 
 export const AreaAndPriceAsset = observer(() => {
-    const { data } = useCreatePostContext()
+    const { data, setOpenMap, openMap, setMessage, message, setAction } = useCreatePostContext()
     return (
         <div className="w-full h-full flex flex-col space-y-2 px-3">
-            <span className="text-xl font-medium text-gray-900">Diện tích và vị trí:</span>
-            <div className="w-full flex flex-col space-y-1">
+            <span className="text-xl font-medium text-gray-900">Diện tích và vị trí: {message && <span className="text-blue-400">{message}</span>}</span>
+            {!openMap && <div className="w-full flex flex-col space-y-1">
                 <div className="w-full flex flex-col space-x-1">
                     <div className="w-full flex items-center space-x-2">
                         <span className="text-base font-medium text-gray-700">Vị trí:</span>
-                        <div className="flex items-center space-x-2 cursor-pointer">
+                        <div className="flex items-center space-x-2 cursor-pointer"
+                            onClick={() => {
+                                setOpenMap(true)
+                                setMessage('Tìm kiếm và "Chọn trên bản đồ" vị trí BDS của bạn.')
+                                setAction(ActionMap.Select_location)
+                            }}
+                        >
                             <IconBase icon='location-outline' size={16} color={Colors.blue[600]} />
                             <span className="text-blue-600">Chọn trên bản đồ</span>
                         </div>
@@ -49,7 +59,8 @@ export const AreaAndPriceAsset = observer(() => {
                     <span className="text-base font-medium text-gray-700">Đường bao:</span>
                     <div className="flex flex-col space-x-0.5">
                         {!data.coordinates ?
-                            <div className="flex items-center space-x-2 cursor-pointer">
+                            <div className="flex items-center space-x-2 cursor-pointer"
+                                onClick={() => setOpenMap(true)}>
                                 <IconBase icon='location-outline' size={16} color={Colors.blue[600]} />
                                 <span className="text-blue-600">Thêm đường bao</span>
                             </div>
@@ -139,7 +150,8 @@ export const AreaAndPriceAsset = observer(() => {
                         }}
                     />
                 </div>}
-            </div>
+            </div>}
+            {openMap && <ModalMapContainer />}
         </div>
     )
 })

@@ -20,12 +20,18 @@ export const LeafletMapContainer = observer(() => {
         return pointsArea.calculateDistance() || 0
     }, [pointsArea.currentMousePos, pointsArea.points]);
 
+    const { sessionStore } = useCoreStores();
+
+    useEffect(() => {
+        sessionStore.requestLocation();
+    }, [])
     return (
         <MapContainer
             style={{ width: '100%', height: '100%', zIndex: 0 }}
             center={[location.lat, location.lng]}
             zoom={14}
             maxZoom={30}
+            attributionControl={true}
         >
             <MapEvents setSelectedLocation={setSelectedLocation} />
             <MapViewUpdater placement={placement} setSelectedLocation={setSelectedLocation} />
@@ -189,6 +195,13 @@ const MapViewUpdater = observer(({ placement, setSelectedLocation }: IProps2) =>
         };
 
         window.addEventListener('go-to-current-location', handleGoToLocation);
+        map.invalidateSize();
+        if (location?.lat !== 0 && location?.lng !== 0) {
+            map.flyTo([location.lat, location.lng], 18, {
+                animate: true,
+                duration: 1,
+            });
+        }
         return () => {
             window.removeEventListener('go-to-current-location', handleGoToLocation);
         };

@@ -37,7 +37,7 @@ export const CreatePostContainer = observer(() => {
                     onClick={() => {
                         navigate('/home/my_post')
                     }}
-                >
+                >   
                     {
                         data && data?.avatar ?
                             <img src={data.avatar} alt="" className="size-full object-cover" />
@@ -76,8 +76,8 @@ export const CreatePostContainer = observer(() => {
             <ModalBase
                 ref={modalRef}
             >
-                <ModalCreatePost    type={typePost} onClose={() => { modalRef.current.close() }} onSave={(item) => { modalRef.current.close() }} />
-                
+                <ModalCreatePost type={typePost} onClose={() => { modalRef.current.close() }} onSave={(item) => { modalRef.current.close() }} />
+
             </ModalBase>
         </div>
     );

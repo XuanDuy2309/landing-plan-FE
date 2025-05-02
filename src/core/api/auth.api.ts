@@ -12,4 +12,10 @@ export const AuthApi = {
     upload: (params?: any) => server.multipartPost('/auth/upload', params),
     updateInfo: (params?: any) => server.put('/user/update', params),
     updatePassword: (params?: any) => server.put('/user/change_password', params),
+    follow: (params?: any) => server.post('/user/follow', params),
+    unfollow: (params?: any) => server.delete('/user/follow', params),
+    getFollowing: (params?: any) => server.get('/user/followings', params),
+    getFollowers: (params?: any) => server.get('/user/followers', params),
+    checkFollow: (params?: any) => server.get('/user/check_follow', params),
+    getListUser: (params?: any) => server.get('/user', params),
 }

@@ -78,7 +78,6 @@ export const RegisterScreen = observer(() => {
             toast('Sign up successfully')
             return
         }
-        console.log('ressss', res)
         setErrorMessage(res.Message)
     }
     return <div className="w-full h-full flex justify-center overflow-y-auto bg-[url('/images/bg-auth.png')] bg-contain bg-left-top bg-no-repeat bg-gray-100">

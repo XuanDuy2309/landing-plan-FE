@@ -1,5 +1,6 @@
 import { Dropdown } from "antd";
 import { observer } from "mobx-react";
+import moment from "moment";
 import { useMemo, useState } from "react";
 import { IconBase } from "src/components";
 import { currencyFormat } from "src/core/base";
@@ -85,8 +86,11 @@ export const HistorySetBid = observer(({ data, value, onSelected }: IProps) => {
                     displayedProgram.length > 0 ?
                         <div className="w-full flex flex-col flex-none border border-gray-200">
                             <div className='w-full h-12 flex items-center divide-x font-medium text-gray-700 border-b border-gray-200 divide-gray-200'>
-                                <div className="w-[100px] h-full px-3 flex items-center justify-center">
+                                <div className="w-[100px] flex-none h-full px-3 flex items-center justify-center">
                                     <span>{'STT'}</span>
+                                </div>
+                                <div className="w-full h-full px-3 flex items-center">
+                                    <span>{"Thời gian đặt giá"}</span>
                                 </div>
                                 <div className="w-full h-full px-3 flex items-center">
                                     <span>{"Họ và tên"}</span>
@@ -99,11 +103,14 @@ export const HistorySetBid = observer(({ data, value, onSelected }: IProps) => {
                                 displayedProgram.map((item, index) => {
                                     return (
                                         <div className='w-full h-12 flex items-center divide-x border-b border-gray-200 divide-gray-200' key={index}>
-                                            <div className="w-[100px] h-full px-3 flex items-center justify-center">
+                                            <div className="w-[100px] h-full px-3 flex flex-none items-center justify-center">
                                                 <span>{index + 1}</span>
                                             </div>
                                             <div className="w-full h-full px-3 flex items-center">
-                                                <span>{item.create_by_name}</span>
+                                                <span>{item.create_at ? moment(item.create_at).format('HH:mm DD/MM/YYYY') : '--/--/----'}</span>
+                                            </div>
+                                            <div className="w-full h-full px-3 flex items-center">
+                                                <span>{item.user_name}</span>
                                             </div>
                                             <div className="w-full h-full px-3 flex items-center justify-end">
                                                 <span>{currencyFormat(item.price)} VND</span>

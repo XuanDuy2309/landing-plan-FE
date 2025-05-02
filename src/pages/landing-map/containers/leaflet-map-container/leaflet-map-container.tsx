@@ -53,9 +53,17 @@ export const LeafletMapContainer = observer(() => {
                         attribution="&copy; <a href='https://www.google.com/maps'>Google Maps</a> contributors"
                     />
                 </LayersControl.BaseLayer>
+                <LayersControl.BaseLayer name="Map vệ tinh">
+                    <TileLayer
+                        url="http://{s}.google.com/vt/lyrs=m,t&x={x}&y={y}&z={z}"
+                        subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+                        maxZoom={30}
+                        attribution="&copy; <a href='https://www.google.com/maps'>Google Maps</a> contributors"
+                    />
+                </LayersControl.BaseLayer>
             </LayersControl>
             {landingPlanMap && landingPlanMap.folder_path && <TileLayer
-                url={`http://localhost:3000/${landingPlanMap?.folder_path}/{z}/{x}/{y}.png`}
+                url={`${landingPlanMap?.folder_path}{z}/{x}/{y}.png`}
                 // pane="overlayPane"
                 minZoom={12}
                 maxZoom={18}
@@ -63,15 +71,16 @@ export const LeafletMapContainer = observer(() => {
                 zIndex={999}
                 tms={true}
             />}
-            {/* <TileLayer
-                url={`https://s3-hn-2.cloud.cmctelecom.vn/guland7/land/ha-noi/{z}/{x}/{y}.png`}
+            <TileLayer
+                url={`https://cdn.dandautu.vn/quy-hoach/ha_noi/hoang_mai__ha_noi/{z}/{x}/{y}.png`}
                 // pane="overlayPane"
                 minZoom={12}
                 maxZoom={18}
                 opacity={0.8}
                 zIndex={999}
+                tms={true}
             // opacity={opacit}
-            /> */}
+            />
 
             {selectedLocation.lat && selectedLocation.lng && (
                 <Marker position={[Number(selectedLocation.lat), Number(selectedLocation.lng)]}>

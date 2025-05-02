@@ -4,7 +4,7 @@ import { ButtonLoading } from "../Button"
 import { observer } from "mobx-react"
 import { Colors } from "src/assets"
 import { Dropdown, MenuProps } from "antd"
-import {  useEffect } from "react"
+import { useEffect } from "react"
 import { Purpose_Post, Type_Post } from "src/core/models"
 import { ContentCreatePost } from "./content-create-post"
 import { toast } from "react-toastify"
@@ -22,7 +22,7 @@ export const ModalCreatePost = observer(({ type, onSave, onClose }: IProps) => {
 })
 
 const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
-    const { data, onSubmit, onClear } = useCreatePostContext()
+    const { data, onSubmit, onClear, message, openMap } = useCreatePostContext()
     const { onRefresh } = usePostContext()
     const { data: user } = useUserContext()
 
@@ -57,8 +57,8 @@ const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
     }, [type])
 
     return <div className="w-full h-[600px] bg-white flex-none flex flex-col">
-        <div className="relative w-full h-14 flex-none border-b border-gray-200 flex items-center justify-center">
-            <span className="text-2xl font-semibold text-gray-700">Tạo bài viết</span>
+        <div className="relative w-full h-14 px-3 flex-none border-b border-gray-200 flex items-center justify-start">
+            <span className="text-2xl font-semibold text-gray-700">Tạo bài viết {message && <span className="text-blue-400">{message}</span>}</span>
             <div
                 className="absolute right-3 size-9 text-gray-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-200"
                 onClick={() => {
@@ -70,7 +70,7 @@ const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
             </div>
         </div>
         <div className="w-full h-full overflow-y-auto flex flex-col">
-            <div className="w-full flex-none p-3 border-gray-200 flex items-center space-x-3">
+            {!openMap && <div className="w-full flex-none p-3 border-gray-200 flex items-center space-x-3">
                 <div className='size-14 rounded-full flex items-center bg-gray-200 justify-center overflow-hidden'>
                     {
                         user?.avatar ?
@@ -92,12 +92,19 @@ const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
                         </Dropdown>
                     </div>
                 </div>
-            </div>
+            </div>}
             <ContentCreatePost />
-
-
         </div>
-        <div className="w-full h-14 flex-none px-3 border-t border-gray-200 flex items-center justify-end">
+        <div className="w-full h-14 flex-none px-3 border-t border-gray-200 flex items-center justify-end space-x-2">
+            <ButtonLoading
+                label="Huỷ bỏ"
+                template="ActionBase"
+                className="h-10 w-32 flex items-center justify-center text-xl font-medium"
+                onClick={() => {
+                    onClose()
+                    onClear()
+                }}
+            />
             <ButtonLoading
                 label="Đăng"
                 template="ActionBlue"

@@ -11,14 +11,11 @@ export const HomeScreen = observer(() => {
     return (
         <PostContextProvider>
             <div className="w-full h-full flex items-center justify-between max-w-[1440px] mx-auto">
-                <div className="w-1/4 max-w-[360px] min-w-[280px] h-full">
+                <div className="w-1/3 max-w-[480px] min-w-[280px] h-full flex-none">
                     <LeftSideHome />
                 </div>
-                <div className="w-full h-full max-w-[680px] py-4">
+                <div className="w-2/3 h-full pr-4">
                     <HomeContainer />
-                </div>
-                <div className="w-1/4 max-w-[360px] min-w-[280px] h-ful">
-                    <RightSideHome />
                 </div>
             </div>
         </PostContextProvider>

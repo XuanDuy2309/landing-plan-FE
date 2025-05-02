@@ -91,14 +91,6 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
             data.err_area = 'Vui lòng nhập diện tích'
             isValid = false
         }
-        if (!data.width) {
-            data.err_width = 'Vui lòng nhập chiều ngang'
-            isValid = false
-        }
-        if (!data.height) {
-            data.err_height = 'Vui lòng nhập chiều dài'
-            isValid = false
-        }
 
         // Giá mua bán / thuê
         if (data.purpose === Purpose_Post.For_Sell && !data.price_for_buy) {

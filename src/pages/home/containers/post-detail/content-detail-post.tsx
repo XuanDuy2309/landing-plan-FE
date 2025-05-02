@@ -73,13 +73,13 @@ export const ContentDetailPost = observer(() => {
     }
 
     const renderPrice = () => {
-        if (data.purpose === Purpose_Post.For_Sell) {
+        if (Number(data.purpose) === Purpose_Post.For_Sell) {
             return data.price_for_buy
         }
-        if (data.purpose === Purpose_Post.For_Rent) {
+        if (Number(data.purpose) === Purpose_Post.For_Rent) {
             return data.price_for_rent
         }
-        if (data.purpose === Purpose_Post.For_Auction) {
+        if (Number(data.purpose) === Purpose_Post.For_Auction) {
             return data.price_start
         }
         return data.price_current
@@ -153,14 +153,6 @@ export const ContentDetailPost = observer(() => {
                         <span className=" w-[140px]">Diện tích:</span>
                         <span>{data.area} m2</span>
                     </div>
-                    <div className="w-full flex items-center space-x-2 ">
-                        <span className=" w-[140px]">Chiều dài:</span>
-                        <span>{data.width} m</span>
-                    </div>
-                    <div className="w-full flex items-center space-x-2 ">
-                        <span className=" w-[140px]">Chiều rộng:</span>
-                        <span>{data.height} m</span>
-                    </div>
                     <div className="w-full flex items-center space-x-2">
                         <span className=" w-[140px]">Giá:</span>
                         <span>{formatMoney(renderPrice(), 1, 'vn')} {renderUnit()}</span>
@@ -196,11 +188,11 @@ export const ContentDetailPost = observer(() => {
                         <>
                             <div className="w-full flex items-center space-x-2">
                                 <span className=" w-[140px]">Thời gian bắt đầu:</span>
-                                <span>{data.date_start ? moment(data.date_start).format('DD/MM/YYYY') : '--/--/----'}</span>
+                                <span>{data.start_date ? moment(data.start_date).format('DD/MM/YYYY') : '--/--/----'}</span>
                             </div>
                             <div className="w-full flex items-center space-x-2">
                                 <span className=" w-[140px]">Thời gian kết thúc:</span>
-                                <span>{data.date_end ? moment(data.date_end).format('DD/MM/YYYY') : '--/--/----'}</span>
+                                <span>{data.end_date ? moment(data.end_date).format('DD/MM/YYYY') : '--/--/----'}</span>
                             </div>
                             <div className="w-full flex items-center space-x-2">
                                 <span className=" w-[140px]">Giá khởi điểm:</span>

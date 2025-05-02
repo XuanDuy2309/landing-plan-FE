@@ -337,3 +337,7 @@ button {
     scrollbar-width: none;
     /* Firefox */
 }
+
+.infinite-scroll-component__outerdiv {
+    width: 100%;
+}

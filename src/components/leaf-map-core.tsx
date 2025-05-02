@@ -7,21 +7,21 @@ import { useManagementLandingPlan } from "src/core/modules";
 import { useCoreStores } from "src/core/stores";
 import { Colors } from "src/assets";
 import { isValidPolygon } from "src/core/base";
+import { NominatimResult, PointsMapModel, SelectedLocationModel } from "src/core/models";
 
 interface IProps {
-    MapEvent?: () => JSX.Element;
-    MapViewUpdater?: () => JSX.Element;
-    RoutingMachine?: () => JSX.Element
+    MapEvent?: (Props: { pointsArea: PointsMapModel, setSelectedLocation: (selectedLocation: SelectedLocationModel) => void }) => JSX.Element;
+    MapViewUpdater?: (Props: { placement: NominatimResult, setSelectedLocation: (selectedLocation: SelectedLocationModel) => void }) => JSX.Element;
+    RoutingMachine?: (props: { from: [number, number], to: [number, number] }) => JSX.Element
 }
 
 export const LeafletMapCore = observer(({ MapEvent, MapViewUpdater, RoutingMachine }: IProps) => {
-    const { location } = useCoreStores().sessionStore
-    const {  polygon, selectedLocation, setSelectedLocation, isDraw, coordinates, pointsArea, landingPlanMap, opacity } = useManagementLandingPlan()
+    const { sessionStore } = useCoreStores()
+    const { location } = sessionStore
+    const { polygon, selectedLocation, setSelectedLocation, placement, isDraw, coordinates, pointsArea, landingPlanMap, opacity } = useManagementLandingPlan()
     const calculateDistance = useMemo(() => {
         return pointsArea.calculateDistance() || 0
     }, [pointsArea.currentMousePos, pointsArea.points]);
-
-    const { sessionStore } = useCoreStores();
 
     useEffect(() => {
         sessionStore.requestLocation();
@@ -34,9 +34,9 @@ export const LeafletMapCore = observer(({ MapEvent, MapViewUpdater, RoutingMachi
             maxZoom={30}
             attributionControl={true}
         >
-            {MapEvent && <MapEvent />}
-            {MapViewUpdater && <MapViewUpdater />}
-            {RoutingMachine && pointsArea.routeTo && pointsArea.isRouting && <RoutingMachine />}
+            {MapEvent && <MapEvent setSelectedLocation={setSelectedLocation} pointsArea={pointsArea} />}
+            {MapViewUpdater && <MapViewUpdater placement={placement} setSelectedLocation={setSelectedLocation} />}
+            {RoutingMachine && pointsArea.routeTo && pointsArea.isRouting && <RoutingMachine from={[location.lat, location.lng]} to={[pointsArea.routeTo[0], pointsArea.routeTo[1]]} />}
             <LayersControl>
                 <LayersControl.BaseLayer checked name="Map mặc định">
                     <TileLayer
@@ -64,15 +64,6 @@ export const LeafletMapCore = observer(({ MapEvent, MapViewUpdater, RoutingMachi
                 zIndex={999}
                 tms={true}
             />}
-            {/* <TileLayer
-                url={`https://s3-hn-2.cloud.cmctelecom.vn/guland7/land/ha-noi/{z}/{x}/{y}.png`}
-                // pane="overlayPane"
-                minZoom={12}
-                maxZoom={18}
-                opacity={0.8}
-                zIndex={999}
-            // opacity={opacit}
-            /> */}
 
             {selectedLocation.lat && selectedLocation.lng && (
                 <Marker position={[Number(selectedLocation.lat), Number(selectedLocation.lng)]}>

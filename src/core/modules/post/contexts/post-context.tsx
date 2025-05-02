@@ -1,12 +1,10 @@
-import { observer } from "mobx-react";
-import React, { use, useEffect } from "react";
-import { AuthApi, PostApi } from "../../../api";
-import { Direction_Land_Enum, PostModel, Purpose_Post, Status_Post, Type_Asset_Enum, Type_Post } from "../../../models";
 import { makeObservable, observable } from "mobx";
+import { observer } from "mobx-react";
+import React, { useEffect } from "react";
+import { PostApi } from "../../../api";
 import { IBaseContextType, IContextFilter, useBaseContextProvider } from "../../../context";
-import moment from "moment";
+import { PostModel, Purpose_Post, Type_Asset_Enum } from "../../../models";
 import { PostUseCase } from "../usecase";
-import { SessionStore, useCoreStores } from "src/core/stores";
 
 
 export class FilterPostContextType extends IContextFilter {
@@ -23,17 +21,19 @@ export class FilterPostContextType extends IContextFilter {
 }
 
 export class PostContextType extends IBaseContextType<PostModel, FilterPostContextType> {
-    onLikePost: (id: number) => Promise<any> = async (id: number) => {}
-    onUnLikePost: (id: number) => Promise<any> = async (id: number) => {}
+    onLikePost: (id: number) => Promise<any> = async (id: number) => { }
+    onUnLikePost: (id: number) => Promise<any> = async (id: number) => { }
 }
 
 export const PostContext = React.createContext<PostContextType>(new PostContextType());
 
 interface IProps {
     children: React.ReactNode
+    id?: number
+    following?: boolean
 }
 
-export const PostContextProvider = observer(({ children }: IProps) => {
+export const PostContextProvider = observer(({ children, id, following }: IProps) => {
     const context = useBaseContextProvider<FilterPostContextType, PostModel>(new FilterPostContextType(), request)
 
     async function request(
@@ -42,19 +42,29 @@ export const PostContextProvider = observer(({ children }: IProps) => {
         pageSize: number
     ): Promise<{ count: number; list: PostModel[]; offset: number }> {
         const uc = new PostUseCase()
-        const res = await uc.fetchInternal(filter, index, pageSize)
+        let res = {
+            count: 0,
+            list: [],
+            offset: 0
+        }
+        if (following) {
+            res = await uc.fetchFollowingPost({ ...filter, user_id: id }, index, pageSize)
+        }
+        else {
+            res = await uc.fetchInternal({ ...filter, user_id: id }, index, pageSize)
+        }
         return {
             ...res,
         }
     }
 
     const onLikePost = async (id: number) => {
-        const res = await PostApi.likePost({id})
+        const res = await PostApi.likePost({ id })
         return res
     }
 
     const onUnLikePost = async (id: number) => {
-        const res = await PostApi.unlike({id})
+        const res = await PostApi.unlike({ id })
         return res
     }
 

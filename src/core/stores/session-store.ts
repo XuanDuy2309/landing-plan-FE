@@ -40,6 +40,9 @@ export class SessionStore {
             // stringify: false,
             // debugMode: true,
         });
+        runInAction(() => {
+            this.requestLocation();
+        })
         getPersistedStore(this).then((data) => {
             if (data) {
                 runInAction(() => {
@@ -47,7 +50,6 @@ export class SessionStore {
                 });
             }
         });
-        this.requestLocation();
     }
 
     setProfile(profile?: UserModel) {
@@ -74,21 +76,25 @@ export class SessionStore {
     }
 
     requestLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    runInAction(() => {
-                        this.setLocation(position.coords.latitude, position.coords.longitude);
-                    });
-                },
-                (error) => {
-                    console.error("Lỗi lấy vị trí: ", error);
-                },
-                { enableHighAccuracy: true }
-            );
-        } else {
+        if (!navigator.geolocation) {
             console.warn("Trình duyệt không hỗ trợ Geolocation");
+            return;
         }
+
+        navigator.geolocation.getCurrentPosition(
+            ({ coords: { latitude, longitude } }) => {
+                runInAction(() => {
+                    this.setLocation(latitude, longitude);
+                });
+            },
+            (error) => {
+                console.error("Lỗi khi lấy vị trí:", error);
+                runInAction(() => {
+                    this.setLocation(0, 0); // Đặt tọa độ mặc định nếu xảy ra lỗi
+                });
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
     }
 
     showLoading() {

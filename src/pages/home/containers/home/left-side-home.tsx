@@ -6,11 +6,11 @@ import { Colors } from "src/assets"
 import { ButtonLoading, InputUnit } from "src/components"
 import { ButtonIcon } from "src/components/button-icon"
 import { Purpose_Post, Type_Asset_Enum } from "src/core/models"
-import { usePostContext } from "src/core/modules"
+import { FilterPostContextType, usePostContext } from "src/core/modules"
 
 export const LeftSideHome = observer(() => {
     const [show, setShow] = useState<boolean>(true)
-    const { filter, onRefresh } = usePostContext()
+    const { filter, onRefresh, setFilter } = usePostContext()
     const [maxHeight, setMaxHeight] = useState<number>()
 
     const listPurpose = [
@@ -73,6 +73,10 @@ export const LeftSideHome = observer(() => {
         },
     ]
 
+    const onClear = () => {
+        Object.assign(filter, new FilterPostContextType())
+    }
+
     return (
         <div className="w-full h-full flex flex-col p-3">
             <div className={classNames("w-full flex flex-col justify-start items-center gap-2 bg-white rounded-xl max-h-full min-h-0",
@@ -92,7 +96,7 @@ export const LeftSideHome = observer(() => {
                         <input type="text"
                             value={filter.query || ''}
                             onChange={(e) => { filter.query = e.target.value }}
-                            placeholder="Tìm kiếm"
+                            placeholder="Tìm kiếm theo địa chỉ"
                             className="w-full outline-none bg-transparent"
                         />
                     </div>
@@ -189,6 +193,8 @@ export const LeftSideHome = observer(() => {
                         setShow(false)
                     }} />
                     <ButtonLoading label="Huỷ bỏ" template="ActionBase" className="h-10 w-full flex items-center justify-center text-xl font-medium" onClick={() => {
+                        onClear()
+                        onRefresh()
                         setShow(false)
                     }} />
                 </div>

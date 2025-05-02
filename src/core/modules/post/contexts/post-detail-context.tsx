@@ -1,14 +1,17 @@
 import { observer } from "mobx-react";
 import moment from "moment";
-import React, { use, useContext, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { PostApi } from "src/core/api";
-import { BIDModel, Direction_Land_Enum, PostModel, Purpose_Post, Status_Post, Type_Asset_Enum, Type_Post } from "src/core/models";
+import { BidsApi } from "src/core/api/bids.api";
+import { BIDModel, PostModel } from "src/core/models";
 
 export class PostDetailContextType {
     data: PostModel = new PostModel();
     zoom: boolean = false;
     dataAuction: BIDModel = new BIDModel();
     setZoom: (zoom: boolean) => void = (zoom: boolean) => { };
+    setBid!: () => Promise<any>;
+    onRefresh: () => Promise<any> = async () => { };
 }
 
 export const PostDetailContext = React.createContext<PostDetailContextType>(new PostDetailContextType());
@@ -32,9 +35,42 @@ export const PostDetailContextProvider = observer(({ children, id }: IProps) => 
         }
     }
 
+    const fetchDataAuction = async (id) => {
+        const res = await BidsApi.getBids({ id });
+        if (res.Status) {
+            data.bids = res.Data.data.map((item) => {
+                const bid = new BIDModel();
+                Object.assign(bid, item);
+                bid.create_at = moment(item.create_at).format('DD/MM/YYYY HH:mm');
+                return bid;
+            })
+            data.price_current = data.bids[0]?.price || 0;
+            dataAuction.price = data.price_current;
+        }
+    }
+
+    const setBid = async () => {
+        const params = {
+            "price": dataAuction.price,
+            "post_id": id,
+        }
+
+        const res = await BidsApi.createBid(params);
+        if (res.Status) {
+            fetchDataAuction(id);
+        }
+        return res;
+    }
+
+    const onRefresh = async () => {
+        await fetchData(id);
+        await fetchDataAuction(id);
+    }
+
     useEffect(() => {
         if (id) {
             fetchData(id);
+            fetchDataAuction(id);
         }
     }, [id]);
     return (
@@ -42,7 +78,9 @@ export const PostDetailContextProvider = observer(({ children, id }: IProps) => 
             data,
             zoom,
             dataAuction,
-            setZoom
+            setZoom,
+            setBid,
+            onRefresh
         }}>
             {children}
         </PostDetailContext.Provider>

@@ -30,9 +30,12 @@ export class UserModel {
     status: Status = Status.active;
     gender: Gender = Gender.male;
     dob?: Moment;
+    follower_ids?: number[];
+    following_ids?: number[];
     avatar?: string;
     background?: string;
     created_at?: string;
+
     err_username?: string;
     err_password?: string;
     err_confirm_password?: string;

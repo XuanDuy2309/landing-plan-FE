@@ -1,16 +1,16 @@
 import { Dropdown, MenuProps } from "antd";
+import classNames from "classnames";
 import { observer } from "mobx-react";
 import moment from "moment";
-import { Colors } from "src/assets";
-import { ButtonIcon } from "src/components/button-icon";
-import { Purpose_Post } from "src/core/models";
-import { ItemMyImage } from "../item-my-image";
-import { IconBase } from "src/components";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Colors } from "src/assets";
+import { IconBase } from "src/components";
+import { ButtonIcon } from "src/components/button-icon";
 import { formatMoney } from "src/core/base";
-import classNames from "classnames";
+import { Purpose_Post } from "src/core/models";
 import { useUserContext } from "src/core/modules";
-import { use, useEffect, useState } from "react";
+import { ItemMyImage } from "../item-my-image";
 
 interface IProps {
     item: any
@@ -30,13 +30,21 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
         3: { label: "Đấu giá", color: Colors.red[400] },
     }
 
-    const listOption: MenuProps['items'] = [
+    let listOption: MenuProps['items'] = [
         {
             key: '1',
             label: 'Chi tiết',
             onClick: () => {
                 navigate(`/post/${item.id}`);
             },
+        },
+        {
+            key: '2',
+            label: 'Đấu giá ngay',
+            onClick: () => {
+                navigate(`/auction/${item.id}`);
+            },
+            disabled: Number(item.purpose) !== Purpose_Post.For_Auction
         },
         {
             key: '3',
@@ -71,6 +79,19 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
         }
         return item.price_current
     }
+
+
+    const getGridClass = () => {
+        switch (listImage.length) {
+            case 1:
+                return 'grid-cols-1';
+            case 2:
+                return 'grid-cols-2';
+            default:
+                return 'grid-cols-3 grid-rows-2';
+        }
+    };
+
     useEffect(() => {
         if (item.image_links) {
             setListImage(JSON.parse(item.image_links))
@@ -79,12 +100,13 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
             setListVideo(JSON.parse(item.video_links))
         }
     }, [item.image_links, item.video_links])
+
     return (
         <div className="w-full p-3 flex flex-col bg-white rounded-xl space-y-2">
             <div className="w-full flex items-center space-x-2 border-gray-200 relative">
                 <div className='size-10 flex-none rounded-full flex items-center bg-gray-200 justify-center overflow-hidden cursor-pointer hover:opacity-80'
                     onClick={() => {
-                        navigate(`/profile/${item.create_by_id}`);
+                        navigate(`/profile/${item.create_by_id}`)
                     }}
                 >
                     {
@@ -107,7 +129,7 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                 </Dropdown>
             </div>
             <div className="w-full flex items-center space-x-2">
-                <span className="text-sm font-medium px-2 py-1 rounded-full text-white"
+                <span className="text-sm font-medium px-2 py-1 rounded-full flex-none text-white"
                     style={{ backgroundColor: renderPurpose[item.purpose].color }}
                 >{renderPurpose[item.purpose].label}</span>
                 <span className="text-gray-900 font-bold text-base">{item.title}</span>
@@ -123,20 +145,22 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                 <span>{item.area} m2</span>
             </div>
 
-            {
-                listImage.length > 0 &&
-                <div className="w-full grid-cols-2 grid gap-3">
-                    {
-                        listImage.map((item, index) => {
-                            return (
-                                <ItemMyImage key={index} item={item} action={undefined} />
-                            )
-                        })
-                    }
-                </div>
-            }
+            <div className={`relative overflow-hidden h-[412px] grid gap-2 ${getGridClass()}`}>
+                {listImage.slice(0, 3).map((item, index) => {
+                    return (
+                        <div
+                            key={index}
+                            className={classNames('relative size-full', {
+                                'row-span-2 col-span-2': listImage.length > 2 && index == 0,
+                            })}
+                        >
+                            <ItemMyImage key={index} item={item} action={undefined} />
+                        </div>
+                    )
+                })}
+            </div>
             <div className="w-full flex items-center border-t space-x-2 border-gray-200 pt-3">
-                <div className={classNames("w-full h-10 flex items-center justify-center space-x-2 rounded hover:bg-gray-200",
+                <div className={classNames("w-full h-10 flex items-center justify-center space-x-2 rounded hover:bg-gray-200 cursor-pointer",
                     { 'text-gray-700': !item.like_by_ids?.includes(user.id || 0) },
                     { 'text-blue-800': item.like_by_ids?.includes(user.id || 0) }
                 )}
@@ -157,11 +181,12 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                         color={!item.like_by_ids.includes(user.id || 0) ? Colors.gray[700] : Colors.blue[600]} />
                     <span>Thích</span>
                 </div>
-                <div className="w-full h-10 flex items-center justify-center space-x-2 rounded hover:bg-gray-200">
+                <div className="w-full h-10 flex items-center justify-center space-x-2 rounded hover:bg-gray-200 cursor-pointer">
                     <IconBase icon='share-outline' size={20} color={Colors.gray[700]} />
                     <span>Chia sẻ</span>
                 </div>
             </div>
+
         </div>
     );
 })

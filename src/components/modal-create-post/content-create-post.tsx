@@ -11,9 +11,10 @@ import { InfoOwner } from "./info-owner";
 import { InfoAsset } from "./info-asset";
 import { SettingAuction } from "./setting-auction";
 import { TitleDescription } from "./title-description";
+import { ModalMapContainer } from "../modal-map";
 
 export const ContentCreatePost = observer(() => {
-    const { data } = useCreatePostContext()
+    const { data, openMap } = useCreatePostContext()
 
     const items: MenuProps['items'] = [
         {
@@ -117,62 +118,65 @@ export const ContentCreatePost = observer(() => {
     }
 
     return (
-        <div className="w-full flex flex-col space-y-3 py-3">
-            <div className="w-full flex flex-col space-y-1">
-                <div className="w-full flex items-center space-x-2 px-3">
-                    <span className="text-base font-medium text-gray-700">Mục đích đăng bài:</span>
-                    <RadioGroup
-                        value={data.purpose}
-                        primary
-                        data={[
-                            { label: 'Cần bán', value: Purpose_Post.For_Sell },
-                            { label: 'Cho thuê', value: Purpose_Post.For_Rent },
-                            { label: 'Đấu giá', value: Purpose_Post.For_Auction },
-                        ]}
-                        onChange={(value) => {
-                            data.purpose = value
-                        }}
-                    />
+        <div className="w-full h-full flex flex-col space-y-3 py-3">
+            {!openMap && <>
+                <div className="w-full h-full flex flex-col space-y-1">
+                    <div className="w-full flex items-center space-x-2 px-3">
+                        <span className="text-base font-medium text-gray-700">Mục đích đăng bài:</span>
+                        <RadioGroup
+                            value={data.purpose}
+                            primary
+                            data={[
+                                { label: 'Cần bán', value: Purpose_Post.For_Sell },
+                                { label: 'Cho thuê', value: Purpose_Post.For_Rent },
+                                { label: 'Đấu giá', value: Purpose_Post.For_Auction },
+                            ]}
+                            onChange={(value) => {
+                                data.purpose = value
+                            }}
+                        />
+                    </div>
+                    <div className="w-full flex items-center space-x-2 px-3">
+                        <span className="text-base font-medium text-gray-700">Loại bất động sản:</span>
+                        <Dropdown trigger={["click"]} menu={{ items }}>
+                            <div className="flex items-center border-b border-gray-200 cursor-pointer space-x-1"
+                            >
+                                <span>{typeAssetPost[data.type_asset].label}</span>
+                                <IconBase icon='arrowdown' size={16} color={Colors.gray[700]} />
+                            </div>
+                        </Dropdown>
+                    </div>
+                    <div className="w-full flex items-center space-x-2 px-3">
+                        <span className="text-base font-medium text-gray-700">Vị trí:</span>
+                        <Dropdown trigger={["click"]} menu={{ items: itemsAlley }}>
+                            <div className="flex items-center border-b border-gray-200 cursor-pointer space-x-1"
+                            >
+                                <span>{typeAlley[data.in_alley].label}</span>
+                                <IconBase icon='arrowdown' size={16} color={Colors.gray[700]} />
+                            </div>
+                        </Dropdown>
+                    </div>
                 </div>
-                <div className="w-full flex items-center space-x-2 px-3">
-                    <span className="text-base font-medium text-gray-700">Loại bất động sản:</span>
-                    <Dropdown trigger={["click"]} menu={{ items }}>
-                        <div className="flex items-center border-b border-gray-200 cursor-pointer space-x-1"
-                        >
-                            <span>{typeAssetPost[data.type_asset].label}</span>
-                            <IconBase icon='arrowdown' size={16} color={Colors.gray[700]} />
-                        </div>
-                    </Dropdown>
-                </div>
-                <div className="w-full flex items-center space-x-2 px-3">
-                    <span className="text-base font-medium text-gray-700">Vị trí:</span>
-                    <Dropdown trigger={["click"]} menu={{ items: itemsAlley }}>
-                        <div className="flex items-center border-b border-gray-200 cursor-pointer space-x-1"
-                        >
-                            <span>{typeAlley[data.in_alley].label}</span>
-                            <IconBase icon='arrowdown' size={16} color={Colors.gray[700]} />
-                        </div>
-                    </Dropdown>
-                </div>
-            </div>
-            <TitleDescription />
-            <AddNewMedia label="Thêm hình ảnh" type='image'
-                data={data.image_links}
-                onChange={(newData) => {
-                    data.image_links = newData
-                }}
-                err={data.err_image}
-            />
-            <AddNewMedia label="Thêm video" type='video'
-                data={data.video_links}
-                onChange={(newData) => {
-                    data.video_links = newData
-                }}
-            />
-            <AreaAndPriceAsset />
-            <InfoAsset />
-            {data.purpose === Purpose_Post.For_Auction && <SettingAuction />}
-            <InfoOwner />
+                <TitleDescription />
+                <AddNewMedia label="Thêm hình ảnh" type='image'
+                    data={data.image_links}
+                    onChange={(newData) => {
+                        data.image_links = newData
+                    }}
+                    err={data.err_image}
+                />
+                <AddNewMedia label="Thêm video" type='video'
+                    data={data.video_links}
+                    onChange={(newData) => {
+                        data.video_links = newData
+                    }}
+                />
+                <AreaAndPriceAsset />
+                <InfoAsset />
+                {data.purpose === Purpose_Post.For_Auction && <SettingAuction />}
+                <InfoOwner />
+            </>}
+            {openMap && <ModalMapContainer />}
         </div>
     )
 })

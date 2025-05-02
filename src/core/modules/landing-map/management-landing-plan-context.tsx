@@ -22,6 +22,9 @@ export class ManagementLandingPlanContextType {
   setLandingPlanMap = (landingPlanMap: LandingPlanModel | undefined) => { }
   opacity = 1
   setOpacity = (opacity: number) => { }
+  placementInfo: NominatimResult | undefined
+  setPlacementInfo = (placementInfo: NominatimResult | undefined) => { }
+  onSearchByLatLon = async (lat: number, lon: number) => { }
 }
 
 export const ManagementLandingPlanContext = createContext<ManagementLandingPlanContextType>(
@@ -38,7 +41,7 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
   const [coordinates, setCoordinates] = useState<CoordinateSearchLocationModel>(new CoordinateSearchLocationModel());
 
   const [polygon, setPolygon] = useState<any>(null);
-  const [placementInfo, setPlacementInfo] = useState<any>();
+  const [placementInfo, setPlacementInfo] = useState<NominatimResult>();
   const [isDraw, setIsDraw] = useState<boolean>(false);
 
   const [pointsArea, setPointsArea] = useState<PointsMapModel>(new PointsMapModel());
@@ -87,10 +90,20 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
       })
       return
     }
-    if (res2) {
-      setPlacementInfo(res2)
-    }
     setCoordinates(new CoordinateSearchLocationModel())
+  }
+
+  const onSearchByLatLon = async (lat: number, lon: number) => {
+    const params = {
+      lat: lat,
+      lon: lon
+    }
+    await SearchLandingPlanReverseApi.searchInterval(params)
+      .then((res) => {
+        setPlacementInfo(res.data)
+      }).catch((error) => {
+        console.log(error)
+      })
   }
 
   const searchLandingPlan = async (lat: number, lon: number) => {
@@ -110,6 +123,7 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
   useEffect(() => {
     if (selectedLocation && selectedLocation.lat && selectedLocation.lng) {
       searchLandingPlan(selectedLocation.lat, selectedLocation.lng)
+      onSearchByLatLon(selectedLocation.lat, selectedLocation.lng)
     }
   }, [selectedLocation])
 
@@ -133,6 +147,9 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
         setLandingPlanMap,
         opacity,
         setOpacity,
+        placementInfo,
+        setPlacementInfo,
+        onSearchByLatLon
       }}
     >
       {children}

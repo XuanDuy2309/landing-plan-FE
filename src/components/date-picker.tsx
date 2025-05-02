@@ -56,7 +56,6 @@ export const DatePickerAnt = ({
     }, [minimumDate, maximumDate, disableDate]);
 
     const handleDatePickerChange = useCallback((date) => {
-        console.log(date);
         if (!date) {
             onChange && onChange(undefined);
         } else {

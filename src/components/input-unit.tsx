@@ -11,15 +11,16 @@ interface IProps {
     value?: string | number | undefined
     unit?: string
     err?: string
+    onMeasure?: (e) => void
 }
 
-export const InputUnit = ({ label, className, onChange, value, unit, err, measure }: IProps) => {
+export const InputUnit = ({ label, className, onChange, value, unit, err, measure, onMeasure }: IProps) => {
     return (
         <div className="w-full flex flex-col text-base">
             <div className="w-full flex items-center space-x-3">
                 <span>{label}:</span>
                 {measure &&
-                    <div className="flex items-center space-x-2 cursor-pointer">
+                    <div className="flex items-center space-x-2 cursor-pointer" onClick={onMeasure}>
                         <IconBase icon='location-outline' size={16} color={Colors.blue[600]} />
                         <span className="text-blue-600">Đo trên bản đồ</span>
                     </div>

@@ -16,4 +16,17 @@ export class PostUseCase {
       offset: 0
     }
   }
+
+  async fetchFollowingPost(
+    filter: any,
+    page: number,
+    page_size: number = 25
+  ): Promise<{ count: number; offset: number; list: any }> {
+    const res = await PostApi.getFollowingPost({ ...filter, page, page_size });
+    return {
+      list: res.Data?.data,
+      count: res.Data?.total,
+      offset: 0
+    }
+  }
 }

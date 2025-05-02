@@ -5,9 +5,14 @@ import { SliderDetailMediaPost } from "../containers/post-detail/slider-detail-m
 import classNames from "classnames";
 import { ContentDetailPost } from "../containers/post-detail/content-detail-post";
 import { ContentAuctionContainer } from "../containers/auction/content-auction-container";
+import { use } from "react";
+import { usePostSocketRoom, useSocketEvent } from "src/core/hook";
+import { toast } from "react-toastify";
 
 export const AuctionScreen = observer(() => {
     const { id } = useParams<{ id: string }>();
+
+    usePostSocketRoom(id ? Number(id) : undefined);
     return (
         <PostDetailContextProvider id={id ? Number(id) : undefined}>
             <Auction />
@@ -17,6 +22,7 @@ export const AuctionScreen = observer(() => {
 
 const Auction = observer(() => {
     const { zoom } = usePostDetailContext()
+
     return (
         <div className="w-full h-full flex bg-gray-200">
 

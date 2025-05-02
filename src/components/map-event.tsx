@@ -4,9 +4,8 @@ import { useManagementLandingPlan } from "src/core/modules";
 
 
 export const MapEvents = observer(() => {
-    const { setSelectedLocation } = useManagementLandingPlan()
     const map = useMap();
-    const { searchCoordinatesLocation, pointsArea } = useManagementLandingPlan()
+    const { searchCoordinatesLocation, pointsArea, setSelectedLocation } = useManagementLandingPlan()
     useMapEvents({
 
         moveend: async (e) => {

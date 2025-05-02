@@ -12,6 +12,7 @@ export const InfoAsset = observer(() => {
     const items: MenuProps['items'] = [
         {
             key: Direction_Land_Enum.North,
+
             label: 'Bắc',
             onClick: () => {
                 data.direction_land = Direction_Land_Enum.North
@@ -84,7 +85,7 @@ export const InfoAsset = observer(() => {
         5: { label: 'Tây Bắc', icon: 'user-outline' },
         6: { label: 'Đông Bắc', icon: 'user-outline' },
         7: { label: 'Tây Nam', icon: 'user-outline' },
-        8: { label: 'Tây Bắc', icon: 'user-outline' },
+        8: { label: 'Đông Nam', icon: 'user-outline' },
     }
 
     const conditions = () => {

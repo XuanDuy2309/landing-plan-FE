@@ -46,8 +46,8 @@ export class BIDModel {
     id?: number
     post_id?: number
     price?: number
-    create_by_name?: string
-    create_by?: number
+    user_name?: string
+    user_id?: number
     create_at?: string
     constructor() {
         makeAutoObservable(this)
@@ -74,8 +74,8 @@ export class PostModel {
     bid_step?: number
     max_bid?: number
     bids: BIDModel[] = []
-    date_start?: moment.Moment
-    date_end?: moment.Moment
+    start_date?: string
+    end_date?: string
     number_floors?: number
     number_bedrooms?: number
     number_bathrooms?: number
@@ -127,7 +127,7 @@ export class PostModel {
     err_number_bathrooms?: string
     err_owner_name?: string
     err_owner_phone?: string
-    err_step_bid?: string;      
+    err_step_bid?: string;
 
 
     constructor() {

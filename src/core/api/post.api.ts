@@ -9,4 +9,5 @@ export const PostApi = {
     sharePost: (params?: any) => server.post('/post/share/'+params.id, params),
     likePost: (params?: any) => server.post('/post/like/'+params.id, params),
     unlike: (params?: any) => server.delete('/post/like/'+params.id, params),
+    getFollowingPost: (params?: any) => server.get('/post/followings', params)
 }

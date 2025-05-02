@@ -5,6 +5,8 @@ import { LeafletMapCore } from "../leaf-map-core";
 import { MapViewUpdater } from "../map-view-update";
 import { RoutingMachine } from "../map-routing";
 import { ModalMapEvents } from "./modal-map-event";
+import { PopupDetailCoordinatesLocationContainer } from "src/pages/landing-map/containers/popup-detail-coordinates-location/popup-detail-coordinates-location-container";
+import { PopupDetailLocationContainer } from "./popup-detail-location";
 
 export const ModalMapContainer = observer(() => {
 
@@ -15,15 +17,14 @@ export const ModalMapContainer = observer(() => {
 });
 
 export const MapContainer = observer(() => {
-    const { placement, polygon, selectedLocation, setSelectedLocation, isDraw, coordinates, pointsArea, landingPlanMap, opacity } = useManagementLandingPlan()
 
     return (
-        <div className='relative flex-none h-[488px] w-full bg-white'>
+        <div className='relative flex-none h-full w-full bg-white'>
             <ModalHeaderLandingMap />
+            <PopupDetailLocationContainer />
             <LeafletMapCore
-                RoutingMachine={() => <RoutingMachine />}
-                MapViewUpdater={() => <MapViewUpdater />}
-                MapEvent={() => <ModalMapEvents />} />
+                MapViewUpdater={(props) => <MapViewUpdater placement={props.placement} setSelectedLocation={props.setSelectedLocation} />}
+                MapEvent={(props) => <ModalMapEvents pointsArea={props.pointsArea} setSelectedLocation={props.setSelectedLocation} />} />
         </div>
     )
 })

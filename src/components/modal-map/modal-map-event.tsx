@@ -1,14 +1,15 @@
 import { observer } from "mobx-react";
 import { useMap, useMapEvents } from "react-leaflet";
-import { SearchLandingPlanReverseApi } from "src/core/api";
-import { useCreatePostContext, useManagementLandingPlan } from "src/core/modules";
+import { PointsMapModel, SelectedLocationModel } from "src/core/models";
 
 
-export const ModalMapEvents = observer(() => {
-    const { setSelectedLocation } = useManagementLandingPlan()
+interface IProps {
+    setSelectedLocation: (selectedLocation: SelectedLocationModel) => void
+    pointsArea: PointsMapModel
+}
+
+export const ModalMapEvents = observer(({ setSelectedLocation, pointsArea }: IProps) => {
     const map = useMap();
-    const { searchCoordinatesLocation, pointsArea, coordinates } = useManagementLandingPlan()
-    const { data } = useCreatePostContext()
     useMapEvents({
 
         moveend: async (e) => {
@@ -18,13 +19,6 @@ export const ModalMapEvents = observer(() => {
             if (!pointsArea.isDraw && !pointsArea.isRouting) {
                 map.setView([lat, lng], map.getZoom());
                 setSelectedLocation({ lat, lng })
-                await SearchLandingPlanReverseApi.searchInterval({ lat, lon: lng })
-                    .then((res) => {
-                        const str = res.data.address.road + ', ' + res.data.address.quarter + ', ' + res.data.address.suburb + ', ' + res.data.address.city + ', ' + res.data.address.country
-                        data.address = str
-                        data.lng = lng
-                        data.lat = lat
-                    })
                 return
             }
             if (pointsArea.isRouting) {

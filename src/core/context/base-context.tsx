@@ -2,8 +2,11 @@ import { makeAutoObservable, makeObservable, observable, runInAction } from "mob
 import { useRef, useState } from "react";
 
 export class IContextFilter {
-  sort?: string
-  query?: string
+  @observable sort?: string
+  @observable query?: string
+  constructor() {
+    makeObservable(this)
+  }
 }
 
 class DataContextType<T, F> {
@@ -65,6 +68,8 @@ export class IBaseContextType<T, F> {
   isGrid?: boolean
   setGrid!: (value: boolean) => void;
   setData!: (value: T[]) => void;
+  hasMore!: () => boolean
+  fetchMore!: () => void
 }
 
 export const useBaseContextProvider = <ITypeFilter, T>(
@@ -80,7 +85,7 @@ export const useBaseContextProvider = <ITypeFilter, T>(
     new DataContextType<T, ITypeFilter>(filterInit)
   )
   const indexPageRef = useRef<number>(1)
-  const pageSizeRef = useRef<number>(25)
+  const pageSizeRef = useRef<number>(5)
   const totalRef = useRef<number>(0)
 
   const fetchInternalWithoutLoading = async () => {
@@ -93,6 +98,31 @@ export const useBaseContextProvider = <ITypeFilter, T>(
   const onRefreshCurentPage = async () => {
     fetchInternalWithoutLoading()
   }
+
+
+  const hasMore = (): boolean => {
+    return (
+      totalRef.current > stateContext.data.length &&
+      !stateContext.loading
+    );
+  };
+
+  const fetchMore = async () => {
+    if (stateContext.loading) return;
+    stateContext.loading = true;
+    indexPageRef.current += 1;
+    try {
+      const res = await request(stateContext.filter!, indexPageRef.current, pageSizeRef.current);
+      runInAction(() => {
+        stateContext.data = [...stateContext.data, ...res.list];
+        totalRef.current = res.count;
+      });
+    } catch (error) {
+      console.error("Error fetching more data: ", error);
+    } finally {
+      stateContext.loading = false;
+    }
+  };
 
   const fetchInternal = async () => {
     stateContext.loading = true
@@ -228,5 +258,7 @@ export const useBaseContextProvider = <ITypeFilter, T>(
     setImport,
     setItemUpdate,
     setData,
+    hasMore,
+    fetchMore
   } as IBaseContextType<T, ITypeFilter>
 }

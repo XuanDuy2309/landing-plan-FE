@@ -1,10 +1,10 @@
 // import { Spin } from 'antd';
+import { Spin } from 'antd';
 import classNames from 'classnames';
 import { observer } from "mobx-react";
 import { useState } from "react";
-import { IconBase } from "./icon-base";
 import { Colors } from 'src/assets';
-import { Spin } from 'antd';
+import { IconBase } from "./icon-base";
 
 const ButtonTemplates = {
     ActionBase: {
@@ -33,11 +33,11 @@ const ButtonTemplates = {
     },
     ActionOrange: {
         baseColor: Colors.orange[600],
-        baseClassName: "bg-orange-400 hover:bg-orange-400 border text-white ",
+        baseClassName: "bg-orange-600 hover:bg-orange-400 border text-white ",
     },
     ActionOrangeOutline: {
         baseColor: Colors.orange[600],
-        baseClassName: "bg-white border-orange-400 hover:bg-orange-400 border text-orange-400 hover:text-white ",
+        baseClassName: "bg-white border-orange-600 hover:bg-orange-600 border text-orange-600 hover:text-white ",
     },
     ActionBgNone: {
         baseColor: Colors.black,

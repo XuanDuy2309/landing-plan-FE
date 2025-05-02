@@ -1,18 +1,19 @@
 import { observer } from "mobx-react"
 import { PostContextProvider } from "src/core/modules"
+import { useCoreStores } from "src/core/stores"
 import { LeftSideHome } from "../containers/home/left-side-home"
-import { HomeContainer } from "../containers/home/home-container"
+import { MyPostContainer } from "../containers/home/my-post-container"
 
 export const MyPost = observer(() => {
+    const { sessionStore } = useCoreStores()
+    const { profile } = sessionStore
     return (
-        <PostContextProvider>
-            <div className="w-full h-full flex items-center justify-between max-w-[1440px] mx-auto">
-                <div className="w-2/5 min-w-[280px] h-full">
+        <PostContextProvider id={profile ? profile.id : undefined}>
+            <div className="w-full h-full flex items-center justify-between max-w-[1440px] mx-auto relative">
+                <div className="w-1/3 flex-none min-w-[280px] h-full">
                     <LeftSideHome />
                 </div>
-                <div className="w-full h-full py-4">
-                    <HomeContainer />
-                </div>
+                <MyPostContainer />
             </div>
         </PostContextProvider>
     )

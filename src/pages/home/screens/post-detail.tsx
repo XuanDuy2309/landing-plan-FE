@@ -4,9 +4,12 @@ import { PostDetailContextProvider, usePostDetailContext } from "src/core/module
 import { SliderDetailMediaPost } from "../containers/post-detail/slider-detail-media-post";
 import classNames from "classnames";
 import { ContentDetailPost } from "../containers/post-detail/content-detail-post";
+import { usePostSocketRoom } from "src/core/hook";
 
 export const PostDetailScreen = observer(() => {
     const { id } = useParams();
+
+    usePostSocketRoom(id ? Number(id) : undefined);
     return (
         <PostDetailContextProvider id={id ? Number(id) : undefined}>
             <PostDetail />

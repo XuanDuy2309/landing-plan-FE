@@ -1,20 +1,59 @@
-import { Dropdown, MenuProps } from "antd";
+import { Dropdown } from "antd";
 import classNames from "classnames";
 import { observer } from "mobx-react";
-import { use, useEffect, useState } from "react";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { Colors } from "src/assets";
 import { IconBase } from "src/components";
+import { NotificationModel, NotificationType, useNotificationStore } from "src/core/context";
+import { useSocketEvent } from "src/core/hook";
 import { useCoreStores } from "src/core/stores";
+import { DropdownNotification } from "./dropdown-notification";
 import { DropdownSettingHeader } from "./dropdown-setting-header";
-import { values } from "mobx";
-import { useLocation, useNavigate } from "react-router-dom";
 
 export const HeaderHome = observer(() => {
     const { sessionStore } = useCoreStores()
     const [activeScreen, setActiveScreen] = useState<number>(0)
     const [activeDropdown, setActiveDropdown] = useState<boolean>(false)
+    const [openNotification, setOpenNotification] = useState<boolean>(false)
     const { pathname } = useLocation()
     const navigate = useNavigate()
+    const { data, onRefresh } = useNotificationStore()
+
+    useSocketEvent("notification", (data: any) => {
+        if (data.receiver_id === sessionStore.profile?.id) {
+            onRefresh()
+            return
+        }
+        toast.info(data.message)
+        onRefresh()
+    })
+
+
+    useSocketEvent("bid_create", (data: any) => {
+        toast.info(data.message)
+        onRefresh()
+    })
+
+    const handleSelectNotification = (item?: NotificationModel) => {
+        setOpenNotification(false)
+        console.log('item', item)
+        if (!item) return
+        if (Number(item.type) === NotificationType.LIKE) {
+            navigate(`/post/${item.post_id}`)
+            return
+        }
+        if (Number(item.type) === NotificationType.MESSAGE) {
+            navigate(`/home/message/${item.sender_id}`)
+            return
+        }
+        if (Number(item.type) === NotificationType.SET_BID) {
+            navigate(`/auction/${item.post_id}`)
+            return
+        }
+    }
+
     const listPages = [
         {
             key: 0,
@@ -26,13 +65,13 @@ export const HeaderHome = observer(() => {
             key: 2,
             title: "Profile",
             icon: "profile-outline",
-            link: '/home/my_post'
+            link: '/home/profile/my_post'
         },
         {
             key: 3,
-            title: "Group",
+            title: "Users",
             icon: "group-outline",
-            link: ''
+            link: '/home/member'
         },
         {
             key: 4,
@@ -81,9 +120,17 @@ export const HeaderHome = observer(() => {
                     >
                         <IconBase icon="allocation-outline" size={28} color={Colors.gray[700]} />
                     </div>
-                    <div className="size-10 rounded-full flex flex-col items-center justify-center space-y-1 cursor-pointer hover:bg-gray-300 bg-gray-200">
-                        <IconBase icon="notification-outline" size={28} color={Colors.gray[700]} />
-                    </div>
+                    <Dropdown trigger={['click']}
+                        dropdownRender={() => <DropdownNotification onSelect={(item) => { handleSelectNotification(item) }} />}
+                        open={openNotification}
+                        onOpenChange={(value) => setOpenNotification(value)}
+                    >
+                        <div className="size-10 rounded-full flex flex-col items-center justify-center space-y-1 cursor-pointer hover:bg-gray-300 bg-gray-200 relative">
+                            <IconBase icon="notification-outline" size={28} color={Colors.gray[700]} />
+                            {data.filter((item) => item.is_read === 0).length > 0 && <div className="absolute top-0 right-0 bg-red-600 size-3 flex items-center justify-center rounded-full text- text-white font-bold flex-none">
+                            </div>}
+                        </div>
+                    </Dropdown>
                     <Dropdown
                         open={activeDropdown}
                         trigger={['click']}

@@ -13,22 +13,26 @@ import { SpaceContext } from "antd/es/space"
 
 export const AreaAndPriceAsset = observer(() => {
     const { data, setOpenMap, openMap, setMessage, message, setAction } = useCreatePostContext()
+    const handleShowMap = () => {
+        setOpenMap(true)
+        setMessage('Tìm kiếm và "Chọn trên bản đồ" vị trí BDS của bạn.')
+        setAction(ActionMap.Select_location)
+    }
     return (
         <div className="w-full h-full flex flex-col space-y-2 px-3">
-            <span className="text-xl font-medium text-gray-900">Diện tích và vị trí: {message && <span className="text-blue-400">{message}</span>}</span>
+            <span className="text-xl font-medium text-gray-900">Diện tích và vị trí:</span>
             {!openMap && <div className="w-full flex flex-col space-y-1">
                 <div className="w-full flex flex-col space-x-1">
-                    <div className="w-full flex items-center space-x-2">
-                        <span className="text-base font-medium text-gray-700">Vị trí:</span>
+                    <div className="w-full flex items-center space-x-2 flex-wrap">
+                        <span className="text-base font-medium text-gray-700 flex-none">Vị trí:</span>
+                        {data.address && <span className="line-clamp-1">{data.address}</span>}
                         <div className="flex items-center space-x-2 cursor-pointer"
                             onClick={() => {
-                                setOpenMap(true)
-                                setMessage('Tìm kiếm và "Chọn trên bản đồ" vị trí BDS của bạn.')
-                                setAction(ActionMap.Select_location)
+                                handleShowMap()
                             }}
                         >
                             <IconBase icon='location-outline' size={16} color={Colors.blue[600]} />
-                            <span className="text-blue-600">Chọn trên bản đồ</span>
+                            <span className="text-blue-600">{data.address ? "Chọn lại" : "Chọn trên bản đồ"}</span>
                         </div>
                     </div>
 
@@ -57,7 +61,9 @@ export const AreaAndPriceAsset = observer(() => {
                 </div>
                 <div className="w-full flex items-start space-x-2">
                     <span className="text-base font-medium text-gray-700">Đường bao:</span>
-                    <div className="flex flex-col space-x-0.5">
+                    <div className="flex flex-col space-x-0.5 cursor-pointer" onClick={() => {
+                        handleShowMap()
+                    }}>
                         {!data.coordinates ?
                             <div className="flex items-center space-x-2 cursor-pointer"
                                 onClick={() => setOpenMap(true)}>
@@ -82,29 +88,8 @@ export const AreaAndPriceAsset = observer(() => {
                     }}
                     measure
                     err={data.err_area}
+                    onMeasure={handleShowMap}
                 />
-                <div className="w-full flex items-center space-x-2">
-                    <InputUnit
-                        label="Chiều dài"
-                        unit={'m'}
-                        value={data.width}
-                        onChange={(value) => {
-                            data.width = value ? Number(value) : undefined
-                        }}
-                        measure
-                        err={data.err_width}
-                    />
-                    <InputUnit
-                        label="Chiều rộng"
-                        unit={'m'}
-                        value={data.height}
-                        onChange={(value) => {
-                            data.height = value ? Number(value) : undefined
-                        }}
-                        measure
-                        err={data.err_height}
-                    />
-                </div>
                 {data.purpose == Purpose_Post.For_Sell && <InputUnit
                     label="Tổng giá bán nguyên căn (lô)"
                     unit={'VNĐ'}
@@ -151,7 +136,7 @@ export const AreaAndPriceAsset = observer(() => {
                     />
                 </div>}
             </div>}
-            {openMap && <ModalMapContainer />}
+
         </div>
     )
 })

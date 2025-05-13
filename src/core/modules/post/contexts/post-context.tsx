@@ -14,6 +14,9 @@ export class FilterPostContextType extends IContextFilter {
     @observable price_end?: string
     @observable area_start?: string
     @observable area_end?: string
+    @observable lat?: number
+    @observable lng?: number
+    @observable range?: number
     constructor() {
         super();
         makeObservable(this)

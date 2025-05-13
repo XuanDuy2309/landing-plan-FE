@@ -1,7 +1,6 @@
 import classNames from 'classnames'
-import debounce from 'debounce'
 import { observer } from 'mobx-react'
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Colors } from 'src/assets'
 import { IconBase } from 'src/components'
 import { NominatimResult } from 'src/core/models'
@@ -11,7 +10,7 @@ import { hideLoading, showLoading } from 'src/core/services'
 export const SearchBoxLandingMap = observer(() => {
     const { filter, handleSearch, listResultSearch, setListResultSearch, loading, handleReverseVietMap } = useListSearchBoxLandingPlan()
     const [keyWord, setKeyWord] = useState("")
-    const { placement, setPlacement } = useManagementLandingPlan()
+    const { placement, setPlacement, setOpenSidebar, openSidebar } = useManagementLandingPlan()
 
     const handleSelect = async (item: NominatimResult) => {
         if (!item.isVietMapSearch) {
@@ -45,9 +44,10 @@ export const SearchBoxLandingMap = observer(() => {
                     <div className={classNames('w-full h-[48px] flex-none flex items-center', {
                         "border-b border-gray-100": listResultSearch.length > 0
                     })}>
-                        <button className='w-[56px] h-full'>
-                            <IconBase icon='more-outline' size={24} color={Colors.gray[500]} />
+                        <button onClick={() => setOpenSidebar(!openSidebar)} className='w-[56px] h-full text-gray-500 hover:text-blue-400'>
+                            <IconBase icon='more-outline' size={24} color={"currentColor"} />
                         </button>
+
                         <input
                             placeholder='Tìm kiếm vị trí'
                             value={keyWord}

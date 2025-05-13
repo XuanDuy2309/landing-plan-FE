@@ -132,7 +132,7 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                 <span>-</span>
                 <span>{formatMoney(renderPrice(), 1, 'vn')} {renderUnit()}</span>
                 <span>-</span>
-                <span>{item.area} m2</span>
+                <span>{item.area} m²</span>
             </div>
 
             <div className={`relative overflow-hidden h-[412px] grid gap-2 ${getGridClass()}`}>

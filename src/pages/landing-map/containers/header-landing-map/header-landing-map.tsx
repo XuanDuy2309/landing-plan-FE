@@ -1,7 +1,9 @@
-import { ListSearchBoxLandingPlanProvider } from 'src/core/modules'
-import { SearchBoxLandingMap } from '../../components/header-landing-map/search-box-landing-map'
+import { observer } from 'mobx-react';
+import { ListSearchBoxLandingPlanProvider } from 'src/core/modules';
+import { SearchBoxLandingMap } from '../../components/header-landing-map/search-box-landing-map';
 
-export const HeaderLandingMap = () => {
+export const HeaderLandingMap = observer(() => {
+
     return (
         <div className='absolute w-full z-[9999]'>
             <ListSearchBoxLandingPlanProvider>
@@ -10,3 +12,4 @@ export const HeaderLandingMap = () => {
         </div>
     )
 }
+)

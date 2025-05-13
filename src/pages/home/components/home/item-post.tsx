@@ -2,12 +2,11 @@ import { Dropdown, MenuProps } from "antd";
 import classNames from "classnames";
 import { observer } from "mobx-react";
 import moment from "moment";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Colors } from "src/assets";
 import { IconBase } from "src/components";
 import { ButtonIcon } from "src/components/button-icon";
-import { formatMoney } from "src/core/base";
+import { formatMoney, getColorFromId } from "src/core/base";
 import { Purpose_Post } from "src/core/models";
 import { useUserContext } from "src/core/modules";
 import { ItemMyImage } from "../item-my-image";
@@ -21,8 +20,6 @@ interface IProps {
 export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
     const navigate = useNavigate();
     const { data: user } = useUserContext();
-    const [listImage, setListImage] = useState<string[]>([])
-    const [listVideo, setListVideo] = useState<string[]>([])
 
     const renderPurpose = {
         1: { label: "Bán", color: Colors.green[400] },
@@ -82,7 +79,7 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
 
 
     const getGridClass = () => {
-        switch (listImage.length) {
+        switch (item.image_links.length) {
             case 1:
                 return 'grid-cols-1';
             case 2:
@@ -91,29 +88,22 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                 return 'grid-cols-3 grid-rows-2';
         }
     };
-
-    useEffect(() => {
-        if (item.image_links) {
-            setListImage(JSON.parse(item.image_links))
-        }
-        if (item.video_links) {
-            setListVideo(JSON.parse(item.video_links))
-        }
-    }, [item.image_links, item.video_links])
-
     return (
         <div className="w-full p-3 flex flex-col bg-white rounded-xl space-y-2">
             <div className="w-full flex items-center space-x-2 border-gray-200 relative">
                 <div className='size-10 flex-none rounded-full flex items-center bg-gray-200 justify-center overflow-hidden cursor-pointer hover:opacity-80'
                     onClick={() => {
-                        navigate(`/profile/${item.create_by_id}`)
+                        navigate(`/home/profile/${item.create_by_id}`)
+                    }}
+                    style={{
+                        backgroundColor: getColorFromId(item.create_by_id || 0)
                     }}
                 >
                     {
                         item && item.create_by_avatar ?
                             <img src={item.create_by_avatar} alt="" className="size-full object-cover" />
                             :
-                            <span className="text-2xl font-bold text-gray-900">{item?.create_by_name?.charAt(0).toUpperCase()}</span>
+                            <span className="text-2xl font-bold text-white">{item?.create_by_name?.charAt(0).toUpperCase()}</span>
 
                     }
                 </div>
@@ -146,15 +136,15 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
             </div>
 
             <div className={`relative overflow-hidden h-[412px] grid gap-2 ${getGridClass()}`}>
-                {listImage.slice(0, 3).map((item, index) => {
+                {item.image_links && item.image_links.slice(0, 3).map((it, index) => {
                     return (
                         <div
                             key={index}
                             className={classNames('relative size-full', {
-                                'row-span-2 col-span-2': listImage.length > 2 && index == 0,
+                                'row-span-2 col-span-2': item.image_links.length > 2 && index == 0,
                             })}
                         >
-                            <ItemMyImage key={index} item={item} action={undefined} />
+                            <ItemMyImage key={index} item={it} action={undefined} />
                         </div>
                     )
                 })}

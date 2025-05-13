@@ -6,7 +6,7 @@ import { IconBase } from "src/components";
 
 interface IProps {
     item: any
-    action: any
+    action?: any
     type?: string
 }
 
@@ -38,7 +38,7 @@ export const ItemMyImage = observer(({ item, action, type }: IProps) => {
         return (
             <div className={classNames("size-full rounded-md overflow-hidden relative cursor-pointer flex-none",
             )} >
-                <video src={item} className="w-full h-full object-cover" controls/>
+                <video src={item} className="w-full h-full object-cover" controls />
                 {action &&
                     <div className="absolute top-3 right-3 rounded-full p-1 flex items-center justify-center bg-gray-100 hover:bg-gray-300">
                         <IconBase icon={"more-2"} size={24} color={Colors.blue[400]} />
@@ -50,7 +50,7 @@ export const ItemMyImage = observer(({ item, action, type }: IProps) => {
     return (
         <div className={classNames("size-full rounded-md overflow-hidden relative cursor-pointer flex-none",
         )} >
-            <img src={item} alt="" className="w-full h-full object-cover" />
+            <img src={item} alt="" className="w-full h-full object-cover" loading="lazy" />
             {action && <Dropdown menu={{ items }} trigger={["click"]}>
                 <div className="absolute top-3 right-3 rounded-full p-1 flex items-center justify-center bg-gray-100 hover:bg-gray-300">
                     <IconBase icon={"more-2"} size={24} color={Colors.blue[400]} />

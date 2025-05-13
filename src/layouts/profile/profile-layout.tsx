@@ -25,11 +25,13 @@ export const ProfileLayout = observer(() => {
         },
         {
             label: "Đang theo dõi",
-            link: '/home/following',
+            link: '/home/profile/following'
+
         },
         {
             label: "Người theo dõi",
-            link: '/home/follower',
+            link: '/home/profile/follower'
+
         }
     ]
     return (

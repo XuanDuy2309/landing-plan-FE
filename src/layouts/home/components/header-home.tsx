@@ -1,11 +1,12 @@
 import { Dropdown } from "antd";
 import classNames from "classnames";
 import { observer } from "mobx-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Colors } from "src/assets";
 import { IconBase } from "src/components";
+import { getColorFromId } from "src/core/base";
 import { NotificationModel, NotificationType, useNotificationStore } from "src/core/context";
 import { useSocketEvent } from "src/core/hook";
 import { useCoreStores } from "src/core/stores";
@@ -20,6 +21,26 @@ export const HeaderHome = observer(() => {
     const { pathname } = useLocation()
     const navigate = useNavigate()
     const { data, onRefresh } = useNotificationStore()
+
+    useEffect(() => {
+        // Check if pathname starts with /home/profile to active Profile tab
+        if (pathname.startsWith('/home/profile')) {
+            setActiveScreen(2);
+            return;
+        }
+        
+        // Check if pathname starts with /home/member to active Users tab
+        if (pathname.startsWith('/home/member')) {
+            setActiveScreen(3);
+            return;
+        }
+
+        // For other routes, find exact match
+        const currentTab = listPages.find(page => pathname === page.link);
+        if (currentTab) {
+            setActiveScreen(currentTab.key);
+        }
+    }, [pathname]);
 
     useSocketEvent("notification", (data: any) => {
         if (data.receiver_id === sessionStore.profile?.id) {
@@ -65,7 +86,7 @@ export const HeaderHome = observer(() => {
             key: 2,
             title: "Profile",
             icon: "profile-outline",
-            link: '/home/profile/my_post'
+            link: '/home/profile'
         },
         {
             key: 3,
@@ -138,12 +159,16 @@ export const HeaderHome = observer(() => {
                         onOpenChange={(value) => setActiveDropdown(value)}
                     >
                         <div className="size-12 relative flex items-center justify-center hover:opacity-70">
-                            <div className='size-10 rounded-full flex items-center bg-gray-200 justify-center overflow-hidden'>
+                            <div className='size-10 rounded-full flex items-center bg-gray-200 justify-center overflow-hidden'
+                                style={{
+                                    backgroundColor: getColorFromId(sessionStore.profile?.id || 0)
+                                }}
+                            >
                                 {
                                     sessionStore.profile && sessionStore.profile?.avatar ?
                                         <img src={sessionStore.profile.avatar} alt="" className="size-full object-cover" />
                                         :
-                                        <span className="text-2xl font-bold text-gray-900">{sessionStore.profile?.fullname?.charAt(0).toUpperCase()}</span>
+                                        <span className="text-2xl font-bold text-white">{sessionStore.profile?.fullname?.charAt(0).toUpperCase()}</span>
 
                                 }
                             </div>

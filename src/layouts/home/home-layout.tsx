@@ -6,7 +6,7 @@ export const HomeLayout = observer(() => {
     return (
         <div className="w-full h-full flex flex-col min-h-0">
             <HeaderHome />
-            <div className="w-full h-full flex-none bg-gray-200 min-h-0">
+            <div className="w-full h-full bg-gray-200 min-h-0">
                 <Outlet />
             </div >
         </div>

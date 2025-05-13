@@ -1,10 +1,11 @@
 import { observer } from "mobx-react";
-import { useUserContext } from "src/core/modules";
 import { useRef, useState } from "react";
-import { IconBase, ModalBase } from "src/components";
-import { Colors } from "src/assets";
 import { useNavigate } from "react-router-dom";
+import { Colors } from "src/assets";
+import { IconBase, ModalBase } from "src/components";
 import { ModalCreatePost } from "src/components/modal-create-post/modal-create-post";
+import { getColorFromId } from "src/core/base";
+import { useUserContext } from "src/core/modules";
 
 export const CreatePostContainer = observer(() => {
     const { data } = useUserContext()
@@ -35,14 +36,17 @@ export const CreatePostContainer = observer(() => {
             <div className="w-full flex items-center space-x-2 pb-3 border-b border-gray-200">
                 <div className='size-10 flex-none rounded-full flex items-center bg-gray-200 justify-center overflow-hidden cursor-pointer hover:opacity-80'
                     onClick={() => {
-                        navigate('/home/my_post')
+                        navigate('/home/profile/my_post')
                     }}
-                >   
+                    style={{
+                        backgroundColor: getColorFromId(data?.id || 0)
+                    }}
+                >
                     {
                         data && data?.avatar ?
                             <img src={data.avatar} alt="" className="size-full object-cover" />
                             :
-                            <span className="text-2xl font-bold text-gray-900">{data?.fullname?.charAt(0).toUpperCase()}</span>
+                            <span className="text-2xl font-bold text-white">{data?.fullname?.charAt(0).toUpperCase()}</span>
 
                     }
                 </div>

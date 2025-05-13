@@ -1,13 +1,14 @@
-import { CreatePostContextProvider, useCreatePostContext, usePostContext, useUserContext } from "src/core/modules"
-import { IconBase } from "../icon-base"
-import { ButtonLoading } from "../Button"
-import { observer } from "mobx-react"
-import { Colors } from "src/assets"
 import { Dropdown, MenuProps } from "antd"
+import { observer } from "mobx-react"
 import { useEffect } from "react"
-import { Purpose_Post, Type_Post } from "src/core/models"
-import { ContentCreatePost } from "./content-create-post"
 import { toast } from "react-toastify"
+import { Colors } from "src/assets"
+import { getColorFromId } from "src/core/base"
+import { Purpose_Post, Type_Post } from "src/core/models"
+import { CreatePostContextProvider, useCreatePostContext, usePostContext, useUserContext } from "src/core/modules"
+import { ButtonLoading } from "../Button"
+import { IconBase } from "../icon-base"
+import { ContentCreatePost } from "./content-create-post"
 
 interface IProps {
     type?: Purpose_Post
@@ -71,12 +72,16 @@ const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
         </div>
         <div className="w-full h-full overflow-y-auto flex flex-col">
             {!openMap && <div className="w-full flex-none p-3 border-gray-200 flex items-center space-x-3">
-                <div className='size-14 rounded-full flex items-center bg-gray-200 justify-center overflow-hidden'>
+                <div className='size-14 rounded-full flex items-center bg-gray-200 justify-center overflow-hidden'
+                    style={{
+                        backgroundColor: getColorFromId(user?.id || 0)
+                    }}
+                >
                     {
                         user?.avatar ?
                             <img src={user.avatar} alt="" className="size-full object-cover" />
                             :
-                            <span className="text-2xl font-bold text-gray-900">{user?.fullname?.charAt(0).toUpperCase()}</span>
+                            <span className="text-2xl font-bold text-white">{user?.fullname?.charAt(0).toUpperCase()}</span>
 
                     }
                 </div>

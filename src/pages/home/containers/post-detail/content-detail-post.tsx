@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { Colors } from "src/assets"
 import { IconBase } from "src/components"
 import { ButtonIcon } from "src/components/button-icon"
-import { formatMoney } from "src/core/base"
+import { formatMoney, getColorFromId } from "src/core/base"
 import { Purpose_Post, Type_Asset_Enum } from "src/core/models"
 import { useUserContext } from "src/core/modules"
 import { usePostDetailContext } from "src/core/modules/post"
@@ -100,13 +100,17 @@ export const ContentDetailPost = observer(() => {
             <div className="w-full flex-none flex items-center border-b py-3 space-x-2 border-gray-200 relative">
                 <div className='size-10 flex-none rounded-full flex items-center bg-gray-200 justify-center overflow-hidden cursor-pointer hover:opacity-80'
                     onClick={() => {
+                        navigate(`/home/profile/${data.create_by_id}`)
+                    }}
+                    style={{
+                        backgroundColor: getColorFromId(data?.create_by_id || 0)
                     }}
                 >
                     {
                         data && data.create_by_avatar ?
                             <img src={data.create_by_avatar} alt="" className="size-full object-cover" />
                             :
-                            <span className="text-2xl font-bold text-gray-900">{data.create_by_name?.charAt(0).toUpperCase()}</span>
+                            <span className="text-2xl font-bold text-white">{data.create_by_name?.charAt(0).toUpperCase()}</span>
 
                     }
                 </div>

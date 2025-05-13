@@ -1,10 +1,10 @@
-import { action, makeAutoObservable, runInAction } from "mobx";
-import { UserModel } from "../models";
+import { makeAutoObservable, runInAction } from "mobx";
 import { clearPersistedStore, getPersistedStore, makePersistable } from "mobx-persist-store";
+import { UserModel } from "../models";
 
 export class ILocation {
-    lat: number = 0;
-    lng: number = 0;
+    lat: number = 21.0283334;
+    lng: number = 105.854041;
     constructor() {
         makeAutoObservable(this)
     }
@@ -17,32 +17,28 @@ export class ISession {
     }
 }
 
-
 export class SessionStore {
     profile?: UserModel;
     session?: ISession;
     location: ILocation = new ILocation();
     isLoading: boolean = false;
+    isInitialized: boolean = false;
+
     constructor() {
-        makeAutoObservable(this, {
-            setProfile: action,
-            setSession: action,
-            logout: action,
-            setLocation: action,
-            requestLocation: action
-        })
+        makeAutoObservable(this);
         makePersistable(this, {
             name: 'SessionStore',
             properties: ['profile', 'session', 'location'],
             storage: window.localStorage,
             expireIn: 63115200000,
-            // removeOnExpiration: true,
-            // stringify: false,
-            // debugMode: true,
+        }).then(() => {
+            runInAction(() => {
+                this.isInitialized = true;
+            });
         });
         runInAction(() => {
             this.requestLocation();
-        })
+        });
         getPersistedStore(this).then((data) => {
             if (data) {
                 runInAction(() => {

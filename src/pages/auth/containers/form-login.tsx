@@ -1,16 +1,12 @@
-
-import { useState } from "react";
-import { InputForm } from "../../../components/Input";
 import { observer } from "mobx-react";
-import { AuthApi } from "../../../core/api";
-import { ISession, useCoreStores } from "../../../core/stores";
-import { UserModel } from "../../../core/models";
-import { useNavigate } from "react-router-dom";
-import { setToken } from "../../../core/config";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 import { ButtonLoading } from "src/components";
-import { ToastContainer, toast } from 'react-toastify';
-
-
+import { InputForm } from "../../../components/Input";
+import { AuthApi } from "../../../core/api";
+import { setToken } from "../../../core/config";
+import { useCoreStores } from "../../../core/stores";
 
 export const FormLogin = observer(() => {
     const [hidePassword, setHidePassword] = useState(true);
@@ -19,8 +15,8 @@ export const FormLogin = observer(() => {
     const [err, setErr] = useState<string>('');
     const { sessionStore } = useCoreStores();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState<boolean>(false)
-
+    const location = useLocation();
+    const [loading, setLoading] = useState<boolean>(false);
 
     const handleLogin = async () => {
         setErr('')
@@ -46,7 +42,11 @@ export const FormLogin = observer(() => {
             sessionStore.setProfile(res.Data.data)
             setToken(res.Data.data.access_token);
             toast('Login successfully')
-            return
+            
+            // Chuyển hướng về trang trước đó nếu có
+            const from = location.state?.from || '/home';
+            navigate(from, { replace: true });
+            return;
         }
         setErr(res.Message)
     }

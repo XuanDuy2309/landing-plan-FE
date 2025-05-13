@@ -1,16 +1,14 @@
 import { Spin } from "antd";
 import { observer } from "mobx-react";
-import { ButtonLoading } from "src/components";
 import { ImageContextProvider, useImageContext, useUserContext } from "src/core/modules";
-import { SelectFileCase } from "src/core/services";
-import { useCoreStores } from "../../../core/stores";
-import { ItemMyImage } from "../components/item-my-image";
+import { useCoreStores } from "src/core/stores";
+import { ItemMyImage } from "../../components/item-my-image";
 
 interface IProps {
     id?: number
 }
 
-export const ProfileImageScreen = observer(({ id }: IProps) => {
+export const ListImageDetailMember = observer(({ id }: IProps) => {
     const { sessionStore } = useCoreStores();
     return (
         <ImageContextProvider id={id}>
@@ -22,29 +20,15 @@ export const ProfileImageScreen = observer(({ id }: IProps) => {
 
 
 const SelectImage = observer(() => {
-    const { data, dataVideo, loading, onUpload } = useImageContext();
+    const { data, dataVideo, loading } = useImageContext();
     const { onUpdateAvatar, onUpdateBackground } = useUserContext();
 
-    const handleUpload = async (type: string) => {
-        const input = new SelectFileCase(type, false);
-        await input.process()
-            .then(res => {
-                if (res.length > 0) { onUpload(res[0], type); }
-            })
-            .catch(err => console.log(err));
-    }
-
-    const actionItemImage = {
-        updateAvatar: (image: string) => onUpdateAvatar(image),
-        updateBackground: (image: string) => onUpdateBackground(image),
-        deleteImage: (id: number) => { console.log(id) }
-    }
     return (
         <div className="w-full flex flex-col items-center space-y-3 py-4">
             <div className="w-full h-full max-w-[1240px] bg-white rounded-xl flex flex-col">
                 <div className="w-full h-16 px-3 flex items-center justify-between border-b border-gray-200 flex-none">
-                    <span className="text-2xl font-semibold text-gray-700">Ảnh của bạn</span>
-                    <ButtonLoading iconLeft="uploadimage-outline" label="Thêm ảnh mới" template="ActionBlueOutline" size="xs" onClick={() => handleUpload('image')} />
+                    <span className="text-2xl font-semibold text-gray-700">Hình ảnh</span>
+                    {/* <ButtonLoading iconLeft="uploadimage-outline" label="Thêm ảnh mới" template="ActionBlueOutline" size="xs" onClick={() => handleUpload('image')} /> */}
                 </div>
                 <div className="w-full flex flex-col border-b border-gray-200 space-y-4 p-3">
                     {loading ?
@@ -56,7 +40,7 @@ const SelectImage = observer(() => {
                             {
                                 data.map((item, index) => {
                                     return (
-                                        <ItemMyImage key={index} item={item.link} action={actionItemImage} />
+                                        <ItemMyImage key={index} item={item.link} />
                                     )
                                 })
                             }
@@ -72,8 +56,8 @@ const SelectImage = observer(() => {
             </div>
             <div className="w-full h-full max-w-[1240px] bg-white rounded-xl flex flex-col">
                 <div className="w-full h-16 px-3 flex items-center justify-between border-b border-gray-200 flex-none">
-                    <span className="text-2xl font-semibold text-gray-700">Video của bạn</span>
-                    <ButtonLoading iconLeft="uploadimage-outline" label="Thêm video mới" template="ActionBlueOutline" size="xs" onClick={() => handleUpload('video')} />
+                    <span className="text-2xl font-semibold text-gray-700">Video</span>
+                    {/* <ButtonLoading iconLeft="uploadimage-outline" label="Thêm video mới" template="ActionBlueOutline" size="xs" onClick={() => handleUpload('video')} /> */}
                 </div>
                 <div className="w-full flex flex-col border-b border-gray-200 space-y-4 p-3">
                     {loading ?
@@ -85,7 +69,7 @@ const SelectImage = observer(() => {
                             {
                                 dataVideo.map((item, index) => {
                                     return (
-                                        <ItemMyImage key={index} item={item.link} action={actionItemImage} type="video" />
+                                        <ItemMyImage key={index} item={item.link} type="video" />
                                     )
                                 })
                             }

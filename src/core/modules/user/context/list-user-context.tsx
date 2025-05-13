@@ -3,7 +3,9 @@ import { makeObservable } from "mobx";
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
 import { UserModel } from "src/core/models";
+import { useCoreStores } from "src/core/stores";
 import { IBaseContextType, IContextFilter, useBaseContextProvider } from "../../../context";
+import { Type_List } from "../../members";
 import { UserUseCase } from "../usecase";
 
 
@@ -24,12 +26,13 @@ export const ListUserContext = React.createContext<ListUserContextType>(new List
 
 interface IProps {
     children: React.ReactNode
+    type?: Type_List
     id?: number
-    following?: boolean
 }
 
-export const ListUserContextProvider = observer(({ children, id, following }: IProps) => {
+export const ListUserContextProvider = observer(({ children, type, id }: IProps) => {
     const context = useBaseContextProvider<FilterListUserContextType, UserModel>(new FilterListUserContextType(), request)
+    const { sessionStore } = useCoreStores()
 
     async function request(
         filter: FilterListUserContextType,
@@ -38,7 +41,14 @@ export const ListUserContextProvider = observer(({ children, id, following }: IP
     ): Promise<{ count: number; list: UserModel[]; offset: number }> {
         const uc = new UserUseCase()
 
-        const res = await uc.fetchInternal({ ...filter, user_id: id }, index, pageSize)
+        let res = {
+            count: 0,
+            list: [],
+            offset: 0
+        }
+        if (type === Type_List.User) { res = await uc.fetchInternal({ ...filter, excludeIds: [sessionStore.profile?.id] }, index, pageSize) }
+        if (type === Type_List.Follower) { res = await uc.fetchFollowers({ ...filter, user_id: id ? id : null }, index, pageSize) }
+        if (type === Type_List.Following) { res = await uc.fetchFollowing({ ...filter, user_id: id ? id : null }, index, pageSize) }
         return {
             ...res,
         }

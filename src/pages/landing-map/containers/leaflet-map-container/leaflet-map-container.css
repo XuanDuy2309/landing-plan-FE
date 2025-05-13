@@ -16,3 +16,11 @@
         -1px 1px 0 white,
         1px 1px 0 white;
 }
+
+.leaflet-popup-content-wrapper {
+    border-radius: 0 !important;
+}
+
+.leaflet-popup-content-wrapper .leaflet-popup-content {
+    margin: 0 !important;
+}

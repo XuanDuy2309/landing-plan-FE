@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import { observer } from 'mobx-react';
 import { Fragment, memo, useEffect, useMemo } from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { LayersControl, MapContainer, Marker, Polygon, Polyline, Popup, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
+import { LayersControl, MapContainer, Marker, Pane, Polygon, Polyline, Popup, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import { Colors } from 'src/assets';
 import { getColorFromId, isValidPolygon } from 'src/core/base';
 import { NominatimResult, SelectedLocationModel } from 'src/core/models';
@@ -48,7 +48,9 @@ export const LeafletMapContainer = observer(() => {
                     <TileLayer
                         url="https://{s}.google.com/vt/lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
                         subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-                        maxZoom={22}
+                        maxZoom={30}
+                        minZoom={0}
+                        maxNativeZoom={21}    // Nhưng chỉ tải tile tới mức 18
                         attribution="&copy; <a href='https://www.google.com/maps'>Google Maps</a> contributors"
                     />
                 </LayersControl.BaseLayer>
@@ -56,7 +58,9 @@ export const LeafletMapContainer = observer(() => {
                     <TileLayer
                         url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
                         subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-                        maxZoom={22}
+                        maxZoom={30}
+                        minZoom={0}
+                        maxNativeZoom={21}    // Nhưng chỉ tải tile tới mức 18
                         attribution="&copy; <a href='https://www.google.com/maps'>Google Maps</a> contributors"
                     />
                 </LayersControl.BaseLayer>
@@ -64,22 +68,26 @@ export const LeafletMapContainer = observer(() => {
                     <TileLayer
                         url="http://{s}.google.com/vt/lyrs=m,t&x={x}&y={y}&z={z}"
                         subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-                        maxZoom={22}
-                        minZoom={8}
+                        maxZoom={30}
+                        minZoom={0}
+                        maxNativeZoom={21}    // Nhưng chỉ tải tile tới mức 18
                         attribution="&copy; <a href='https://www.google.com/maps'>Google Maps</a> contributors"
                     />
                 </LayersControl.BaseLayer>
             </LayersControl>
-            {landingPlanMap && landingPlanMap.folder_path && <TileLayer
-                url={`${landingPlanMap?.folder_path}{z}/{x}/{y}.png`}
-                // pane="overlayPane"
-                minZoom={12}
-                maxZoom={18}
-                opacity={opacity}
-                zIndex={999}
-                tms={true}
-            />}
-            <TileLayer
+            <Pane name="customOverlayPane" style={{ zIndex: 400 }}>
+                {landingPlanMap && landingPlanMap.folder_path && (
+                    <TileLayer
+                        url={`${landingPlanMap.folder_path}/{z}/{x}/{y}.png`}
+                        pane="customOverlayPane"
+                        minZoom={0}
+                        maxZoom={30}
+                        maxNativeZoom={18}
+                        opacity={opacity}
+                    />
+                )}
+            </Pane>
+            {/* <TileLayer
                 url={`https://cdn.dandautu.vn/quy-hoach/ha_noi/hoang_mai__ha_noi/{z}/{x}/{y}.png`}
                 // pane="overlayPane"
                 minZoom={12}
@@ -88,7 +96,7 @@ export const LeafletMapContainer = observer(() => {
                 zIndex={999}
                 tms={true}
             // opacity={opacit}
-            />
+            /> */}
 
             {selectedLocation.lat && selectedLocation.lng && (
                 <Marker position={[Number(selectedLocation.lat), Number(selectedLocation.lng)]}>

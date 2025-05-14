@@ -1,15 +1,13 @@
 import { observer } from "mobx-react";
-import { FormLogin } from "../containers/form-login";
 import { useState } from "react";
-import { UserModel } from "src/core/models";
+import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 import { ButtonLoading, InputForm } from "src/components";
 import { CheckBox } from "src/components/checkbox";
-import { useNavigate } from "react-router-dom";
-import { set } from "mobx";
 import { AuthApi } from "src/core/api";
-import { ISession, useCoreStores } from "src/core/stores";
 import { setToken } from "src/core/config";
-import { ToastContainer, toast } from 'react-toastify';
+import { UserModel } from "src/core/models";
+import { useCoreStores } from "src/core/stores";
 
 export const RegisterScreen = observer(() => {
     const [data, setData] = useState<UserModel>(new UserModel)
@@ -82,29 +80,29 @@ export const RegisterScreen = observer(() => {
     }
     return <div className="w-full h-full flex justify-center overflow-y-auto bg-[url('/images/bg-auth.png')] bg-contain bg-left-top bg-no-repeat bg-gray-100">
         <div className="w-[500px] h-full flex flex-col items-center py-12">
-            <div className="w-full bg-transparent flex flex-col border rounded-2xl border-gray-300 p-8 text-[16px]">
-                <span className="text-4xl text-gray-900 font-bold">Register</span>
+            <div className="w-full flex flex-col border rounded-2xl border-gray-300 p-8 text-[16px] bg-white">
+                <span className="text-4xl text-gray-900 font-bold">Đăng ký</span>
                 <div className="flex flex-col space-y-3 mt-10">
-                    <InputForm label="Fullname" value={data.fullname || ''} onChange={(e) => { data.fullname = e.target.value }} error={data.err_fullname} />
+                    <InputForm label="Họ và tên" value={data.fullname || ''} onChange={(e) => { data.fullname = e.target.value }} error={data.err_fullname} />
                     <InputForm label="Email" value={data.email || ''} onChange={(e) => { data.email = e.target.value }} error={data.err_email} />
-                    <InputForm label="Phone" value={data.phone_number || ''} onChange={(e) => { data.phone_number = e.target.value }} error={data.err_phone_number} />
-                    <InputForm label="Username" value={data.username || ''} onChange={(e) => { data.username = e.target.value }} error={data.err_username} />
-                    <InputForm label="Password" value={data.password || ''} onChange={(e) => { data.password = e.target.value }} type="password" error={data.err_password} />
-                    <InputForm label="Confirm Password" value={data.confirm_password || ''} onChange={(e) => { data.confirm_password = e.target.value }} type="password" error={data.err_confirm_password} />
+                    <InputForm label="Số điện thoại" value={data.phone_number || ''} onChange={(e) => { data.phone_number = e.target.value }} error={data.err_phone_number} />
+                    <InputForm label="Tên đăng nhập" value={data.username || ''} onChange={(e) => { data.username = e.target.value }} error={data.err_username} />
+                    <InputForm label="Mật khẩu" value={data.password || ''} onChange={(e) => { data.password = e.target.value }} type="password" error={data.err_password} />
+                    <InputForm label="Xác nhận mật khẩu" value={data.confirm_password || ''} onChange={(e) => { data.confirm_password = e.target.value }} type="password" error={data.err_confirm_password} />
                 </div>
                 {errMessage && <span className="text-red-400 mt-2 bg-red-50 px-3 py-2 rounded">{errMessage}</span>}
                 <div className="w-full mt-4">
-                    <CheckBox label="I agree to the terms and conditions" checked={agree} onChange={(value, e) => { setAgree(value) }} />
+                    <CheckBox label="Bạn sẽ đồng ý với Điều khoản, Chính sách" checked={agree} onChange={(value, e) => { setAgree(value) }} />
                 </div>
                 <ButtonLoading
-                    label="Register"
+                    label="Đăng ký"
                     className="h-14 w-full flex items-center justify-center rounded-full mt-4 text-xl"
                     template="ActionBlue" onClick={handleRegister} disabled={!agree}
                     loading={loading}
                 />
             </div>
             <ButtonLoading
-                label="Back to Login"
+                label="Trở lại đăng nhập"
                 template="ActionBaseBorder"
                 className="h-14 w-full flex items-center justify-center rounded-full mt-10 flex-none"
                 onClick={() => { navigate('/auth/login') }} />

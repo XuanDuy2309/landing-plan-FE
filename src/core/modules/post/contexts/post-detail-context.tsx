@@ -30,8 +30,6 @@ export const PostDetailContextProvider = observer(({ children, id }: IProps) => 
         const res = await PostApi.getDetailPost({ id });
         if (res.Status) {
             Object.assign(data, res.Data.data);
-            data.image_links = JSON.parse(res.Data.data.image_links);
-            data.video_links = JSON.parse(res.Data.data.video_links);
         }
     }
 

@@ -10,7 +10,7 @@ class SocketService {
   }
 
   connect(token: string) {
-    this.socket = io("http://localhost:3000", {
+    this.socket = io("https://landing-plan-be.onrender.com", {
       auth: { token },
     });
 

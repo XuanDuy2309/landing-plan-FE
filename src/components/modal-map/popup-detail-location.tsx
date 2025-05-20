@@ -1,7 +1,6 @@
 
-import { set } from 'mobx'
 import { observer } from 'mobx-react'
-import { ButtonLoading, IconBase } from 'src/components'
+import { ButtonLoading } from 'src/components'
 import { ButtonIcon } from 'src/components/button-icon'
 import { ActionMap, useCreatePostContext, useManagementLandingPlan } from 'src/core/modules'
 
@@ -73,7 +72,7 @@ export const PopupDetailLocationContainer = observer(() => {
                 }} />
                 {
                     pointsArea.points.length > 0 && (
-                        <ButtonLoading label="Chọn lại đường bào" template="ActionOrange" size="xs" onClick={() => {
+                        <ButtonLoading label="Chọn lại đường bao" template="ActionOrange" size="xs" onClick={() => {
                             pointsArea.reset()
                             pointsArea.isDraw = true
                         }} />

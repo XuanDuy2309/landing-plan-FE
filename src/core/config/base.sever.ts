@@ -9,8 +9,8 @@ let HEADERS: any = {
   'ngrok-skip-browser-warning': 'true',
   "charset": "utf-8",
 };
-export let baseUrl = 'http://localhost:3000';
-// export let baseUrl = 'https://landing-plan-be.onrender.com';
+// export let baseUrl = 'http://localhost:3000';
+export let baseUrl = 'https://landing-plan-be.onrender.com';
 
 export class BaseResponse {
   Data: any = null;

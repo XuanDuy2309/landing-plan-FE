@@ -8,11 +8,9 @@ import { SideBarLandingMapContainer } from './side-bar-landing-map-container'
 
 export const LandingMapContainer = observer(() => {
     const { openSidebar } = useManagementLandingPlan()
-    console.log('openSidebar', openSidebar)
-    // const { openSidebar } = useManagementLandingPlan()
     return (
         <div className='w-full h-screen flex'>
-            <div className={`h-full transition-[width] duration-300 ${openSidebar ? 'w-[35%]' : 'w-0 overflow-hidden'
+            <div className={`h-full flex-none transition-[width] duration-300 ${openSidebar ? 'w-[450px]' : 'w-0 overflow-hidden'
                 }`}>
                 <SideBarLandingMapContainer />
             </div>

@@ -1,19 +1,17 @@
 import debounce from "debounce";
 import L from "leaflet";
-import 'leaflet-routing-machine'; // Thêm import này
-import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import 'leaflet/dist/leaflet.css';
 import { observer } from 'mobx-react';
-import { Fragment, memo, useEffect, useMemo } from 'react';
-import ReactDOMServer from 'react-dom/server';
+import { useEffect, useMemo } from 'react';
 import { LayersControl, MapContainer, Marker, Pane, Polygon, Polyline, Popup, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import { Colors } from 'src/assets';
-import { getColorFromId, isValidPolygon } from 'src/core/base';
+import { isValidPolygon } from 'src/core/base';
 import { NominatimResult, SelectedLocationModel } from 'src/core/models';
 import { FilterPostContextType, useManagementLandingPlan, usePostContext } from 'src/core/modules';
 import { useCoreStores } from 'src/core/stores';
-import { PopupPostLandingMapContainer } from "../popup-post-landing-map-container";
 import './leaflet-map-container.css';
+import { ListPostMarkerLeafletMap } from "./list-post-marker-leaflet-map";
+import { RoutingMachineLeafletMap } from "./routing-machine-leaflet-map";
 
 export const LeafletMapContainer = observer(() => {
     const { location } = useCoreStores().sessionStore
@@ -30,7 +28,6 @@ export const LeafletMapContainer = observer(() => {
         sessionStore.requestLocation();
     }, [])
 
-    console.log("placement", placement);
     return (
         <MapContainer
             style={{ width: '100%', height: '100%', zIndex: 0 }}
@@ -42,7 +39,12 @@ export const LeafletMapContainer = observer(() => {
         >
             <MapEvents setSelectedLocation={setSelectedLocation} filter={filter} onRefresh={onRefresh} />
             <MapViewUpdater placement={placement} setSelectedLocation={setSelectedLocation} />
-            {pointsArea.routeTo && pointsArea.isRouting && <RoutingMachine from={[location.lat, location.lng]} to={[pointsArea.routeTo[0], pointsArea.routeTo[1]]} />}
+            {pointsArea.routeTo && <RoutingMachineLeafletMap
+                from={[location.lat, location.lng]}
+                to={[pointsArea.routeTo[0], pointsArea.routeTo[1]]}
+                isRouting={pointsArea.isRouting}
+                onChangeLocation={(lat, lng) => { setSelectedLocation({ lat, lng }) }}
+            />}
             <LayersControl>
                 <LayersControl.BaseLayer checked name="Map mặc định">
                     <TileLayer
@@ -98,11 +100,13 @@ export const LeafletMapContainer = observer(() => {
             // opacity={opacit}
             /> */}
 
-            {selectedLocation.lat && selectedLocation.lng && (
+            {selectedLocation.lat && selectedLocation.lng && !pointsArea.isRouting && (
                 <Marker position={[Number(selectedLocation.lat), Number(selectedLocation.lng)]}>
-                    <Popup>
-                        <div>
-                            <span>Vị trí hiện tại: { }</span>
+                    <Popup
+
+                    >
+                        <div className="p-3">
+                            <span>Vị trí hiện tại</span>
                         </div>
                     </Popup>
                 </Marker>
@@ -176,7 +180,7 @@ export const LeafletMapContainer = observer(() => {
                 </Polyline>
             )}
 
-            <RenderedPostMarkers />
+            <ListPostMarkerLeafletMap />
 
             <Marker
                 position={[location.lat, location.lng]}
@@ -281,6 +285,8 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
             }
             if (pointsArea.isRouting) {
                 pointsArea.routeTo = [lat, lng]
+                setSelectedLocation({ lat, lng })
+                // setSelectedLocation({lat: undefined, lng: undefined})
                 return
             }
             pointsArea.addPoint([lng, lat])
@@ -293,171 +299,5 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
     });
 
     return null;
-});
-
-interface RoutingProps {
-    from: [number, number];
-    to: [number, number];
-}
-
-const RoutingMachine = observer(({ from, to }: RoutingProps) => {
-    const map = useMap();
-
-    useEffect(() => {
-        if (!map || !from || !to) return;
-        console.log("form, to", from, to);
-
-        // Tạo routing control
-        const routingControl = L.Routing.control({
-            waypoints: [
-                L.latLng(from[0], from[1]),
-                L.latLng(to[0], to[1])
-            ],
-            lineOptions: {
-                styles: [{ color: 'blue', weight: 4 }],
-                extendToWaypoints: true,
-                missingRouteTolerance: 10
-            },
-            // plan: L.Routing.plan(
-            //     [
-            //         L.latLng(from[0], from[1]),
-            //         L.latLng(to[0], to[1])
-            //     ],
-            //     {
-            //         createMarker: function (i, waypoint) {
-            //             return L.marker(waypoint.latLng, {
-            //                 icon: L.divIcon({
-            //                     className: "routing-marker",
-            //                     html: `<div style="width: 16px; height: 16px; background: ${i === 0 ? 'green' : 'red'}; border-radius: 50%; border: 2px solid white;"></div>`,
-            //                 })
-            //             });
-            //         }
-            //     }
-            // ),
-            // addWaypoints: false,
-            // routeWhileDragging: fal  se,
-            // draggableWaypoints: false,
-            // showAlternatives: false,
-            altLineOptions: {
-                styles: [
-                    { color: 'gray', opacity: 0.4, weight: 3 }
-                ],
-                extendToWaypoints: true,
-                missingRouteTolerance: 10
-            },
-            router: L.Routing.osrmv1({
-                serviceUrl: `https://router.project-osrm.org/route/v1`,
-                language: 'vi' // Dù có set nhưng thường OSRM chỉ hỗ trợ 1 số ngôn ngữ
-            }),
-            // formatter: new L.Routing.Formatter({
-            //     // Đây là nơi bạn có thể tùy chỉnh text hướng dẫn
-            //     language: "vi",
-            //     formatInstruction: function (instr) {
-            //         return instr.text
-            //             .replace("Turn right", "Rẽ phải")
-            //             .replace("Turn left", "Rẽ trái")
-            //             .replace("Continue straight", "Đi thẳng")
-            //             .replace("Take the first exit", "Rẽ ra ở lối ra đầu tiên")
-            //             .replace("at the roundabout", "ở vòng xoay")
-            //             .replace("You have reached your destination", "Bạn đã đến nơi");
-            //     },
-            // }),
-            fitSelectedRoutes: true,
-        }).addTo(map);
-
-        // Clean up khi component unmount
-        return () => {
-            map.removeControl(routingControl);
-        };
-    }, [from, to]);
-
-    return null;
-});
-
-const RenderedPostMarkers = memo(() => {
-    const map = useMap();
-    const { data } = usePostContext();
-    const { hoveredPostId } = useManagementLandingPlan();
-
-    useEffect(() => {
-        if (!hoveredPostId) {
-            map.closePopup();
-            return;
-        }
-
-        const post = data.find(p => p.id === hoveredPostId);
-        if (!post || !post.lat || !post.lng) return;
-
-        const popup = L.popup({
-            className: 'custom-popup',
-            autoPan: true,
-        })
-            .setLatLng([post.lat, post.lng])
-            .setContent(
-                ReactDOMServer.renderToString(
-                    <PopupPostLandingMapContainer
-                        item={post}
-                        onCancel={() => map.closePopup()}
-                        onConfirm={(value) => {
-                            map.closePopup();
-                            window.open(`/post/${value.id}`);
-                        }}
-                    />
-                )
-            );
-
-        map.openPopup(popup);
-
-        return () => {
-            map.closePopup();
-        };
-    }, [hoveredPostId, data, map]);
-
-    return (
-        <>
-            {data.map((item, index) => {
-                const { lat, lng, coordinates } = item;
-                const hasPolygon = Array.isArray(coordinates) && coordinates.length >= 3;
-
-                return (
-                    <Fragment key={item.id || index}>
-                        {lat && lng && (
-                            <Marker
-                                position={[lat, lng]}
-                                icon={L.divIcon({
-                                    className: 'custom-marker',
-                                    html: `<div style="width: 16px; height: 16px; background: green; border-radius: 50%; border: 2px solid white;"></div>`,
-                                })}
-                            >
-                                <Popup>
-                                    <PopupPostLandingMapContainer
-                                        item={item}
-                                        onCancel={() => map.closePopup()}
-                                        onConfirm={(value) => {
-                                            map.closePopup();
-                                            window.open(`/post/${value.id}`);
-                                        }}
-                                    />
-                                </Popup>
-                            </Marker>
-                        )}
-
-                        {hasPolygon && (
-                            <Polygon
-                                positions={coordinates.map(([lng, lat]: number[]) => [lat, lng])}
-                                pathOptions={{
-                                    color: hoveredPostId === item.id ? 'orange' : getColorFromId(item.id!),
-                                    fillOpacity: 0.2,
-                                    weight: 2,
-                                }}
-                            >
-                                {map.getZoom() > 18 && <Tooltip direction="center" permanent>{item.title} - {item.area} m²</Tooltip>}
-                            </Polygon>
-                        )}
-                    </Fragment>
-                );
-            })}
-        </>
-    );
 });
 

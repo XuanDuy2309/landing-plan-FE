@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Colors } from 'src/assets'
 import { ButtonIcon } from 'src/components/button-icon'
 import { useManagementLandingPlan, usePostContext } from 'src/core/modules'
+import { useCoreStores } from 'src/core/stores'
+import { ItemLandingMap } from '../components/item-landing-map'
 import { ItemPostSidebarLandingMap } from '../components/item-post-sidebar-landing-map'
 
 interface IProps {
@@ -10,8 +12,9 @@ interface IProps {
 }
 
 export const SideBarLandingMapContainer = observer(({ }: IProps) => {
-    const { openSidebar, setOpenSidebar, setHoveredPostId, hoveredPostId } = useManagementLandingPlan()
+    const { openSidebar, setOpenSidebar, setHoveredPostId, hoveredPostId, landingPlanMap } = useManagementLandingPlan()
     const { data } = usePostContext()
+    const { profile } = useCoreStores().sessionStore
     const navigate = useNavigate()
 
     return (
@@ -32,6 +35,13 @@ export const SideBarLandingMapContainer = observer(({ }: IProps) => {
             </div>
 
             <div className="flex flex-col gap-2 p-4 overflow-y-auto h-full min-h-0">
+                <span className='text-gray-900 font-medium text-[16px]'>Danh sách bản đồ quy hoạch</span>
+                <div className=' '>
+                    {landingPlanMap && <ItemLandingMap item={landingPlanMap} />}
+                    {!landingPlanMap && <span className='text-gray-500 text-center h-[200px] flex items-center justify-center'>Không có bản đồ quy hoạch tại đây</span>}
+                </div>
+            </div>
+            <div className="flex flex-col gap-2 p-4 overflow-y-auto h-full min-h-0">
                 <span className='text-gray-900 font-medium text-[16px]'>Danh sách bài viết</span>
                 <div className='grid grid-cols-2 gap-2 '>
                     {data && data.length > 0 && data.map((item, index) => (
@@ -43,7 +53,10 @@ export const SideBarLandingMapContainer = observer(({ }: IProps) => {
                             <ItemPostSidebarLandingMap item={item as any} />
                         </div>
                     ))}
-                    {data && data.length === 0 && <span className='text-gray-500 text-center col-span-2 h-[200px] flex items-center justify-center'>Không có bài viết nào</span>}
+                    {data && data.length === 0 && profile && <span className='text-gray-500 text-center col-span-2 h-[200px] flex items-center justify-center'>Không có bài viết nào</span>}
+                    {data && data.length === 0 && !profile && <span className='text-gray-500 text-center col-span-2 h-[200px] flex items-center justify-center gap-1'>Vui lòng <button onClick={() => {
+                        navigate('/auth/login')
+                    }} className='text-blue-600 font-medium'>đăng nhập</button> để xem các bài viết</span>}
                 </div>
             </div>
         </div >

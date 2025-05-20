@@ -1,5 +1,5 @@
+import * as turf from '@turf/turf';
 import { makeAutoObservable } from "mobx";
-import * as turf from '@turf/turf'
 
 export class SearchLandingPlanModel {
 
@@ -82,13 +82,11 @@ export class PointsMapModel {
     areaLabelPosition: [number, number] | null = null;
     currentMousePos?: L.LatLng
     isRouting?: boolean
-    routeTo: [number, number] = [0, 0];
+    routeTo?: [number, number];
 
     constructor() {
         makeAutoObservable(this);
     }
-
-
 
     addPoint = (lngLat: [number, number], isMarkerClick?: boolean) => {
         if (!this.isDraw) {
@@ -141,7 +139,7 @@ export class PointsMapModel {
         this.isDraw = false;
         this.segmentLengths = []; // Reset lại chiều dài các đoạn
         this.isRouting = false
-        this.routeTo = [0, 0]
+        this.routeTo = undefined
     };
 
     calculateDistance = () => {
@@ -168,4 +166,4 @@ export class LandingPlanModel {
     constructor() {
         makeAutoObservable(this)
     }
-} 
+}

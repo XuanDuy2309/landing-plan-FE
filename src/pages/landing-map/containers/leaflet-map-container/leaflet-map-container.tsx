@@ -36,7 +36,8 @@ export const LeafletMapContainer = observer(() => {
             style={{ width: '100%', height: '100%', zIndex: 0 }}
             center={[location.lat, location.lng]}
             zoom={14}
-            maxZoom={30}
+            maxZoom={22}
+            minZoom={8}
             attributionControl={true}
         >
             <MapEvents setSelectedLocation={setSelectedLocation} filter={filter} onRefresh={onRefresh} />
@@ -63,7 +64,7 @@ export const LeafletMapContainer = observer(() => {
                         attribution="&copy; <a href='https://www.google.com/maps'>Google Maps</a> contributors"
                     />
                 </LayersControl.BaseLayer>
-                <LayersControl.BaseLayer name="Map vệ tinh">
+                <LayersControl.BaseLayer name="Map địa hình">
                     <TileLayer
                         url="http://{s}.google.com/vt/lyrs=m,t&x={x}&y={y}&z={z}"
                         subdomains={['mt0', 'mt1', 'mt2', 'mt3']}

@@ -85,7 +85,7 @@ export const useBaseContextProvider = <ITypeFilter, T>(
     new DataContextType<T, ITypeFilter>(filterInit)
   )
   const indexPageRef = useRef<number>(1)
-  const pageSizeRef = useRef<number>(5)
+  const pageSizeRef = useRef<number>(25)
   const totalRef = useRef<number>(0)
 
   const fetchInternalWithoutLoading = async () => {

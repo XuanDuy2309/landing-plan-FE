@@ -49,9 +49,9 @@ export const ModalConfirm = observer(
                 closable={false}
                 centered={props.centered}
             >
-                <div className='w-full h-full flex flex-col'>
-                    <div className='h-10 flex justify-center items-center border-b border-gray-200 text-llg font-medium'>
-                        <span>Thông báo</span>
+                <div className='w-full h-full flex flex-col bg-white rounded'>
+                    <div className='h-14 flex justify-center items-center border-b border-gray-200 text-llg font-medium'>
+                        <span className='text-gray-700 text-xl'>Thông báo</span>
                     </div>
                     <div className='flex flex-col items-center justify-center w-full h-[100px]'>
                         <div className='flex flex-row items-center space-x-2'>

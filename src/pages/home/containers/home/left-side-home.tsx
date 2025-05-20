@@ -1,7 +1,6 @@
 import classNames from "classnames"
 import { observer } from "mobx-react"
-import { useEffect, useRef, useState } from "react"
-import { Collapse, UnmountClosed } from "react-collapse"
+import { useState } from "react"
 import { Colors } from "src/assets"
 import { ButtonLoading, InputUnit } from "src/components"
 import { ButtonIcon } from "src/components/button-icon"
@@ -85,11 +84,7 @@ export const LeftSideHome = observer(() => {
                     <ButtonIcon icon={show ? 'filter' : 'filter-outline'} iconSize={'24'} size={'medium'} color={Colors.gray[700]} onClick={() => setShow(!show)} />
                     <span className="text-xl font-bold text-gray-900">Bộ lọc</span>
                 </div>
-                <div className="w-full h-full flex flex-col px-3 py-2 space-y-3"
-                    style={{
-                        maxHeight: maxHeight,
-                        overflowY: 'auto',
-                    }}
+                <div className="w-full h-full flex flex-col px-3 py-2 space-y-3 overflow-y-auto"
                 >
                     <div className="w-full flex items-center rounded-full bg-gray-200">
                         <ButtonIcon icon="search-outline" iconSize={'16'} size={'medium'} color={Colors.gray[700]} />

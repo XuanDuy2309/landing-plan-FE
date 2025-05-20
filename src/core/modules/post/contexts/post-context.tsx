@@ -39,6 +39,7 @@ interface IProps {
 export const PostContextProvider = observer(({ children, id, following }: IProps) => {
     const context = useBaseContextProvider<FilterPostContextType, PostModel>(new FilterPostContextType(), request)
 
+
     async function request(
         filter: FilterPostContextType,
         index: number,
@@ -51,7 +52,7 @@ export const PostContextProvider = observer(({ children, id, following }: IProps
             offset: 0
         }
         if (following) {
-            res = await uc.fetchFollowingPost({ ...filter, user_id: id }, index, pageSize)
+            res = await uc.fetchFollowingPost({ ...filter }, index, pageSize)
         }
         else {
             res = await uc.fetchInternal({ ...filter, user_id: id }, index, pageSize)

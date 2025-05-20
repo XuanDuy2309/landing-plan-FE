@@ -1,6 +1,7 @@
 import { observer } from "mobx-react";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { AuthApi } from "src/core/api";
+import { BaseResponse } from "src/core/config";
 
 export class ImageContextType {
     data: any = [];
@@ -13,16 +14,27 @@ export const ImageContext = React.createContext<ImageContextType>(new ImageConte
 
 interface IProps {
     children: React.ReactNode
+    id?: number
 }
 
-export const ImageContextProvider = observer(({ children }: IProps) => {
+export const ImageContextProvider = observer(({ children, id }: IProps) => {
     const [data, setData] = React.useState<any>([]);
     const [dataVideo, setDataVideo] = React.useState<any>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
 
     const fetchData = async () => {
         setLoading(true)
-        const res = await AuthApi.getListUpload({ type: 'image' });
+        let res: BaseResponse = {
+            Status: false,
+            Data: undefined,
+            Message: "",
+            Code: undefined
+        }
+        if (id) {
+            res = await AuthApi.getListUploadById({ type: 'image', id });
+        } else {
+            res = await AuthApi.getListUpload({ type: 'image' });
+        }
         setLoading(false)
         if (res.Status) {
             setData(res.Data.data);
@@ -31,7 +43,17 @@ export const ImageContextProvider = observer(({ children }: IProps) => {
 
     const fetchDataVideo = async () => {
         setLoading(true)
-        const res = await AuthApi.getListUpload({ type: 'video' });
+        let res: BaseResponse = {
+            Status: false,
+            Data: undefined,
+            Message: "",
+            Code: undefined
+        }
+        if (id) {
+            res = await AuthApi.getListUploadById({ type: 'video', id });
+        } else {
+            res = await AuthApi.getListUpload({ type: 'video' });
+        }
         setLoading(false)
         if (res.Status) {
             setDataVideo(res.Data.data);

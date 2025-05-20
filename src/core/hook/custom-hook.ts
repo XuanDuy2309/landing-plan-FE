@@ -23,3 +23,17 @@ export function useSocketEvent<T = any>(event: string, handler: (data: T) => voi
         };
     }, [event, handler]);
 }
+
+export const useJoinToConversationRoom = (roomId: number | string) => {
+    useEffect(() => {
+        if (!roomId) return;
+        console.log('roomId', roomId)
+
+        if (!socketService.socket) return
+        socketService.socket.emit('join_conversation', { id: roomId }); // 👈 Tham gia phòng
+
+        return () => {
+            socketService.socket?.emit('leave_conversation', { id: roomId }); // 👈 Thoát phòng khi unmount
+        };
+    }, [roomId]);
+}

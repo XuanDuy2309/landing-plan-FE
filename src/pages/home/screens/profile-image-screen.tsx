@@ -1,19 +1,19 @@
-import { observer } from "mobx-react";
-import { useCoreStores } from "../../../core/stores";
-import { AuthApi } from "../../../core/api";
-import { ImageContextProvider, useImageContext, useUserContext } from "src/core/modules";
-import { ButtonLoading, IconBase } from "src/components";
-import classNames from "classnames";
 import { Spin } from "antd";
-import { Colors } from "src/assets";
+import { observer } from "mobx-react";
+import { ButtonLoading } from "src/components";
+import { ImageContextProvider, useImageContext, useUserContext } from "src/core/modules";
 import { SelectFileCase } from "src/core/services";
-import { use, useState } from "react";
+import { useCoreStores } from "../../../core/stores";
 import { ItemMyImage } from "../components/item-my-image";
 
-export const ProfileImageScreen = observer(() => {
+interface IProps {
+    id?: number
+}
+
+export const ProfileImageScreen = observer(({ id }: IProps) => {
     const { sessionStore } = useCoreStores();
     return (
-        <ImageContextProvider>
+        <ImageContextProvider id={id}>
             <SelectImage />
         </ImageContextProvider>
     )
@@ -61,6 +61,13 @@ const SelectImage = observer(() => {
                                 })
                             }
                         </div>}
+                    {
+                        !loading && data.length === 0 && <div className="w-full h-[100px] items-center justify-center flex">
+
+                            <span className="text-lg text-gray-700">Chưa có ảnh nào</span>
+                        </div>
+
+                    }
                 </div>
             </div>
             <div className="w-full h-full max-w-[1240px] bg-white rounded-xl flex flex-col">
@@ -78,11 +85,18 @@ const SelectImage = observer(() => {
                             {
                                 dataVideo.map((item, index) => {
                                     return (
-                                        <ItemMyImage key={index} item={item.link} action={actionItemImage} type="video"/>
+                                        <ItemMyImage key={index} item={item.link} action={actionItemImage} type="video" />
                                     )
                                 })
                             }
                         </div>}
+                    {
+                        !loading && dataVideo.length === 0 && <div className="w-full h-[100px] items-center justify-center flex">
+
+                            <span className="text-lg text-gray-700">Chưa có video nào</span>
+                        </div>
+
+                    }
                 </div>
             </div>
         </div>)

@@ -8,7 +8,7 @@ export const MyPost = observer(() => {
     const { sessionStore } = useCoreStores()
     const { profile } = sessionStore
     return (
-        <PostContextProvider id={profile ? profile.id : undefined}>
+        <PostContextProvider id={profile?.id}>
             <div className="w-full h-full flex items-center justify-between max-w-[1440px] mx-auto relative">
                 <div className="w-1/3 flex-none min-w-[280px] h-full">
                     <LeftSideHome />

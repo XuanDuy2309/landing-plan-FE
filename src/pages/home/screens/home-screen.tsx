@@ -1,10 +1,8 @@
 import { observer } from "mobx-react";
-import { useCoreStores } from "../../../core/stores";
-import { AuthApi } from "../../../core/api";
-import { LeftSideHome } from "../containers/home/left-side-home";
-import { RightSideHome } from "../containers/home/right-side-home";
 import { PostContextProvider } from "src/core/modules";
+import { useCoreStores } from "../../../core/stores";
 import { HomeContainer } from "../containers/home/home-container";
+import { LeftSideHome } from "../containers/home/left-side-home";
 
 export const HomeScreen = observer(() => {
     const { sessionStore } = useCoreStores();

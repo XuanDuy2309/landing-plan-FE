@@ -1,3 +1,4 @@
+import { Spin } from "antd";
 import { observer } from "mobx-react";
 import { JSX, useEffect } from "react";
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
@@ -9,7 +10,6 @@ import { AuthRoutes } from "./pages/auth/routes";
 import { HomeRoutes } from "./pages/home/routes";
 import { AuctionScreen } from "./pages/home/screens/auction-screen";
 import { PostDetailScreen } from "./pages/home/screens/post-detail";
-import { ProfileDetail } from "./pages/home/screens/profile-detail";
 import { LandingMapRoutes } from "./pages/landing-map/routes";
 import { SettingsRoutes } from "./pages/settings/routes";
 
@@ -28,7 +28,7 @@ export const AppRouter = observer(() => {
         return () => {
             socketService.disconnect();
         };
-    }, []);
+    }, [token]);
     return (
         <div className="w-screen h-screen">
             <Router>
@@ -49,11 +49,6 @@ export const AppRouter = observer(() => {
                                 <SettingsRoutes />
                             </RequireAuth>
                         } />
-                        <Route path="profile/:id" element={
-                            <RequireAuth>
-                                <ProfileDetail />
-                            </RequireAuth>
-                        } />
                     </Route>
                     <Route path="post/:id" element={
                         <RequireAuth>
@@ -61,11 +56,6 @@ export const AppRouter = observer(() => {
                         </RequireAuth>
                     } />
                     <Route path="auction/:id" element={
-                        <RequireAuth>
-                            <AuctionScreen />
-                        </RequireAuth>
-                    } />
-                    <Route path="profile/:id" element={
                         <RequireAuth>
                             <AuctionScreen />
                         </RequireAuth>
@@ -82,10 +72,20 @@ const SkipAuth = observer(({ children }: { children: JSX.Element }) => {
     const { sessionStore } = useCoreStores();
     const location = useLocation();
 
-
-    if (sessionStore.session) {
-        return <Navigate to="/home" state={{ from: location }} replace />;
+    if (!sessionStore.isInitialized) {
+        return (
+            <div className="w-full h-full flex items-center justify-center">
+                <Spin />
+            </div>
+        );
     }
+
+    // Nếu đã đăng nhập và có route trước đó, quay về route đó
+    if (sessionStore.session?.access_token) {
+        const from = location.state?.from || '/home';
+        return <Navigate to={from} replace />;
+    }
+
     return children;
 });
 
@@ -93,9 +93,21 @@ const RequireAuth = observer(({ children }: { children: JSX.Element }) => {
     const { sessionStore } = useCoreStores();
     const location = useLocation();
 
-    if (!sessionStore.session?.access_token) {
-        // Lưu lại đường dẫn hiện tại để chuyển hướng sau khi đăng nhập
-        return <Navigate to="/auth/login" state={{ from: location }} replace />;
+    // Đợi cho đến khi sessionStore được khởi tạo hoàn toàn
+    if (!sessionStore.isInitialized) {
+        return (
+            <div className="w-full h-full flex items-center justify-center">
+                <Spin />
+            </div>
+        );
     }
+
+    // Chỉ chuyển hướng khi không có session
+    if (!sessionStore.session?.access_token) {
+        // Lưu lại route hiện tại để sau khi login sẽ quay lại
+        return <Navigate to="/auth/login" state={{ from: location.pathname + location.search }} replace />;
+    }
+
+    // Nếu có session, giữ nguyên route hiện tại
     return children;
 });

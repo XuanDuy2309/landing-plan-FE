@@ -1,10 +1,10 @@
-import { observer } from "mobx-react"
-import { useParams } from "react-router-dom";
-import { PostDetailContextProvider, usePostDetailContext } from "src/core/modules/post";
-import { SliderDetailMediaPost } from "../containers/post-detail/slider-detail-media-post";
 import classNames from "classnames";
-import { ContentDetailPost } from "../containers/post-detail/content-detail-post";
+import { observer } from "mobx-react";
+import { useParams } from "react-router-dom";
 import { usePostSocketRoom } from "src/core/hook";
+import { PostDetailContextProvider, usePostDetailContext } from "src/core/modules/post";
+import { ContentDetailPost } from "../containers/post-detail/content-detail-post";
+import { SliderDetailMediaPost } from "../containers/post-detail/slider-detail-media-post";
 
 export const PostDetailScreen = observer(() => {
     const { id } = useParams();

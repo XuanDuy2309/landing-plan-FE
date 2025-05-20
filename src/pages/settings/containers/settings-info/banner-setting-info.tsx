@@ -3,6 +3,7 @@ import { observer } from "mobx-react";
 import { useRef, useState } from "react";
 import { Colors } from "src/assets";
 import { ButtonLoading, IconBase, ModalBase, ModalSelectImage } from "src/components";
+import { getColorFromId } from "src/core/base";
 import { useUserContext } from "src/core/modules";
 
 export const BannerSettingInfo = observer(() => {
@@ -28,7 +29,11 @@ export const BannerSettingInfo = observer(() => {
                 <div className="absolute bottom-0 left-0 right-0 w-full h-10 flex items-end justify-between p-3">
                     <div className="size-[120px] relative flex items-center justify-center bg-white rounded-full">
 
-                        <div className='size-[110px] rounded-full flex items-center bg-gray-200 hover:opacity-70 justify-center overflow-hidden'>
+                        <div className='size-[110px] rounded-full flex items-center bg-gray-200 hover:opacity-70 justify-center overflow-hidden'
+                            style={{
+                                backgroundColor: getColorFromId(data?.id || 0)
+                            }}
+                        >
                             {
                                 loading ?
                                     <div className="w-full h-full flex items-center justify-center">
@@ -37,7 +42,7 @@ export const BannerSettingInfo = observer(() => {
                                     : (data && data?.avatar ?
                                         <img src={data.avatar} alt="" className="size-full object-cover" />
                                         :
-                                        <span className="text-7xl font-bold text-gray-900">{data?.fullname?.charAt(0).toUpperCase()}</span>)
+                                        <span className="text-7xl font-bold text-white">{data?.fullname?.charAt(0).toUpperCase()}</span>)
 
                             }
                         </div>

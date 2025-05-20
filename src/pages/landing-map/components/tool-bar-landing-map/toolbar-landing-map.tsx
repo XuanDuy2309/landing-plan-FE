@@ -1,17 +1,15 @@
-import classNames from 'classnames';
+import { Slider } from 'antd';
 import { observer } from 'mobx-react';
 import { useState } from 'react';
+import { Collapse } from 'react-collapse';
 import { Colors } from 'src/assets';
 import { IconBase } from 'src/components';
 import { useManagementLandingPlan } from 'src/core/modules';
-import { Collapse } from 'react-collapse';
-import { point } from 'leaflet';
 import { ToolbarButton } from './button-toolbar-landing-map';
-import { Slider, Tooltip } from 'antd';
 
 export const ToolbarLandingMap = observer(() => {
     const [isOpen, setIsOpen] = useState(false);
-    const { pointsArea, opacity, setOpacity } = useManagementLandingPlan()
+    const { pointsArea, opacity, setOpacity, landingPlanMap } = useManagementLandingPlan()
 
     const handleToggleDraw = () => {
         pointsArea.isDraw = !pointsArea.isDraw;
@@ -33,7 +31,7 @@ export const ToolbarLandingMap = observer(() => {
     const handleToggleRouting = () => {
         pointsArea.isRouting = !pointsArea.isRouting
         if (pointsArea.isRouting) {
-            pointsArea.routeTo = [0, 0]
+            pointsArea.routeTo = undefined
         }
     }
 
@@ -47,9 +45,9 @@ export const ToolbarLandingMap = observer(() => {
 
     return (
         <>
-            <div className='h-[120px] pb-2 absolute z-[9999] top-20 right-3'>
+            {landingPlanMap && <div className='h-[120px] pb-2 absolute z-[9999] top-20 right-3'>
                 <Slider vertical defaultValue={100} step={2} onChange={(value) => { setOpacity(value / 100) }} value={opacity * 100} />
-            </div>
+            </div>}
             <div className='absolute z-[9999] bottom-3 right-3'>
                 <div className="flex flex-col bg-white rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),0_-1px_0px_rgba(0,0,0,0.02)]">
 

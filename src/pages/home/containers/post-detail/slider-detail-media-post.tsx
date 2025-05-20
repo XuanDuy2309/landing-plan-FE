@@ -1,5 +1,5 @@
 import { observer } from "mobx-react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Colors } from "src/assets"
 import { ButtonIcon } from "src/components/button-icon"
@@ -78,7 +78,7 @@ export const SliderDetailMediaPost = observer(() => {
             <div className="w-full flex items-center justify-between p-3 absolute top-0 left-0 right-0">
                 <div className="flex items-center space-x-3">
                     <ButtonIcon icon="close-outline" iconSize="24" color={Colors.gray[500]} onClick={() => {
-                        navigate(-1)
+                        navigate("/home")
                     }}
                     />
                     <img src="/images/logo-landing-plan.png" alt="" className="size-14 object-contain flex-none" />

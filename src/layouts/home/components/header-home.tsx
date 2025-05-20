@@ -28,7 +28,7 @@ export const HeaderHome = observer(() => {
             setActiveScreen(2);
             return;
         }
-        
+
         // Check if pathname starts with /home/member to active Users tab
         if (pathname.startsWith('/home/member')) {
             setActiveScreen(3);
@@ -98,7 +98,7 @@ export const HeaderHome = observer(() => {
             key: 4,
             title: 'Messages',
             icon: "messenger-outline",
-            link: ''
+            link: '/home/message'
         }
     ]
 

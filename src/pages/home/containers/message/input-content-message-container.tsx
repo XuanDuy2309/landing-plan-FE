@@ -41,7 +41,7 @@ export const InputContentMessageContainer = observer(() => {
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+        if (e.key === "Enter" && !e.shiftKey && !loading) {
             e.preventDefault()
             handleSendMessage()
         }

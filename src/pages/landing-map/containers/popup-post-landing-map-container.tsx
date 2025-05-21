@@ -26,7 +26,7 @@ export const PopupPostLandingMapContainer = memo(observer((props: IProps) => {
     return (
         <div className="w-full h-full flex flex-col">
             <div className="flex flex-col gap-1">
-                <img src={JSON.parse((props.item as any).image_links)[0]} className='w-full h-[200px] object-cover' />
+                <img src={props.item.image_links[0]} className='w-full h-[200px] object-cover' />
                 <div className="flex flex-col gap-1 p-2">
                     <span className="font-medium text-[16px] line-clamp-2 overflow-hidden text-gray-900 leading-[20px]">
                         {props.item.title}

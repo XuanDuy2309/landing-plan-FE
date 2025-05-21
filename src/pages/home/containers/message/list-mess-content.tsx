@@ -33,7 +33,7 @@ export const ListMessageContent = observer(() => {
             // Add is_new flag for animation
             mess.is_new = true;
             data.unshift(mess)
-            
+
             // Remove the is_new flag after animation completes
             setTimeout(() => {
                 mess.is_new = false;
@@ -123,11 +123,9 @@ export const ListMessageContent = observer(() => {
         return (
             <div
                 key={message.id}
-                className={`flex items-end space-x-2 group transition-all ${
-                    isMine ? 'flex-row-reverse' : 'flex-row'
-                } ${isSequence ? 'mt-1' : 'mt-4'} ${
-                    message.is_new ? 'animate-fade-in' : ''
-                }`}
+                className={`flex items-end space-x-2 group transition-all ${isMine ? 'flex-row-reverse' : 'flex-row'
+                    } ${isSequence ? 'mt-1' : 'mt-4'} ${message.is_new ? 'animate-fade-in' : ''
+                    }`}
             >
                 {/* Avatar */}
                 {!isMine && isEndOfSequence && (

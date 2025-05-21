@@ -1,6 +1,7 @@
 // services/SocketService.ts
 import { makeObservable, observable } from "mobx";
 import { io, Socket } from "socket.io-client";
+import { baseUrl } from "../config";
 
 class SocketService {
   @observable socket?: Socket;
@@ -10,7 +11,7 @@ class SocketService {
   }
 
   connect(token: string) {
-    this.socket = io("http://localhost:3000", {
+    this.socket = io(baseUrl, {
       auth: { token },
     });
 

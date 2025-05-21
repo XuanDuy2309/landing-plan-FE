@@ -38,7 +38,9 @@ export const CreateMessageContextProvider = observer(({ children }: IProps) => {
             "content": data.content,
             "type": data.type
         }
+        setLoading(true)
         const res = await ConversationsApi.sendMessage(selectedId, params)
+        setLoading(false)
         return res
     }
 

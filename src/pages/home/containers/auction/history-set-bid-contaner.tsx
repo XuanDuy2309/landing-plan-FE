@@ -107,7 +107,7 @@ export const HistorySetBid = observer(({ data, value, onSelected }: IProps) => {
                                                 <span>{index + 1}</span>
                                             </div>
                                             <div className="w-full h-full px-3 flex items-center">
-                                                <span>{item.create_at ? moment(item.create_at).format('HH:mm DD/MM/YYYY') : '--/--/----'}</span>
+                                                <span>{item.create_at ? moment(item.create_at, 'YYYY-MM-DD HH:mm').format('HH:mm DD/MM/YYYY') : '--/--/----'}</span>
                                             </div>
                                             <div className="w-full h-full px-3 flex items-center">
                                                 <span>{item.user_name}</span>

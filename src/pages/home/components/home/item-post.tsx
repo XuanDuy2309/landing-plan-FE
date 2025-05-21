@@ -2,17 +2,19 @@ import { Dropdown, MenuProps } from "antd";
 import classNames from "classnames";
 import { observer } from "mobx-react";
 import moment from "moment";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Colors } from "src/assets";
-import { IconBase } from "src/components";
+import { IconBase, ModalBase } from "src/components";
 import { ButtonIcon } from "src/components/button-icon";
+import { ModalSharePost } from "src/components/modal-share/modal-share-post";
 import { formatMoney, getColorFromId } from "src/core/base";
-import { Purpose_Post } from "src/core/models";
+import { PostModel, Purpose_Post } from "src/core/models";
 import { useUserContext } from "src/core/modules";
 import { ItemMyImage } from "../item-my-image";
 
 interface IProps {
-    item: any
+    item: PostModel
     onLike: (id: number) => void
     onUnlike: (id: number) => void
 }
@@ -20,6 +22,7 @@ interface IProps {
 export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
     const navigate = useNavigate();
     const { data: user } = useUserContext();
+    const shareModalRef = useRef<any>(null);
 
     const renderPurpose = {
         1: { label: "Bán", color: Colors.green[400] },
@@ -35,20 +38,34 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                 navigate(`/post/${item.id}`);
             },
         },
-        {
-            key: '2',
-            label: 'Đấu giá ngay',
-            onClick: () => {
-                navigate(`/auction/${item.id}`);
-            },
-            disabled: Number(item.purpose) !== Purpose_Post.For_Auction
-        },
+
+        ...(item.purpose === Purpose_Post.For_Auction
+            ? [{
+                key: '2',
+                label: 'Đấu giá ngay',
+                onClick: () => {
+                    navigate(`/auction/${item.id}`);
+                },
+            }]
+            : []
+        ),
         {
             key: '3',
             label: 'Liên hệ ngay',
             onClick: () => {
             },
         },
+        ...(item.create_by_id === user?.id
+            ? [{
+                key: '5',
+                label: 'Xóa bài viết',
+                onClick: () => {
+                    navigate(`/home/edit-post/${item.id}`);
+                },
+                danger: true,
+            }]
+            : []
+        )
     ]
 
     const renderUnit = () => {
@@ -124,7 +141,7 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                 >{renderPurpose[item.purpose].label}</span>
                 <span className="text-gray-900 font-bold text-base">{item.title}</span>
             </div>
-            <div className="w-full flex items-center space-x-1">
+            <div className="w-full flex items-center space-x-1 flex-wrap">
                 <div className=" flex items-center space-x-2">
                     <IconBase icon='location-outline' size={16} color={Colors.gray[700]} />
                     <span>{item.address}</span>
@@ -149,6 +166,9 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                     )
                 })}
             </div>
+            <div className="w-full flex items-center justify-end px-3">
+                <span>{item.like_by_ids?.length} người thích - {item.share_count} lượt chia sẻ</span>
+            </div>
             <div className="w-full flex items-center border-t space-x-2 border-gray-200 pt-3">
                 <div className={classNames("w-full h-10 flex items-center justify-center space-x-2 rounded hover:bg-gray-200 cursor-pointer",
                     { 'text-gray-700': !item.like_by_ids?.includes(user.id || 0) },
@@ -157,10 +177,10 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                     onClick={() => {
                         if (item.like_by_ids?.includes(user.id || 0)) {
                             item.like_by_ids = item.like_by_ids.filter((id: number) => id !== user.id);
-                            onUnlike(item.id);
+                            onUnlike(item.id || 0);
                         }
                         else {
-                            onLike(item.id);
+                            onLike(item.id || 0);
                             item.like_by_ids.push(user.id || 0);
                         }
                     }}
@@ -171,12 +191,25 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                         color={!item.like_by_ids.includes(user.id || 0) ? Colors.gray[700] : Colors.blue[600]} />
                     <span>Thích</span>
                 </div>
-                <div className="w-full h-10 flex items-center justify-center space-x-2 rounded hover:bg-gray-200 cursor-pointer">
+                <div
+                    className="w-full h-10 flex items-center justify-center space-x-2 rounded hover:bg-gray-200 cursor-pointer"
+                    onClick={() => {
+                        shareModalRef.current?.open();
+                    }}
+                >
                     <IconBase icon='share-outline' size={20} color={Colors.gray[700]} />
                     <span>Chia sẻ</span>
                 </div>
             </div>
 
+            <ModalBase
+                ref={shareModalRef}
+            >
+                <ModalSharePost
+                    post={item}
+                    onClose={() => shareModalRef.current?.close()}
+                />
+            </ModalBase>
         </div>
     );
 })

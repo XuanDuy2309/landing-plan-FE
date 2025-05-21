@@ -1,6 +1,5 @@
-import moment from "moment";
-import { Status, UserModel } from "./user-model";
 import { makeAutoObservable } from "mobx";
+import moment from "moment";
 
 export enum Type_Post {
     Public = 1,
@@ -103,7 +102,7 @@ export class PostModel {
     create_by_email?: string
     create_at?: moment.Moment
     update_at?: moment.Moment
-    number_share?: number
+    share_count?: number
     like_by_ids: number[] = []
 
     err_create_by_name?: string

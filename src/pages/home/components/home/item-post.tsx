@@ -4,13 +4,15 @@ import { observer } from "mobx-react";
 import moment from "moment";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { Colors } from "src/assets";
 import { IconBase, ModalBase } from "src/components";
 import { ButtonIcon } from "src/components/button-icon";
+import { ModalConfirm } from "src/components/modal-confirm/modal-confim";
 import { ModalSharePost } from "src/components/modal-share/modal-share-post";
 import { formatMoney, getColorFromId } from "src/core/base";
 import { PostModel, Purpose_Post } from "src/core/models";
-import { useUserContext } from "src/core/modules";
+import { usePostContext, useUserContext } from "src/core/modules";
 import { ItemMyImage } from "../item-my-image";
 
 interface IProps {
@@ -23,6 +25,8 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
     const navigate = useNavigate();
     const { data: user } = useUserContext();
     const shareModalRef = useRef<any>(null);
+    const { itemUpdate, setItemUpdate, onDeletePost, onRefresh } = usePostContext()
+    const deleteRef = useRef<any>(null);
 
     const renderPurpose = {
         1: { label: "Bán", color: Colors.green[400] },
@@ -58,12 +62,24 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
         ...(item.create_by_id === user?.id
             ? [{
                 key: '5',
+                label: 'Chỉnh sửa bài viết',
+                onClick: () => {
+                    setItemUpdate(item)
+                    const event = new CustomEvent('update-post');
+                    window.dispatchEvent(event);
+                }
+
+            },
+
+            {
+                key: '6',
                 label: 'Xóa bài viết',
                 onClick: () => {
-                    navigate(`/home/edit-post/${item.id}`);
+                    deleteRef.current?.open()
                 },
                 danger: true,
-            }]
+            }
+            ]
             : []
         )
     ]
@@ -82,13 +98,13 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
     }
 
     const renderPrice = () => {
-        if (item.purpose === Purpose_Post.For_Sell) {
+        if (Number(item.purpose) === Purpose_Post.For_Sell) {
             return item.price_for_buy
         }
-        if (item.purpose === Purpose_Post.For_Rent) {
+        if (Number(item.purpose) === Purpose_Post.For_Rent) {
             return item.price_for_rent
         }
-        if (item.purpose === Purpose_Post.For_Auction) {
+        if (Number(item.purpose) === Purpose_Post.For_Auction) {
             return item.price_start
         }
         return item.price_current
@@ -210,6 +226,21 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                     onClose={() => shareModalRef.current?.close()}
                 />
             </ModalBase>
+            <ModalConfirm
+                ref={deleteRef}
+                label="Xác nhận xoá bài viết"
+                onCancel={() => deleteRef.current?.close()}
+                onConfirm={async () => {
+                    deleteRef.current?.open()
+                    const res = await onDeletePost(item.id || 0)
+                    if (res.Status) {
+                        toast.success(res.Message)
+                        onRefresh()
+                        return
+                    }
+                    toast.error(res.Message)
+                }}
+            />
         </div>
     );
 })

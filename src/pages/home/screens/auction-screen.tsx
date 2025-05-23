@@ -1,13 +1,10 @@
-import { observer } from "mobx-react"
-import { useParams } from "react-router-dom";
-import { PostDetailContextProvider, usePostDetailContext } from "src/core/modules/post";
-import { SliderDetailMediaPost } from "../containers/post-detail/slider-detail-media-post";
 import classNames from "classnames";
-import { ContentDetailPost } from "../containers/post-detail/content-detail-post";
+import { observer } from "mobx-react";
+import { useParams } from "react-router-dom";
+import { usePostSocketRoom } from "src/core/hook";
+import { PostDetailContextProvider, usePostDetailContext } from "src/core/modules/post";
 import { ContentAuctionContainer } from "../containers/auction/content-auction-container";
-import { use } from "react";
-import { usePostSocketRoom, useSocketEvent } from "src/core/hook";
-import { toast } from "react-toastify";
+import { ContentDetailPost } from "../containers/post-detail/content-detail-post";
 
 export const AuctionScreen = observer(() => {
     const { id } = useParams<{ id: string }>();

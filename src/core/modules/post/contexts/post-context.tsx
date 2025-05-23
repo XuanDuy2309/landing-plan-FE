@@ -26,6 +26,7 @@ export class FilterPostContextType extends IContextFilter {
 export class PostContextType extends IBaseContextType<PostModel, FilterPostContextType> {
     onLikePost: (id: number) => Promise<any> = async (id: number) => { }
     onUnLikePost: (id: number) => Promise<any> = async (id: number) => { }
+    onDeletePost: (id: number) => Promise<any> = async (id: number) => { }
 }
 
 export const PostContext = React.createContext<PostContextType>(new PostContextType());
@@ -72,12 +73,17 @@ export const PostContextProvider = observer(({ children, id, following }: IProps
         return res
     }
 
+    const onDeletePost = async (id: number) => {
+        const res = await PostApi.deletePost({ id })
+        return res
+    }
+
     useEffect(() => {
         context.onRefresh()
     }, [])
 
     return (
-        <PostContext.Provider value={{ ...context, onLikePost, onUnLikePost }}>
+        <PostContext.Provider value={{ ...context, onLikePost, onUnLikePost, onDeletePost }}>
             {children}
         </PostContext.Provider>
     )

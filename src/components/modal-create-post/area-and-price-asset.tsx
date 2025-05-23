@@ -1,15 +1,11 @@
 import { observer } from "mobx-react"
-import { InputUnit } from "../input-unit"
-import { ActionMap, useCreatePostContext } from "src/core/modules"
-import { InputLabel } from "../input-label"
-import { IconBase } from "../icon-base"
 import { Colors } from "src/assets"
-import { Purpose_Post } from "src/core/models"
 import { currencyFormat, currencyFormatToInt } from "src/core/base"
-import { ModalMapContainer } from "../modal-map"
-import { useState } from "react"
-import { set } from "mobx"
-import { SpaceContext } from "antd/es/space"
+import { Purpose_Post } from "src/core/models"
+import { ActionMap, useCreatePostContext } from "src/core/modules"
+import { IconBase } from "../icon-base"
+import { InputLabel } from "../input-label"
+import { InputUnit } from "../input-unit"
 
 export const AreaAndPriceAsset = observer(() => {
     const { data, setOpenMap, openMap, setMessage, message, setAction } = useCreatePostContext()
@@ -90,7 +86,7 @@ export const AreaAndPriceAsset = observer(() => {
                     err={data.err_area}
                     onMeasure={handleShowMap}
                 />
-                {data.purpose == Purpose_Post.For_Sell && <InputUnit
+                <InputUnit
                     label="Tổng giá bán nguyên căn (lô)"
                     unit={'VNĐ'}
                     value={currencyFormat(data.price_for_buy)}
@@ -98,7 +94,7 @@ export const AreaAndPriceAsset = observer(() => {
                         data.price_for_buy = currencyFormatToInt(value)
                     }}
                     err={data.err_price_for_buy}
-                />}
+                />
                 {data.purpose == Purpose_Post.For_Rent && <InputUnit
                     label="Tổng giá thuê nguyên căn (lô)/tháng"
                     unit={'VNĐ'}
@@ -115,6 +111,7 @@ export const AreaAndPriceAsset = observer(() => {
                     onChange={(value) => {
                         data.price_start = currencyFormatToInt(value)
                     }}
+                    err={data.err_price_start}
                 />}
                 {data.purpose === Purpose_Post.For_Auction && <div className="w-full flex items-center space-x-2">
                     <InputUnit
@@ -133,6 +130,7 @@ export const AreaAndPriceAsset = observer(() => {
                         onChange={(value) => {
                             data.max_bid = currencyFormatToInt(value)
                         }}
+                        err={data.err_max_bid}
                     />
                 </div>}
             </div>}

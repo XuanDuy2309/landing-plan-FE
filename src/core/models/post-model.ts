@@ -127,6 +127,7 @@ export class PostModel {
     err_owner_name?: string
     err_owner_phone?: string
     err_step_bid?: string;
+    err_max_bid?: string;
 
 
     constructor() {

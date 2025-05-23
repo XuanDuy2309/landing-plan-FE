@@ -1,17 +1,17 @@
-import { observer } from "mobx-react";
-import { useCreatePostContext } from "src/core/modules";
-import { RadioGroup } from "../radio-group";
-import { Purpose_Post, Type_Asset_Enum } from "src/core/models";
-import { Colors } from "src/assets";
-import { IconBase } from "../icon-base";
 import { Dropdown, MenuProps } from "antd";
-import { AreaAndPriceAsset } from "./area-and-price-asset";
+import { observer } from "mobx-react";
+import { Colors } from "src/assets";
+import { Purpose_Post, Type_Asset_Enum } from "src/core/models";
+import { useCreatePostContext } from "src/core/modules";
+import { IconBase } from "../icon-base";
+import { ModalMapContainer } from "../modal-map";
+import { RadioGroup } from "../radio-group";
 import { AddNewMedia } from "./add-new-media";
-import { InfoOwner } from "./info-owner";
+import { AreaAndPriceAsset } from "./area-and-price-asset";
 import { InfoAsset } from "./info-asset";
+import { InfoOwner } from "./info-owner";
 import { SettingAuction } from "./setting-auction";
 import { TitleDescription } from "./title-description";
-import { ModalMapContainer } from "../modal-map";
 
 export const ContentCreatePost = observer(() => {
     const { data, openMap } = useCreatePostContext()
@@ -124,7 +124,7 @@ export const ContentCreatePost = observer(() => {
                     <div className="w-full flex items-center space-x-2 px-3">
                         <span className="text-base font-medium text-gray-700">Mục đích đăng bài:</span>
                         <RadioGroup
-                            value={data.purpose}
+                            value={Number(data.purpose)}
                             primary
                             data={[
                                 { label: 'Cần bán', value: Purpose_Post.For_Sell },
@@ -151,7 +151,7 @@ export const ContentCreatePost = observer(() => {
                         <Dropdown trigger={["click"]} menu={{ items: itemsAlley }}>
                             <div className="flex items-center border-b border-gray-200 cursor-pointer space-x-1"
                             >
-                                <span>{typeAlley[data.in_alley].label}</span>
+                                <span>{typeAlley[Number(data.in_alley)].label}</span>
                                 <IconBase icon='arrowdown' size={16} color={Colors.gray[700]} />
                             </div>
                         </Dropdown>

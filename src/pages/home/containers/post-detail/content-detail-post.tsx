@@ -60,13 +60,13 @@ export const ContentDetailPost = observer(() => {
         1: { label: 'Mặt đường', icon: 'user-outline' },
     }
     const renderUnit = () => {
-        if (data.purpose === Purpose_Post.For_Sell) {
+        if (Number(data.purpose) === Purpose_Post.For_Sell) {
             return 'VNĐ'
         }
-        if (data.purpose === Purpose_Post.For_Rent) {
+        if (Number(data.purpose) === Purpose_Post.For_Rent) {
             return 'VNĐ/Tháng'
         }
-        if (data.purpose === Purpose_Post.For_Auction) {
+        if (Number(data.purpose) === Purpose_Post.For_Auction) {
             return 'VNĐ'
         }
         return 'VNĐ'
@@ -137,7 +137,7 @@ export const ContentDetailPost = observer(() => {
                     <span>{data.address}</span>
                 </div>
                 <span>-</span>
-                <span>{formatMoney(data.price_for_buy, 1, 'vn')} VND </span>
+                <span>{formatMoney(renderPrice(), 1, 'vn')} VND </span>
                 <span>-</span>
                 <span>{data.area} m2</span>
             </div>
@@ -159,7 +159,7 @@ export const ContentDetailPost = observer(() => {
                     </div>
                     <div className="w-full flex items-center space-x-2">
                         <span className=" w-[140px]">Giá:</span>
-                        <span>{formatMoney(renderPrice(), 1, 'vn')} {renderUnit()}</span>
+                        <span>{formatMoney(data.price_for_buy, 1, 'vn')} {renderUnit()}</span>
                     </div>
                     {
                         data.type_asset === Type_Asset_Enum.Apartment &&
@@ -216,8 +216,14 @@ export const ContentDetailPost = observer(() => {
                             </div>
                         </>
                     }
-                    <span>{data.description}</span>
                 </div>
+                {
+                    data.description &&
+                    <div className="w-full flex flex-col">
+                        <span className="text-xl font-bold text-gray-900">Mô tả:</span>
+                        <span>{data.description}</span>
+                    </div>
+                }
             </div>
             <div className="w-full flex items-center border-t space-x-2 border-gray-200 py-3">
                 <div className={classNames("w-full h-10 flex items-center justify-center space-x-2 rounded hover:bg-gray-200 cursor-pointer",

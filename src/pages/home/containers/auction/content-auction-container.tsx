@@ -52,7 +52,6 @@ export const ContentAuctionContainer = observer(() => {
     }
 
     useSocketEvent('bid_create', (data: any) => {
-        console.log("alo", data.user_id === sessionStore.profile?.id)
         if (data.user_id === sessionStore.profile?.id) {
             onRefresh()
             return

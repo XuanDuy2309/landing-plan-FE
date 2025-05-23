@@ -1,7 +1,5 @@
 import { observer } from "mobx-react"
-import { InputLabel } from "../input-label"
-import { IconBase } from "../icon-base"
-import { Dropdown } from "antd"
+import moment from "moment"
 import { useCreatePostContext } from "src/core/modules"
 import { DatePickerAnt } from "../date-picker"
 
@@ -11,25 +9,12 @@ export const SettingAuction = observer(() => {
         <span className="text-xl font-medium text-gray-900">Thiết lập đấu giá:</span>
         <div className="flex flex-col space-y-1">
             <div className="w-full flex items-start space-x-2">
-                <span className="w-[130px] flex-none text-end font-medium text-gray-700">Giá khởi điểm:</span>
-                <div className="flex flex-col space-y-0.5">
-                    <input type="text"
-                        className="outline-none w-[100px] border-b border-gray-200 text-end"
-                        value={data.price_start}
-                        onChange={(e) => { data.price_start = e.target.value }}
-                        placeholder="0"
-                    />
-                    {data.err_price_start && <span className="text-sm text-red-400">{data.err_price_start}</span>}
-                </div>
-                <span>VNĐ</span>
-            </div>
-            <div className="w-full flex items-start space-x-2">
                 <span className="w-[130px] flex-none text-end font-medium text-gray-700">Bắt đầu từ:</span>
                 <div className="flex flex-col space-y-0.5">
                     <DatePickerAnt format={"HH:mm DD/MM/YYYY"}
-                        value={data.date_start}
+                        value={data.start_date ? moment(data.start_date) : undefined}
                         onChange={(value) => {
-                            data.date_start = value
+                            data.start_date = value?.format('YYYY-MM-DD HH:mm:ss')
                         }}
                         disableDate="before"
                         showTime="HH:mm"
@@ -40,9 +25,9 @@ export const SettingAuction = observer(() => {
                 <span>Đến</span>
                 <div className="flex flex-col space-y-0.5">
                     <DatePickerAnt format={"HH:mm DD/MM/YYYY"}
-                        value={data.date_end}
+                        value={data.end_date ? moment(data.end_date) : undefined}
                         onChange={(value) => {
-                            data.date_end = value
+                            data.end_date = value?.format('YYYY-MM-DD HH:mm:ss')
                         }}
                         disableDate="before"
                         showTime="HH:mm"

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Colors } from "src/assets";
 import { IconBase, ModalBase } from "src/components";
@@ -30,6 +30,17 @@ export const CreatePostContainer = observer(() => {
             icon: "auction-outline"
         },
     ]
+
+    useEffect(() => {
+        window.addEventListener('update-post', () => {
+            modalRef.current.open()
+        })
+        return () => {
+            window.removeEventListener('update-post', () => {
+                modalRef.current.open()
+            })
+        };
+    }, [typePost])
 
     return (
         <div className="w-full p-3 flex flex-col bg-white rounded-xl">

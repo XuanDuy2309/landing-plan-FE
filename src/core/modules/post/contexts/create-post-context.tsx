@@ -1,9 +1,10 @@
 import { observer } from "mobx-react";
-import React from "react";
-import { PostModel, Purpose_Post, Type_Asset_Enum } from "../../../models";
 import moment from "moment";
+import React, { useEffect } from "react";
 import { PostApi } from "src/core/api";
 import { BaseResponse } from "src/core/config";
+import { PostModel, Purpose_Post, Type_Asset_Enum } from "../../../models";
+import { usePostContext } from "./post-context";
 
 export class CreatePostContextType {
     data: PostModel = new PostModel();
@@ -36,6 +37,7 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
     const [openMap, setOpenMap] = React.useState<boolean>(false);
     const [action, setAction] = React.useState<ActionMap>();
     const [message, setMessage] = React.useState<string>('');
+    const { itemUpdate, setItemUpdate } = usePostContext()
 
     const isValidate = () => {
         let isValid = true;
@@ -63,6 +65,7 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
         data.err_number_bathrooms = ''
         data.err_owner_name = ''
         data.err_owner_phone = ''
+        data.err_max_bid = ''
 
         // Tiêu đề
         if (!data.title) {
@@ -93,7 +96,7 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
         }
 
         // Giá mua bán / thuê
-        if (data.purpose === Purpose_Post.For_Sell && !data.price_for_buy) {
+        if (!data.price_for_buy) {
             data.err_price_for_buy = 'Vui lòng nhập giá trị'
             isValid = false
         }
@@ -112,19 +115,23 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
                 data.err_step_bid = 'Vui lòng nhập bước giá'
                 isValid = false
             }
-            if (!data.date_start) {
+            if (!data.max_bid) {
+                data.err_max_bid = 'Vuiật bước giá tối đa'
+                isValid = false
+            }
+            if (!data.start_date) {
                 data.err_date_start = 'Vui lòng nhập ngày bắt đầu'
                 isValid = false
             }
-            if (!data.date_end) {
+            if (!data.end_date) {
                 data.err_date_end = 'Vui lòng nhập ngày kết thúc'
                 isValid = false
             }
-            if (data.date_start?.isSameOrBefore(moment().startOf('day').add(1, 'day'))) {
+            if (data.start_date && moment(data.start_date).isSameOrBefore(moment().startOf('day').add(1, 'day'))) {
                 data.err_date_start = 'Ngày bắt đầu muộn nhất vào ngày mai'
                 isValid = false
             }
-            if (data.date_end?.isSameOrBefore(data.date_start)) {
+            if (data.end_date && moment(data.end_date).isSameOrBefore(data.start_date)) {
                 data.err_date_end = 'Ngày kết thúc phải sau ngày bắt đầu'
                 isValid = false
             }
@@ -182,7 +189,6 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
 
     const onSubmit = async () => {
         if (!isValidate()) {
-            console.log('data', data)
             return
         }
         const params = {
@@ -200,11 +206,11 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
             "price_for_buy": data.price_for_buy,
             "price_for_rent": data.price_for_rent,
             "price_start": data.price_start,
-            "price_current": data.price_current,
+            "price_current": data.purpose === Purpose_Post.For_Auction ? data.price_start : data.price_for_buy,
             "bid_step": data.bid_step,
             "max_bid": data.max_bid,
-            "start_date": data.date_start ? moment(data.date_start).format('YYYY-MM-DD') : '',
-            "end_date": data.date_end ? moment(data.date_end).format('YYYY-MM-DD') : '',
+            "start_date": data.start_date ? moment(data.start_date).format('YYYY-MM-DD') : '',
+            "end_date": data.end_date ? moment(data.end_date).format('YYYY-MM-DD') : '',
             "number_floors": data.number_floors,
             "number_bedrooms": data.number_bedrooms,
             "number_bathrooms": data.number_bathrooms,
@@ -234,6 +240,16 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
         setAction(undefined)
         setMessage('')
     }
+
+    const initData = (itemUpdate: PostModel) => {
+        Object.assign(data, itemUpdate);
+    }
+
+    useEffect(() => {
+        if (itemUpdate) {
+            initData(itemUpdate)
+        }
+    }, [itemUpdate])
 
     return (
         <CreatePostContext.Provider value={{ data, loading, openMap, action, message, setOpenMap, setAction, setMessage, onSubmit, onClear }}>

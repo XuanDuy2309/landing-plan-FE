@@ -34,6 +34,7 @@ export class NominatimResult {
 export class SelectedLocationModel {
     lat?: number
     lng?: number
+    radius?: number
 
     constructor() {
         makeAutoObservable(this)
@@ -162,6 +163,8 @@ export class LandingPlanModel {
     district_id?: number
     ward_id?: number
     created_at?: string
+    lat?: number
+    lng?: number
 
     constructor() {
         makeAutoObservable(this)

@@ -17,8 +17,8 @@ export class ManagementLandingPlanContextType {
     setCoordinates = (coordinates: CoordinateSearchLocationModel) => { }
     pointsArea = new PointsMapModel()
     setPointsArea = (pointsArea: PointsMapModel) => { }
-    landingPlanMap: LandingPlanModel | undefined = undefined
-    setLandingPlanMap = (landingPlanMap: LandingPlanModel | undefined) => { }
+    landingPlanMap: LandingPlanModel[] = []
+    setLandingPlanMap = (landingPlanMap: LandingPlanModel[]) => { }
     opacity = 1
     setOpacity = (opacity: number) => { }
     placementInfo: NominatimResult | undefined
@@ -28,6 +28,10 @@ export class ManagementLandingPlanContextType {
     setOpenSidebar = (openSidebar: boolean) => { }
     hoveredPostId: number | null = null;
     setHoveredPostId = (id: number | null) => { };
+    selectedLandingPlan: LandingPlanModel | undefined
+    setSelectedLandingPlan = (selectedLandingPlan: LandingPlanModel | undefined) => { }
+    shouldFlyToLandingPlan = false
+    setShouldFlyToLandingPlan = (val: boolean) => { }
 }
 
 export const ManagementLandingPlanContext = createContext<ManagementLandingPlanContextType>(
@@ -48,7 +52,9 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
     const [isDraw, setIsDraw] = useState<boolean>(false);
 
     const [pointsArea, setPointsArea] = useState<PointsMapModel>(new PointsMapModel());
-    const [landingPlanMap, setLandingPlanMap] = useState<LandingPlanModel | undefined>(undefined)
+    const [landingPlanMap, setLandingPlanMap] = useState<LandingPlanModel[]>([])
+    const [selectedLandingPlan, setSelectedLandingPlan] = useState<LandingPlanModel | undefined>()
+    const [shouldFlyToLandingPlan, setShouldFlyToLandingPlan] = useState(false);
 
     const [opacity, setOpacity] = useState<number>(1);
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
@@ -112,23 +118,28 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
             })
     }
 
-    const searchLandingPlan = async (lat: number, lon: number) => {
+    const searchLandingPlan = async (lat: number, lon: number, radius?: number) => {
         const params = {
             lat: lat,
-            lon: lon
+            lon: lon,
+            radius: radius
         }
         const res = await LandingPlanApi.searchLandingPlan(params)
         if (res.Status) {
             setLandingPlanMap(res.Data.data)
+            setSelectedLandingPlan(res.Data.data[0])
+            setShouldFlyToLandingPlan(false);
             return
         }
-        setLandingPlanMap(undefined)
+        setShouldFlyToLandingPlan(false);
+        setLandingPlanMap([])
+        setSelectedLandingPlan(undefined)
     }
 
 
     useEffect(() => {
         if (selectedLocation && selectedLocation.lat && selectedLocation.lng) {
-            searchLandingPlan(selectedLocation.lat, selectedLocation.lng)
+            searchLandingPlan(selectedLocation.lat, selectedLocation.lng, selectedLocation.radius)
             onSearchByLatLon(selectedLocation.lat, selectedLocation.lng)
         }
     }, [selectedLocation])
@@ -160,6 +171,10 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
                 setOpenSidebar,
                 hoveredPostId,
                 setHoveredPostId,
+                selectedLandingPlan,
+                setSelectedLandingPlan,
+                shouldFlyToLandingPlan,
+                setShouldFlyToLandingPlan,
             }}
         >
             {children}

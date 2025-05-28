@@ -6,7 +6,7 @@ import { useEffect, useMemo } from 'react';
 import { LayersControl, MapContainer, Marker, Pane, Polygon, Polyline, Popup, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import { Colors } from 'src/assets';
 import { isValidPolygon } from 'src/core/base';
-import { NominatimResult, SelectedLocationModel } from 'src/core/models';
+import { LandingPlanModel, NominatimResult, SelectedLocationModel } from 'src/core/models';
 import { FilterPostContextType, useManagementLandingPlan, usePostContext } from 'src/core/modules';
 import { useCoreStores } from 'src/core/stores';
 import './leaflet-map-container.css';
@@ -15,7 +15,7 @@ import { RoutingMachineLeafletMap } from "./routing-machine-leaflet-map";
 
 export const LeafletMapContainer = observer(() => {
     const { location } = useCoreStores().sessionStore
-    const { placement, polygon, selectedLocation, setSelectedLocation, coordinates, pointsArea, landingPlanMap, opacity } = useManagementLandingPlan()
+    const { placement, polygon, selectedLocation, setSelectedLocation, coordinates, pointsArea, landingPlanMap, opacity, selectedLandingPlan } = useManagementLandingPlan()
     const { data, filter, onRefresh } = usePostContext()
 
     const calculateDistance = useMemo(() => {
@@ -38,7 +38,7 @@ export const LeafletMapContainer = observer(() => {
             attributionControl={true}
         >
             <MapEvents setSelectedLocation={setSelectedLocation} filter={filter} onRefresh={onRefresh} />
-            <MapViewUpdater placement={placement} setSelectedLocation={setSelectedLocation} />
+            <MapViewUpdater placement={placement} setSelectedLocation={setSelectedLocation} landingPlan={selectedLandingPlan} />
             {pointsArea.routeTo && <RoutingMachineLeafletMap
                 from={[location.lat, location.lng]}
                 to={[pointsArea.routeTo[0], pointsArea.routeTo[1]]}
@@ -78,9 +78,9 @@ export const LeafletMapContainer = observer(() => {
                 </LayersControl.BaseLayer>
             </LayersControl>
             <Pane name="customOverlayPane" style={{ zIndex: 400 }}>
-                {landingPlanMap && landingPlanMap.folder_path && (
+                {selectedLandingPlan && selectedLandingPlan.folder_path && (
                     <TileLayer
-                        url={`${landingPlanMap.folder_path}/{z}/{x}/{y}.png`}
+                        url={`${selectedLandingPlan.folder_path}/{z}/{x}/{y}.png`}
                         pane="customOverlayPane"
                         minZoom={0}
                         maxZoom={30}
@@ -205,11 +205,13 @@ export const LeafletMapContainer = observer(() => {
 interface IProps2 {
     placement: NominatimResult
     setSelectedLocation: (selectedLocation: SelectedLocationModel) => void
+    landingPlan?: LandingPlanModel
 }
 
-const MapViewUpdater = observer(({ placement, setSelectedLocation }: IProps2) => {
+const MapViewUpdater = observer(({ placement, setSelectedLocation, landingPlan }: IProps2) => {
     const map = useMap();
     const { location } = useCoreStores().sessionStore;
+    const { shouldFlyToLandingPlan, setShouldFlyToLandingPlan } = useManagementLandingPlan();
 
     useEffect(() => {
         if (placement?.lat && placement?.lon) {
@@ -218,9 +220,28 @@ const MapViewUpdater = observer(({ placement, setSelectedLocation }: IProps2) =>
                 easeLinearity: 0.2,
                 duration: 1.5,
             });
-            setSelectedLocation({ lat: Number(placement.lat), lng: Number(placement.lon) })
+            const center = map.getCenter();
+            const bounds = map.getBounds();
+            const radius = center.distanceTo(bounds.getNorthEast());
+            setSelectedLocation({ lat: Number(placement.lat), lng: Number(placement.lon), radius })
         }
     }, [placement.lat, placement.lon, map]);
+
+    useEffect(() => {
+        if (
+            shouldFlyToLandingPlan &&
+            landingPlan &&
+            landingPlan.lat &&
+            landingPlan.lng
+        ) {
+            map.flyTo([Number(landingPlan.lat), Number(landingPlan.lng)], map.getZoom(), {
+                animate: true,
+                easeLinearity: 0.2,
+                duration: 1.5,
+            });
+            setShouldFlyToLandingPlan(false);
+        }
+    }, [landingPlan, shouldFlyToLandingPlan, map]);
 
     useEffect(() => {
         const handleGoToLocation = () => {
@@ -280,7 +301,10 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
             const { lat, lng } = e.latlng;
             if (!pointsArea.isDraw && !pointsArea.isRouting) {
                 map.setView([lat, lng], map.getZoom());
-                setSelectedLocation({ lat, lng })
+                const center = map.getCenter();
+                const bounds = map.getBounds();
+                const radius = center.distanceTo(bounds.getNorthEast());
+                setSelectedLocation({ lat, lng, radius })
                 searchCoordinatesLocation(lat, lng)
                 return
             }

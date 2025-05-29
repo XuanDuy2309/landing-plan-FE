@@ -173,7 +173,7 @@ export const ContentCreatePost = observer(() => {
                 />
                 <AreaAndPriceAsset />
                 <InfoAsset />
-                {data.purpose === Purpose_Post.For_Auction && <SettingAuction />}
+                {Number(data.purpose) === Purpose_Post.For_Auction && <SettingAuction />}
                 <InfoOwner />
             </>}
             {openMap && <ModalMapContainer />}

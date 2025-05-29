@@ -41,7 +41,7 @@ export const ProfileLayout = observer(() => {
             <div className="w-full flex justify-center bg-white">
                 <div className="w-full p-3 bg-white border-b border-gray-200 flex flex-col space-x-1 max-w-[1240px]">
                     <span className="text-2xl font-medium text-gray-700">{data.fullname}</span>
-                    <span>{data.dob ? moment(data.dob).format('DD/MM/YYYY') : '--/--/----'}</span>
+                    <span>{data.dob ? moment(data.dob, 'YYYY-MM-DD').format('DD/MM/YYYY') : '--/--/----'}</span>
                 </div>
             </div>
             <div className="w-full flex justify-center bg-white  sticky top-0 z-10">

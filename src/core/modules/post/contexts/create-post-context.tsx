@@ -226,7 +226,22 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
             "group_id": data.group_id,
         }
 
-        const res = await PostApi.createPost(params);
+        let res: BaseResponse = {
+            Status: false,
+            Data: undefined,
+            Message: "",
+            Code: undefined
+        }
+
+        if (itemUpdate) {
+            res = await PostApi.updatePost(itemUpdate.id || 0, params);
+            if (res.Status) {
+                onClear()
+            }
+            return res
+        }
+
+        res = await PostApi.createPost(params);
         if (res.Status) {
             onClear()
         }
@@ -239,10 +254,12 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
         setOpenMap(false)
         setAction(undefined)
         setMessage('')
+        setItemUpdate(undefined)
     }
 
     const initData = (itemUpdate: PostModel) => {
         Object.assign(data, itemUpdate);
+        data.is_owner = itemUpdate.owner_phone ? false : true
     }
 
     useEffect(() => {

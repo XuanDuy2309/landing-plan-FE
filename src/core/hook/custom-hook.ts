@@ -1,5 +1,7 @@
+import { debounce } from 'lodash';
 import { useEffect } from 'react';
 import { socketService } from '../services';
+import { useCoreStores } from '../stores';
 
 export function usePostSocketRoom(postId?: number | string) {
     useEffect(() => {
@@ -36,4 +38,24 @@ export const useJoinToConversationRoom = (roomId: number | string) => {
             socketService.socket?.emit('leave_conversation', { id: roomId }); // 👈 Thoát phòng khi unmount
         };
     }, [roomId]);
+}
+
+export function useTyping(conversationId: number, inputValue: string) {
+    const { sessionStore } = useCoreStores()
+    // debounce để giới hạn số lần gửi typing_start
+    const sendTypingStart = debounce(() => {
+        socketService.socket?.emit('typing_start', { id: conversationId, full_name: sessionStore.profile?.fullname });
+    }, 300);
+
+    useEffect(() => {
+        if (inputValue) {
+            sendTypingStart();
+        } else {
+            socketService.socket?.emit('typing_end', { id: conversationId, full_name: sessionStore.profile?.fullname });
+        }
+
+        return () => {
+            sendTypingStart.cancel();
+        };
+    }, [inputValue]);
 }

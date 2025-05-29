@@ -1,8 +1,9 @@
 import { round } from "@turf/turf"
 import { Dropdown, MenuProps, Slider } from "antd"
+import classNames from "classnames"
 import { observer } from "mobx-react"
 import moment from "moment"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import { Colors } from "src/assets"
@@ -12,6 +13,7 @@ import { ModalConfirm } from "src/components/modal-confirm/modal-confim"
 import { PostApi } from "src/core/api"
 import { currencyFormat, currencyFormatToInt, formatMoney } from "src/core/base"
 import { useSocketEvent } from "src/core/hook"
+import { Purpose_Post } from "src/core/models"
 import { usePostDetailContext } from "src/core/modules/post"
 import { hideLoading, showLoading } from "src/core/services"
 import { useCoreStores } from "src/core/stores"
@@ -25,6 +27,7 @@ export const ContentAuctionContainer = observer(() => {
     const modalRef = useRef<any>(null)
     const modalRef2 = useRef<any>(null)
     const { sessionStore } = useCoreStores()
+    const [time, setTime] = useState<string>()
 
     const items: MenuProps['items'] = [
         {
@@ -44,6 +47,7 @@ export const ContentAuctionContainer = observer(() => {
     ];
 
     const handleChangeSlider = (value: number) => {
+        dataAuction.err_price = undefined
         const startPrice = ((data.bids[0]?.price ?? data.price_current) ?? 0) + (data.bid_step ?? 0)
         const maxPrice = ((data.bids[0]?.price ?? data.price_current) ?? 0) + (data?.max_bid ?? 0)
         const priceRange = maxPrice - startPrice
@@ -60,6 +64,42 @@ export const ContentAuctionContainer = observer(() => {
         onRefresh()
     })
 
+    useEffect(() => {
+        dataAuction.price = ((data.bids[0]?.price ?? data.price_current) ?? 0) + (data.bid_step ?? 0)
+    }, [data.bids, data.price_current, data.bid_step])
+
+    const [auctionStatus, setAuctionStatus] = useState<'not_started' | 'in_progress' | 'ended'>('not_started');
+
+    useEffect(() => {
+        if (Number(data.purpose) !== Purpose_Post.For_Auction) return;
+
+        const interval = setInterval(() => {
+            const now = moment();
+            const startDate = moment(data.start_date);
+            const endDate = moment(data.end_date);
+
+            if (now.isBefore(startDate)) {
+                setAuctionStatus('not_started');
+                const distance = startDate.valueOf() - now.valueOf();
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const timeString = moment.utc(distance).format("HH:mm:ss");
+                setTime(`Phiên đấu giá sẽ bắt đầu sau: ${days > 0 ? days + ' ngày ' : ''}${timeString}`);
+            } else if (now.isAfter(endDate)) {
+                setAuctionStatus('ended');
+                setTime("Phiên đấu giá đã kết thúc");
+                clearInterval(interval);
+            } else {
+                setAuctionStatus('in_progress');
+                const distance = endDate.valueOf() - now.valueOf();
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const timeString = moment.utc(distance).format("HH:mm:ss");
+                setTime(`Phiên đấu giá sẽ bắt đầu sau: ${days > 0 ? days + ' ngày ' : ''}${timeString}`);
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [data.start_date, data.end_date, data.purpose]);
+
     return (
 
         <div className="w-full h-full flex flex-col p-3 overflow-y-auto space-y-3"
@@ -69,6 +109,10 @@ export const ContentAuctionContainer = observer(() => {
                     <span className="text-lg font-bold text-gray-900">Biểu đồ biến động giá</span>
                     <div className="flex items-center space-x-3">
                         <ButtonIcon icon="close-outline" iconSize="24" color={Colors.gray[500]} onClick={() => {
+                            if (sessionStore.profile?.id === data.create_by_id || data.like_by_ids?.includes(sessionStore.profile?.id || 0)) {
+                                navigate('/home')
+                                return
+                            }
                             modalRef2.current.open()
                         }}
                         />
@@ -113,37 +157,60 @@ export const ContentAuctionContainer = observer(() => {
                     </div>
                     <div className="w-full flex items-center space-x-2">
                         <span className="w-[160px] text-start">Chủ sở hữu (dự kiến):</span>
-                        <span>{data.bids[0] ? data.bids[0].user_name : ''}</span>
+                        <span>{data.bids[0] ? data.bids[0].user_name : '---'}</span>
                     </div>
                 </div>
             </div>
             <div className="w-full flex flex-col p-3 rounded-xl bg-white space-y-3">
-                <span className="text-lg font-bold text-gray-900">Đặt giá</span>
+                <div className="w-full flex items-center justify-between">
+                    <span className="text-lg font-bold text-gray-900">Đặt giá</span>
+                    <span className="text-lg font-bold text-gray-900">{time}</span>
+
+                </div>
                 <div className="w-full flex flex-col space-y-1 text-base text-gray-700">
                     <Slider
                         defaultValue={0}
                         className="w-[400px]"
                         value={((dataAuction.price || 0) - (((data.bids[0]?.price ?? data.price_current) ?? 0) + (data.bid_step ?? 0))) / ((((data.bids[0]?.price ?? data.price_current) ?? 0) + (data?.max_bid ?? 0)) - (((data.bids[0]?.price ?? data.price_current) ?? 0) + (data.bid_step ?? 0))) * 100}
                         onChange={value => handleChangeSlider(value)}
+                        disabled={auctionStatus !== 'in_progress'}
                         tooltip={{
                             formatter: () => formatMoney(dataAuction.price, 1, 'vn') + ' VND',
                         }}
                     />
-                    <div className="w-full flex items-end space-x-2">
-                        <InputUnit label="Giá" value={currencyFormat(dataAuction.price)} onChange={value => { dataAuction.price = currencyFormatToInt(value) }}
-                            unit="VND"
-                        />
-                        <ButtonLoading label="Đặt giá" template="ActionBlue" size="xs" onClick={() => {
-                            modalRef.current.open()
-                        }} className="flex-none h-[42px]" />
-                        <ButtonLoading label="Tối đa" template="ActionOrange" size="xs" onClick={() => {
-                            dataAuction.price = (data.max_bid ?? 0) + ((data.bids[0].price || data.price_current) ?? 0)
-                        }} className="flex-none h-[42px]"
-                        />
+                    <div className={classNames("w-full flex flex-col space-y-2")}>
+                        <div className="w-3/4">
+                            <InputUnit label="Giá" value={currencyFormat(dataAuction.price)} onChange={value => { dataAuction.price = currencyFormatToInt(value) }}
+                                unit="VND"
+                                err={dataAuction.err_price}
+                            />
+                        </div>
+                        <div className="flex items-center space-x-3">
+                            <ButtonLoading
+                                label="Đặt giá"
+                                template="ActionBlue"
+                                size="xs"
+                                onClick={() => {
+                                    modalRef.current.open()
+                                }}
+                                disabled={auctionStatus !== 'in_progress'}
+                                className="flex-none h-[42px]"
+                            />
+                            <ButtonLoading
+                                label="Tối đa"
+                                template="ActionOrange"
+                                size="xs"
+                                onClick={() => {
+                                    dataAuction.price = (data.max_bid ?? 0) + ((data.bids[0]?.price || data.price_current) ?? 0)
+                                }}
+                                disabled={auctionStatus !== 'in_progress'}
+                                className="flex-none h-[42px]"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
-            <div className="w-full flex flex-col p-3 rounded-xl bg-white space-y-3">
+            {auctionStatus !== 'not_started' && <div className="w-full flex flex-col p-3 rounded-xl bg-white space-y-3">
                 <div className="w-full flex items-center justify-between">
                     <span className="text-lg font-bold text-gray-900">Lịch sử đặt giá</span>
                     <Dropdown trigger={["click"]} menu={{ items }}>
@@ -153,7 +220,7 @@ export const ContentAuctionContainer = observer(() => {
                 <div className="w-full flex flex-col space-y-1 text-base text-gray-700">
                     <HistorySetBid data={data.bids} />
                 </div>
-            </div>
+            </div>}
             <ModalConfirm
                 ref={modalRef}
                 label={"Xác nhận đặt giá " + formatMoney(dataAuction.price, 1, 'vn') + " VND"}
@@ -167,9 +234,7 @@ export const ContentAuctionContainer = observer(() => {
                     showLoading()
                     const res = await setBid()
                     hideLoading()
-                    console.log(res)
                     if (res.Status) {
-                        console.log("alo")
                         onRefresh()
                         toast.success("Đặt giá thành công")
                         return

@@ -22,6 +22,7 @@ export class SessionStore {
     session?: ISession;
     location: ILocation = new ILocation();
     isLoading: boolean = false;
+    new_message_count: number = 0;
     isInitialized: boolean = false;
 
     constructor() {
@@ -91,6 +92,12 @@ export class SessionStore {
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
+    }
+
+    setNewMessageCount(count: number) {
+        runInAction(() => {
+            this.new_message_count = count
+        })
     }
 
     showLoading() {

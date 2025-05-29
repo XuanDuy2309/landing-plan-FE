@@ -48,6 +48,8 @@ export class BIDModel {
     user_name?: string
     user_id?: number
     create_at?: string
+
+    err_price?: string
     constructor() {
         makeAutoObservable(this)
     }

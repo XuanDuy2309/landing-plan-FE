@@ -9,7 +9,7 @@ import { CreatePostContainer } from "./create-post-container";
 export const HomeContainer = observer(() => {
     const { data, onLikePost, onUnLikePost, hasMore, fetchMore, onRefresh } = usePostContext()
     return (
-        <div id="post-container" className="w-full py-4 h-full flex flex-col items-center overflow-y-auto scroll-hide">
+        <div id="post_container" className="w-full py-4 h-full flex flex-col items-center overflow-y-auto scroll-hide">
             <InfiniteScroll
                 dataLength={data.length} //This is important field to render the next data
                 next={() => {
@@ -20,7 +20,7 @@ export const HomeContainer = observer(() => {
                 loader={<div className="w-full items-center justify-center flex">
                     <Spin />
                 </div>}
-                scrollableTarget="post-container"
+                scrollableTarget="post_container"
                 style={{ overflow: 'none' }}
             >
                 <div className="w-full h-full flex flex-col gap-4">

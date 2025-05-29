@@ -95,7 +95,7 @@ export const AreaAndPriceAsset = observer(() => {
                     }}
                     err={data.err_price_for_buy}
                 />
-                {data.purpose == Purpose_Post.For_Rent && <InputUnit
+                {Number(data.purpose) == Purpose_Post.For_Rent && <InputUnit
                     label="Tổng giá thuê nguyên căn (lô)/tháng"
                     unit={'VNĐ'}
                     value={currencyFormat(data.price_for_rent)}
@@ -104,7 +104,7 @@ export const AreaAndPriceAsset = observer(() => {
                     }}
                     err={data.err_price_for_rent}
                 />}
-                {data.purpose === Purpose_Post.For_Auction && <InputUnit
+                {Number(data.purpose) === Purpose_Post.For_Auction && <InputUnit
                     label="Giá khởi điểm"
                     unit={'VNĐ'}
                     value={currencyFormat(data.price_start)}
@@ -113,7 +113,7 @@ export const AreaAndPriceAsset = observer(() => {
                     }}
                     err={data.err_price_start}
                 />}
-                {data.purpose === Purpose_Post.For_Auction && <div className="w-full flex items-center space-x-2">
+                {Number(data.purpose) === Purpose_Post.For_Auction && <div className="w-full flex items-center space-x-2">
                     <InputUnit
                         label="Bước giá"
                         unit={'VNĐ'}

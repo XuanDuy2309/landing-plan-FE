@@ -1,16 +1,26 @@
 import { Spin } from "antd"
 import classNames from "classnames"
+import dayjs from "dayjs"
+import 'dayjs/locale/vi'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import debounce from "debounce"
 import { observer } from "mobx-react"
 import moment from "moment"
-import { useRef } from "react"
+import 'moment/locale/vi'; // import ngôn ngữ tiếng Việt
+import { useEffect, useRef } from "react"
 import InfiniteScroll from "react-infinite-scroll-component"
 import { Colors } from "src/assets"
-import { ModalBase } from "src/components"
+import { IconBase, ModalBase } from "src/components"
 import { ButtonIcon } from "src/components/button-icon"
 import { getColorFromId } from "src/core/base"
+import { useSocketEvent } from "src/core/hook"
+import { ConversationModel, MessageModel, MessageType } from "src/core/models"
 import { ListConversationContextProvider, useListConversationContext, useManagerConversationContext } from "src/core/modules"
+import { useCoreStores } from "src/core/stores"
 import { ModalCreateConversation } from "./modal-create-conversation-container"
+
+dayjs.extend(relativeTime);
+dayjs.locale('vi');
 
 export const ListConversationContainer = observer(() => {
     return (
@@ -26,6 +36,71 @@ export const ListConversation = observer(() => {
     const { data, loading, filter, onRefresh, fetchMore, hasMore } = useListConversationContext()
     const { selectedId, setSelectedId } = useManagerConversationContext()
     const modalRef = useRef<any>(null)
+    const { sessionStore } = useCoreStores()
+
+    useEffect(() => {
+        if (data.length > 0) {
+            const messCount = data.reduce((total: number, item: any) => {
+                return total + item.unread_count
+            }, 0)
+            sessionStore.setNewMessageCount(messCount)
+        }
+    }, [JSON.stringify(data)])
+
+    useSocketEvent('notification_message', (dataMess: any) => {
+        data.forEach((item: ConversationModel) => {
+            if (item.id === dataMess.conversation_id) {
+                item.unread_count = item.unread_count + 1
+                item.last_message.sender_name = dataMess.sender_name
+                item.updated_at = moment().format("YYYY-MM-DD HH:mm:ss")
+                item.last_message.content = dataMess.content
+                if (dataMess.type === MessageType.IMAGE) {
+                    item.last_message.content = 'Hình ảnh'
+                }
+                if(dataMess.type === MessageType.FILE) {
+                    item.last_message.content = 'file'
+                }
+            }
+        })
+    })
+
+    useSocketEvent('new_message', (dataMess: any) => {
+        data.forEach((item: ConversationModel) => {
+            if (item.id === dataMess.conversation_id) {
+                item.last_message.sender_name = dataMess.sender_name
+                item.updated_at = moment().format("YYYY-MM-DD HH:mm:ss")
+                item.last_message.content = dataMess.content
+                if (dataMess.type === MessageType.IMAGE) {
+                    item.last_message.content = 'Hình ảnh'
+                }
+                if(dataMess.type === MessageType.FILE) {
+                    item.last_message.content = 'file'
+                }
+            }
+        })
+    })
+
+    useSocketEvent('message_edited', (mess: MessageModel) => {
+        data.forEach((item, index) => {
+            if (item.id === mess.conversation_id) {
+                item.last_message.content = mess.content
+                item.updated_at = moment().format("YYYY-MM-DD HH:mm:ss")
+                item.last_message.sender_name = mess.sender_name
+            }
+        })
+    })
+
+    useSocketEvent('message_deleted', (mess) => {
+        data.forEach((item, index) => {
+            if (item.id === mess.conversation_id) {
+                item.last_message.content = mess.content
+                item.updated_at = moment().format("YYYY-MM-DD HH:mm:ss")
+                item.last_message.sender_name = mess.sender_name
+            }
+        })
+    })
+
+
     return (
         <div className={classNames("w-full flex flex-col transition-all ease-linear duration-500 border-gray-200"
         )}>
@@ -35,16 +110,19 @@ export const ListConversation = observer(() => {
                     modalRef.current?.open()
                 }} />
             </div><div className="w-full flex flex-col py-3 space-y-2 min-h-0 border-t border-gray-200">
-                <div className="w-full h-10 px-3 flex items-center space-x-2 flex-none">
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm"
-                        className="w-full h-full outline-none border border-gray-200 rounded-full text-base text-gray-500 py-1 px-3 focus-within:border-gray-600"
-                        onChange={debounce((e) => {
-                            filter.query = e.target.value
-                            onRefresh()
-                        }, 500)}
-                    />
+                <div className="px-3">
+                    <div className="w-full h-10 px-3 flex items-center space-x-2 flex-none border border-gray-200 rounded">
+                        <IconBase icon="search-outline" size={20} color={Colors.gray[700]} />
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm"
+                            className="w-full h-full outline-none  text-base text-gray-500 py-1 px-3 focus-within:border-gray-600"
+                            onChange={debounce((e) => {
+                                filter.query = e.target.value
+                                onRefresh()
+                            }, 500)}
+                        />
+                    </div>
                 </div>
                 <div className="w-full h-full flex flex-col overflow-y-auto">
                     <div id={"list-mess"} className="w-full py-4 h-full flex flex-col items-center overflow-y-auto scroll-hide">
@@ -63,13 +141,19 @@ export const ListConversation = observer(() => {
                         >
                             <div className="w-full h-full flex flex-col px-2 rounded">
                                 {
-                                    !loading && data.map((item, index) => {
+                                    !loading && [...data].sort((a: ConversationModel, b: ConversationModel) => {
+                                        const aTime = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+                                        const bTime = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+                                        return bTime - aTime;
+                                    }).map((item, index) => {
                                         return (
                                             <div className={classNames("w-full py-2 px-3 flex items-center space-x-3 cursor-pointer hover:bg-gray-200 border-gray-200",
                                                 { "bg-blue-50": selectedId === item.id }
                                             )}
                                                 onClick={() => {
                                                     setSelectedId(item.id || 0)
+                                                    item.unread_count = 0
+                                                    sessionStore.setNewMessageCount(sessionStore.new_message_count - item.unread_count)
                                                 }}
                                                 key={index}
                                             >
@@ -83,12 +167,18 @@ export const ListConversation = observer(() => {
 
 
                                                 </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-lg font-medium text-gray-700 line-clamp-1 leading-[24px]">{item.name}</span>
-                                                    <div className=" flex items-center">
-                                                        {/* {item.last_message && <span className="text-xs text-gray-500 line-clamp-1">{item.last_message.sender_name}: {item.last_message.content}</span>} */}
-                                                        <span className="flex-none text-gray-500">{item.updated_at ? moment(item.updated_at).fromNow() : ''}</span>
+                                                <div className="flex flex-col w-full relative">
+                                                    <span className="text-lg font-medium text-gray-700 line-clamp-1 max-w-[260px] leading-[24px]">{item.name}</span>
+                                                    <div className="w-full flex items-center justify-between max-w-[260px]">
+                                                        {item.last_message && <span className="text-xs text-gray-500 line-clamp-1">{item.last_message.sender_name}: {item.last_message.content}</span>}
+                                                        <span className="flex-none text-gray-500">{item.updated_at ? dayjs(item.updated_at).fromNow() : ''}</span>
                                                     </div>
+                                                    {
+                                                        item.unread_count > 0 &&
+                                                        <div className="w-5 h-5 flex items-center justify-center absolute top-0 right-0 bg-red-500 rounded-full">
+                                                            <span className="text-white text-xs font-bold">{item.unread_count}</span>
+                                                        </div>
+                                                    }
                                                 </div>
                                             </div>
                                         )

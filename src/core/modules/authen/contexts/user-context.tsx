@@ -1,13 +1,12 @@
-import React, { use, useEffect } from "react";
-import { UserModel } from "../../../models";
-import { AuthApi } from "../../../api";
-import { toast } from "react-toastify";
-import { SessionStore, useCoreStores } from "../../../stores";
-import { setToken } from "../../../config";
-import { hideLoading, showLoading } from "../../../services";
-import moment from "moment";
 import { makeAutoObservable } from "mobx";
 import { observer } from "mobx-react";
+import React, { useEffect } from "react";
+import { toast } from "react-toastify";
+import { AuthApi } from "../../../api";
+import { setToken } from "../../../config";
+import { UserModel } from "../../../models";
+import { hideLoading, showLoading } from "../../../services";
+import { useCoreStores } from "../../../stores";
 
 class IPass {
     old_password?: string;
@@ -56,7 +55,6 @@ export const UserContextProvider = observer(({ children }: IProps) => {
         if (res.Status) {
             const use = new UserModel();
             Object.assign(use, res.Data.data);
-            use.dob = moment(res.Data.data.dob);
             sessionStore.setProfile(use);
             sessionStore.setSession({ access_token: res.Data.data.access_token });
             setData(use);
@@ -112,7 +110,6 @@ export const UserContextProvider = observer(({ children }: IProps) => {
     const onUpdateInfo = async () => {
         const params = {
             ...data,
-            dob: data.dob ? data.dob.format('YYYY-MM-DD') : ''
         }
         showLoading();
         await AuthApi.updateInfo(params).then(res => {

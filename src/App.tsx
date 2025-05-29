@@ -10,8 +10,22 @@ import { AppRouter } from "./routes";
 
 export const App = observer(() => {
   const [isInitialized, setIsInitialized] = useState(false);
+  const audio = new Audio('/sounds/notification.mp3');
 
   useEffect(() => {
+    window.addEventListener('notification-sound', () => {
+      audio.play();
+    });
+
+    return () => {
+      window.removeEventListener('notification-sound', () => {
+        audio.play();
+      });
+    };
+  }, [audio]);
+
+  useEffect(() => {
+
     initCoreStores().then(() => {
       setIsInitialized(true);
     });

@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import moment from "moment";
 import { useMemo } from "react";
-import { CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatMoney } from "src/core/base";
 import { usePostDetailContext } from "src/core/modules/post";
 
@@ -27,19 +27,19 @@ export const ChartBids = observer(() => {
                     />
                     <YAxis type="number" domain={['auto', 'auto']} width={80} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend verticalAlign="bottom" height={36} />
 
                     {/* Nhiều đường */}
                     <Line
                         type="monotone"
                         dataKey="price"
+                        label={"Giá"}
                         stroke="#8884d8"
                         activeDot={{ r: 6 }}
                         animationDuration={1000}
                         dot={false}
                     />
                     <ReferenceLine
-                        y={500000000000}
+                        y={Number(data.price_for_buy)}
                         stroke="red"
                         strokeDasharray="5 5"
                         label={{ position: 'left', fill: 'red' }}

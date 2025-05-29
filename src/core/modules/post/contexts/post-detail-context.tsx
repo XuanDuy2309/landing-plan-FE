@@ -48,6 +48,21 @@ export const PostDetailContextProvider = observer(({ children, id }: IProps) => 
     }
 
     const setBid = async () => {
+        if (!dataAuction.price || dataAuction.price <= 0) {
+            dataAuction.err_price = "Giá đấu giá không được để trống";
+            return;
+        }
+
+        if (dataAuction.price < (data.price_current || 0)) {
+            dataAuction.err_price = "Giá đấu giá phải lớn hơn giá hiện tại";
+            return;
+        }
+
+        if (dataAuction.price > ((data.price_current || 0) + (data.max_bid || 0))) {
+            dataAuction.err_price = "Giá đấu giá vượt quá giá tối đa có thể đặt";
+            return;
+        }
+
         const params = {
             "price": dataAuction.price,
             "post_id": id,

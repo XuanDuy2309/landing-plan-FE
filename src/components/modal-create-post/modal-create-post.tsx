@@ -24,7 +24,7 @@ export const ModalCreatePost = observer(({ type, onSave, onClose }: IProps) => {
 
 const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
     const { data, onSubmit, onClear, message, openMap } = useCreatePostContext()
-    const { onRefresh } = usePostContext()
+    const { onRefresh, itemUpdate } = usePostContext()
     const { data: user } = useUserContext()
 
     const items: MenuProps['items'] = [
@@ -111,7 +111,7 @@ const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
                 }}
             />
             <ButtonLoading
-                label="Đăng"
+                label={itemUpdate ? "Câp nhật" : "Đăng"}
                 template="ActionBlue"
                 className="h-10 w-32 flex items-center justify-center text-xl font-medium"
                 onClick={async () => {

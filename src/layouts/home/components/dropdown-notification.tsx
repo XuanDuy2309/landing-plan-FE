@@ -22,7 +22,6 @@ export const DropdownNotification = observer(({ onSelect }: IProps) => {
                 <InfiniteScroll
                     dataLength={data.length}
                     next={() => {
-                        console.log('next')
                         fetchMore();
                     }}
                     scrollThreshold={-50}

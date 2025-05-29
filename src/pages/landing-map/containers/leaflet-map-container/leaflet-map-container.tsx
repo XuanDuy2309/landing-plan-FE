@@ -30,7 +30,7 @@ export const LeafletMapContainer = observer(() => {
 
     return (
         <MapContainer
-            style={{ width: '100%', height: '100%', zIndex: 0, cursor: 'crosshair' }}
+            style={{ width: '100%', height: '100%', zIndex: 0 }}
             center={[location.lat, location.lng]}
             zoom={14}
             maxZoom={22}
@@ -113,38 +113,43 @@ export const LeafletMapContainer = observer(() => {
             )}
             {isValidPolygon(polygon) && <Polygon pathOptions={{ fillColor: 'transparent', weight: 5 }} positions={polygon as any} />}
             {isValidPolygon(coordinates.points) && <Polygon pathOptions={{ fillColor: Colors.red[200], weight: 5, color: Colors.red[300] }} positions={coordinates.points} />}
-            {pointsArea.points.length >= 2 &&
-                pointsArea.points.slice(0, -1).map((pt, i) => {
-                    const next = pointsArea.points[i + 1];
-                    return (
-                        <Polyline key={i} positions={[[pt[1], pt[0]], [next[1], next[0]]]} color="red">
-                            <Tooltip permanent direction="center">
-                                {(pointsArea.segmentLengths[i] * 1000).toFixed(0)} m
-                            </Tooltip>
-                        </Polyline>
-                    );
-                })}
+            <Pane name="areaPane" style={{ zIndex: 500 }}>
+                {pointsArea.points.length >= 2 &&
+                    pointsArea.points.slice(0, -1).map((pt, i) => {
+                        const next = pointsArea.points[i + 1];
+                        return (
+                            <Polyline key={i} positions={[[pt[1], pt[0]], [next[1], next[0]]]} color="red" pane="areaPane">
+                                <Tooltip permanent direction="center">
+                                    {(pointsArea.segmentLengths[i] * 1000).toFixed(0)} m
+                                </Tooltip>
+                            </Polyline>
+                        );
+                    })}
 
-            {/* Polygon và diện tích */}
-            {pointsArea.points.length >= 3 && !pointsArea.isDraw && (
-                <>
-                    <Polygon
-                        positions={pointsArea.points.map(([lng, lat]) => [lat, lng])} color="red" weight={2} >
-                        {/* Label diện tích ở giữa polygon */}
-                        {pointsArea.areaLabelPosition && (
-                            <Tooltip
-                                direction="center"
-                                permanent
-                                // position={[pointsArea.areaLabelPosition[0], pointsArea.areaLabelPosition[1]]}
-                                offset={[0, 0]}
-                                className="area-tooltip"
-                            >
-                                {(pointsArea.area).toFixed(0)} m²
-                            </Tooltip>
-                        )}
-                    </Polygon>
-                </>
-            )}
+                {/* Polygon và diện tích */}
+                {pointsArea.points.length >= 3 && !pointsArea.isDraw && (
+                    <>
+                        <Polygon
+                            pane="areaPane"
+                            positions={pointsArea.points.map(([lng, lat]) => [lat, lng])} color="red" weight={2} >
+                            {/* Label diện tích ở giữa polygon */}
+                            {pointsArea.areaLabelPosition && (
+                                <Tooltip
+                                    direction="center"
+                                    permanent
+                                    // position={[pointsArea.areaLabelPosition[0], pointsArea.areaLabelPosition[1]]}
+                                    offset={[0, 0]}
+                                    className="area-tooltip"
+                                >
+                                    {(pointsArea.area).toFixed(0)} m²
+                                </Tooltip>
+                            )}
+                        </Polygon>
+                    </>
+                )}
+                <ListPostMarkerLeafletMap />
+
+            </Pane>
 
             {/* Marker hình tròn tại điểm được vẽ */}
             {pointsArea.points.length > 0 &&
@@ -181,7 +186,6 @@ export const LeafletMapContainer = observer(() => {
                 </Polyline>
             )}
 
-            <ListPostMarkerLeafletMap />
 
             <Marker
                 position={[location.lat, location.lng]}

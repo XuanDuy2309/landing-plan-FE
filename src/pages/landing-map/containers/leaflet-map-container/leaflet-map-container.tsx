@@ -33,7 +33,7 @@ export const LeafletMapContainer = observer(() => {
     console.log("placement", placement);
     return (
         <MapContainer
-            style={{ width: '100%', height: '100%', zIndex: 0 }}
+            style={{ width: '100%', height: '100%', zIndex: 0, cursor: 'crosshair' }}
             center={[location.lat, location.lng]}
             zoom={14}
             maxZoom={22}
@@ -116,7 +116,8 @@ export const LeafletMapContainer = observer(() => {
             {/* Polygon và diện tích */}
             {pointsArea.points.length >= 3 && !pointsArea.isDraw && (
                 <>
-                    <Polygon positions={pointsArea.points.map(([lng, lat]) => [lat, lng])} color="red" weight={2} >
+                    <Polygon
+                        positions={pointsArea.points.map(([lng, lat]) => [lat, lng])} color="red" weight={2} >
                         {/* Label diện tích ở giữa polygon */}
                         {pointsArea.areaLabelPosition && (
                             <Tooltip
@@ -141,7 +142,7 @@ export const LeafletMapContainer = observer(() => {
                         position={[lat, lng]}
                         icon={L.divIcon({
                             className: "custom-marker",
-                            html: `<div style="width: 16px; height: 16px; background: red; border-radius: 50%; border: 2px solid white;"></div>`,
+                            html: `<div style="width: 16px; height: 16px; background: red; border-radius: 50%; border: 2px solid white; cursor: crosshair"></div>`,
                         })}
                         eventHandlers={{
                             click: () => {

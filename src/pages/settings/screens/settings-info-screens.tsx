@@ -1,10 +1,7 @@
-import { Dropdown, MenuProps, Spin } from "antd";
-import classNames from "classnames";
-import { observer } from "mobx-react"
+import { Spin } from "antd";
+import { observer } from "mobx-react";
 import moment from "moment";
-import { useRef, useState } from "react";
-import { Colors } from "src/assets";
-import { ButtonLoading, DatePickerAnt, DropdownSelectAddress, IconBase, InputEditing, InputLabel, ModalBase, ModalSelectImage, RadioGroup } from "src/components";
+import { ButtonLoading, DatePickerAnt, DropdownSelectAddress, InputLabel, RadioGroup } from "src/components";
 import { Gender, Role, Status } from "src/core/models";
 import { useUserContext } from "src/core/modules";
 import { BannerSettingInfo } from "../containers/settings-info/banner-setting-info";
@@ -67,8 +64,8 @@ export const SettingsInfoScreen = observer(() => {
                             </div>
                             <div className='w-full'>
                                 <DatePickerAnt
-                                    value={data.dob? moment(data.dob) : undefined}
-                                    onChange={(value) => { data.dob = value }}
+                                    value={data.dob ? moment(data.dob, 'YYYY-MM-DD') : undefined}
+                                    onChange={(value) => { data.dob = value?.format('YYYY-MM-DD') }}
                                     placeholder={'dd/mm/yyyy'}
                                     className='p-0 border-none'
                                     format={"DD/MM/YYYY"}

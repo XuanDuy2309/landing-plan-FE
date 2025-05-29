@@ -9,6 +9,7 @@ export const enum MessageType {
     TEXT = 'text',
     IMAGE = 'image',
     FILE = 'file',
+    VIDEO = 'video',
     LOCATION = 'location',
     STICKER = 'sticker',
     EMOJI = 'emoji',
@@ -41,7 +42,11 @@ export class MessageModel {
     sender_name?: string
     sender_avatar?: string
     is_new: boolean = false
-    is_read: 0 | 1 = 0
+    is_edited: boolean = false
+    reply_content?: string
+    reply_sender_id?: number
+    reply_sender_name?: string
+    reply_type?: MessageType
 
     constructor() {
         makeAutoObservable(this)
@@ -57,6 +62,7 @@ export class ConversationModel {
     last_message_id?: number
     last_message_time?: number
     last_message: MessageModel = new MessageModel()
+    unread_count: number = 0
     members: number[] = []
 
     constructor() {

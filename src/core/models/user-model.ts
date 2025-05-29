@@ -1,5 +1,4 @@
 import { makeAutoObservable } from "mobx";
-import { Moment } from "moment";
 
 export enum Role {
     admin = 'admin',
@@ -29,7 +28,7 @@ export class UserModel {
     role: Role = Role.user;
     status: Status = Status.active;
     gender: Gender = Gender.male;
-    dob?: Moment;
+    dob?: string;
     follower_ids?: number[];
     following_ids?: number[];
     avatar?: string;

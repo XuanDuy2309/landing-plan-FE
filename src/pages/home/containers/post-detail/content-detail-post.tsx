@@ -2,6 +2,7 @@ import { Dropdown, MenuProps } from "antd"
 import classNames from "classnames"
 import { observer } from "mobx-react"
 import moment from "moment"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Colors } from "src/assets"
 import { IconBase } from "src/components"
@@ -15,6 +16,38 @@ export const ContentDetailPost = observer(() => {
     const { data } = usePostDetailContext()
     const { data: user } = useUserContext()
     const navigate = useNavigate()
+    const [auctionStatus, setAuctionStatus] = useState<'not_started' | 'in_progress' | 'ended'>('not_started');
+    const [countdownTime, setCountdownTime] = useState<string>("");
+
+    useEffect(() => {
+        if (Number(data.purpose) !== Purpose_Post.For_Auction) return;
+
+        const interval = setInterval(() => {
+            const now = moment();
+            const startDate = moment(data.start_date);
+            const endDate = moment(data.end_date);
+
+            if (now.isBefore(startDate)) {
+                setAuctionStatus('not_started');
+                const distance = startDate.valueOf() - now.valueOf();
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const timeString = moment.utc(distance).format("HH:mm:ss");
+                setCountdownTime(`Phiên đấu giá sẽ bắt đầu sau: ${days > 0 ? days + ' ngày ' : ''}${timeString}`);
+            } else if (now.isAfter(endDate)) {
+                setAuctionStatus('ended');
+                setCountdownTime("Phiên đấu giá đã kết thúc");
+                clearInterval(interval);
+            } else {
+                setAuctionStatus('in_progress');
+                const distance = endDate.valueOf() - now.valueOf();
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const timeString = moment.utc(distance).format("HH:mm:ss");
+                setCountdownTime(`Phiên đấu giá sẽ bắt đầu sau: ${days > 0 ? days + ' ngày ' : ''}${timeString}`);
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [data.start_date, data.end_date, data.purpose]);
     const listOption: MenuProps['items'] = [
         {
             key: '1',
@@ -145,6 +178,12 @@ export const ContentDetailPost = observer(() => {
             <div className="w-full h-full flex flex-col space-y-2">
                 <span className="text-xl font-bold text-gray-900">Thông tin BĐS</span>
                 <div className="w-full flex flex-col text-base text-gray-700 space-y-0.5">
+                    {Number(data.purpose) === Purpose_Post.For_Auction &&
+                        <span className={classNames("font-medium", {
+                            'text-yellow-600': auctionStatus === 'not_started',
+                            'text-green-600': auctionStatus === 'in_progress',
+                            'text-red-600': auctionStatus === 'ended'
+                        })}>{countdownTime}</span>}
                     <div className="w-full flex items-center space-x-2 ">
                         <span className=" w-[140px]">Loại tài sản:</span>
                         <span>{data.type_asset ? typeAssetPost[data.type_asset].label : ""}</span>
@@ -188,7 +227,7 @@ export const ContentDetailPost = observer(() => {
                         <span>{data.direction_land ? directionLand[data.direction_land].label : ""}</span>
                     </div>
                     {
-                        data.purpose === Purpose_Post.For_Auction &&
+                        Number(data.purpose) === Purpose_Post.For_Auction &&
                         <>
                             <div className="w-full flex items-center space-x-2">
                                 <span className=" w-[140px]">Thời gian bắt đầu:</span>

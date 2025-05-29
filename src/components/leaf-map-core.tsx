@@ -1,13 +1,12 @@
 import L from "leaflet";
-import { Polygon } from "react-leaflet";
 import { observer } from "mobx-react";
 import { JSX, useEffect, useMemo } from "react";
-import { LayersControl, MapContainer, Marker, Polyline, Popup, TileLayer, Tooltip } from "react-leaflet";
-import { useManagementLandingPlan } from "src/core/modules";
-import { useCoreStores } from "src/core/stores";
+import { LayersControl, MapContainer, Marker, Polygon, Polyline, Popup, TileLayer, Tooltip } from "react-leaflet";
 import { Colors } from "src/assets";
 import { isValidPolygon } from "src/core/base";
 import { NominatimResult, PointsMapModel, SelectedLocationModel } from "src/core/models";
+import { useManagementLandingPlan } from "src/core/modules";
+import { useCoreStores } from "src/core/stores";
 
 interface IProps {
     MapEvent?: (Props: { pointsArea: PointsMapModel, setSelectedLocation: (selectedLocation: SelectedLocationModel) => void }) => JSX.Element;
@@ -33,6 +32,7 @@ export const LeafletMapCore = observer(({ MapEvent, MapViewUpdater, RoutingMachi
             zoom={14}
             maxZoom={30}
             attributionControl={true}
+
         >
             {MapEvent && <MapEvent setSelectedLocation={setSelectedLocation} pointsArea={pointsArea} />}
             {MapViewUpdater && <MapViewUpdater placement={placement} setSelectedLocation={setSelectedLocation} />}

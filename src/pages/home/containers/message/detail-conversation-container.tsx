@@ -7,9 +7,7 @@ import { ListMessageContainer } from "./list-message-container";
 
 export const DetailConversationContainer = observer(() => {
     const { selectedId } = useManagerConversationContext()
-    
-    // Always call hook at the top level
-    useJoinToConversationRoom(selectedId || '')
+    useJoinToConversationRoom(selectedId || 0)
 
     if (!selectedId) {
         return (

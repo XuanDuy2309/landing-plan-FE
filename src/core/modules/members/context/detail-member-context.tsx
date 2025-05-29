@@ -1,5 +1,4 @@
 import { observer } from "mobx-react";
-import moment from "moment";
 import React, { createContext } from "react";
 import { AuthApi } from "src/core/api";
 import { UserModel } from "src/core/models";
@@ -30,7 +29,6 @@ export const DetailMemberContextProvider = observer(({ children, id }: IProps) =
             if (res.Status) {
                 const use = new UserModel();
                 Object.assign(use, res.Data.data);
-                use.dob = res.Data.data.dob ? moment(res.Data.data.dob) : undefined;
                 setData(use);
             }
         } catch (error) {

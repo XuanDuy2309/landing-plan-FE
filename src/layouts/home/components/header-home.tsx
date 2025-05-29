@@ -43,18 +43,19 @@ export const HeaderHome = observer(() => {
     }, [pathname]);
 
     useSocketEvent("notification", (data: any) => {
-        if (data.receiver_id === sessionStore.profile?.id) {
-            onRefresh()
-            return
-        }
         toast.info(data.message)
         onRefresh()
+        // Play notification sound
+        const event = new CustomEvent('notification-sound');
+        window.dispatchEvent(event);
     })
 
-
-    useSocketEvent("bid_create", (data: any) => {
-        toast.info(data.message)
-        onRefresh()
+    useSocketEvent('notification_message', (data: any) => {
+        toast.info(data.sender_name + ': ' + data.content)
+        sessionStore.setNewMessageCount(sessionStore.new_message_count + 1)
+        // Play notification sound
+        const event = new CustomEvent('notification-sound');
+        window.dispatchEvent(event);
     })
 
     const handleSelectNotification = (item?: NotificationModel) => {
@@ -63,10 +64,6 @@ export const HeaderHome = observer(() => {
         if (!item) return
         if (Number(item.type) === NotificationType.LIKE) {
             navigate(`/post/${item.post_id}`)
-            return
-        }
-        if (Number(item.type) === NotificationType.MESSAGE) {
-            navigate(`/home/message/${item.sender_id}`)
             return
         }
         if (Number(item.type) === NotificationType.SET_BID) {
@@ -114,6 +111,28 @@ export const HeaderHome = observer(() => {
                 <div className="h-full w-full max-w-[680px] flex items-center justify-center space-x-2">
                     {
                         listPages.map((item, index) => {
+                            if (index === 3) {
+                                return (
+                                    <div
+                                        key={index}
+                                        className={classNames("w-full h-13 flex flex-col items-center justify-center space-y-0.5 cursor-pointer  text-[14px] font-medium",
+                                            { 'text-blue-600 border-b-2 border-blue-600': activeScreen === item.key },
+                                            { 'text-white rounded hover:bg-gray-200': activeScreen !== item.key }
+                                        )}
+                                        onClick={(e) => {
+                                            setActiveScreen(item.key)
+                                            navigate(item.link, { replace: true })
+                                        }}
+                                    >
+                                        <div className="relative">
+                                            <IconBase icon={item.icon} size={24} color={activeScreen === item.key ? Colors.blue[400] : Colors.gray[700]} />
+                                            {sessionStore.new_message_count > 0 && <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                                                <span className="text-[10px] font-bold text-white">{sessionStore.new_message_count}</span>
+                                            </div>}
+                                        </div>
+                                    </div>
+                                )
+                            }
                             return (
                                 <div
                                     key={index}

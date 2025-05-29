@@ -1,5 +1,5 @@
+import dayjs from "dayjs"
 import { observer } from "mobx-react"
-import moment from "moment"
 import { Colors } from "src/assets"
 import { ButtonIcon } from "src/components/button-icon"
 import { getColorFromId } from "src/core/base"
@@ -22,7 +22,7 @@ export const HeaderDetailContainer = observer(() => {
                 </div>
                 <div className="flex flex-col">
                     <span className="text-lg font-medium text-gray-700">{data.name}</span>
-                    {data.updated_at && <span className="text-xs text-gray-500">{data.updated_at ? moment(data.updated_at).fromNow() : ''}</span>}
+                    {data.updated_at && <span className="text-xs text-gray-500">{data.updated_at ? dayjs(data.updated_at).fromNow() : ''}</span>}
                 </div>
 
             </div>

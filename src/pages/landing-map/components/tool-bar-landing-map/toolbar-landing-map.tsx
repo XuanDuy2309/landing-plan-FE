@@ -1,16 +1,17 @@
 import { Slider } from 'antd';
 import { observer } from 'mobx-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Collapse } from 'react-collapse';
 import { Colors } from 'src/assets';
 import { IconBase } from 'src/components';
+import { ModalNoteLandingMap } from 'src/components/modal-note-planing-map/modal-note-planing-map-container';
 import { useManagementLandingPlan } from 'src/core/modules';
 import { ToolbarButton } from './button-toolbar-landing-map';
 
 export const ToolbarLandingMap = observer(() => {
     const [isOpen, setIsOpen] = useState(false);
     const { pointsArea, opacity, setOpacity, landingPlanMap } = useManagementLandingPlan()
-
+    const modalNoteLandingRef = useRef<any>(null);
     const handleToggleDraw = () => {
         pointsArea.isDraw = !pointsArea.isDraw;
         if (pointsArea.isDraw) {
@@ -40,6 +41,7 @@ export const ToolbarLandingMap = observer(() => {
         { onClick: handleReset, icon: 'delete-outline', title: 'Đặt lại khu vực', active: false },
         { onClick: handleToggleRouting, icon: 'location-outline', title: 'Chỉ đường', active: pointsArea.isRouting },
         { onClick: handleGoToMyLocation, icon: 'map-outline1', title: 'Định vị', active: false },
+        { onClick: () => modalNoteLandingRef.current?.open(), icon: 'note-outline', title: 'Kí hiệu bản đồ quy hoạch', active: false },
     ];
 
 
@@ -72,6 +74,12 @@ export const ToolbarLandingMap = observer(() => {
                     </button>
                 </div>
             </div>
+
+            <ModalNoteLandingMap
+                ref={modalNoteLandingRef}
+                onCancel={() => modalNoteLandingRef.current?.close()}
+                centered
+            />
         </>
     )
 }

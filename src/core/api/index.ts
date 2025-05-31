@@ -1,5 +1,6 @@
 export * from './auth.api';
 export * from './bids.api';
+export * from './chat-bot-api';
 export * from './conversations.api';
 export * from './landing-map.api';
 export * from './location.api';

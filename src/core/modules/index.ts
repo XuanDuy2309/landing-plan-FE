@@ -1,4 +1,5 @@
 export * from './authen';
+export * from './chat-bot';
 export * from './conversation';
 export * from './landing-map';
 export * from './media';

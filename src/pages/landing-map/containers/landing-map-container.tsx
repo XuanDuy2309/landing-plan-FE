@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react'
 import { useManagementLandingPlan } from 'src/core/modules'
 import { ToolbarLandingMap } from '../components/tool-bar-landing-map/toolbar-landing-map'
+import { ChatBotContainer } from './chat-bot/chat-bot-container'
 import { HeaderLandingMap } from './header-landing-map/header-landing-map'
 import { LeafletMapContainer } from './leaflet-map-container/leaflet-map-container'
 import { PopupDetailCoordinatesLocationContainer } from './popup-detail-coordinates-location/popup-detail-coordinates-location-container'
@@ -18,6 +19,7 @@ export const LandingMapContainer = observer(() => {
                 <HeaderLandingMap />
                 <ToolbarLandingMap />
                 <PopupDetailCoordinatesLocationContainer />
+                <ChatBotContainer />
                 <div className='w-full h-full'> <LeafletMapContainer /></div>
             </div>
         </div>

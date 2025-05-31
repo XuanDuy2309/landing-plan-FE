@@ -102,7 +102,7 @@ export const useBaseContextProvider = <ITypeFilter, T>(
 
   const hasMore = (): boolean => {
     return (
-      totalRef.current > stateContext.data.length &&
+      totalRef.current > stateContext?.data?.length &&
       !stateContext.loading
     );
   };

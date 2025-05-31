@@ -194,6 +194,7 @@ export const InputContentMessageContainer = observer(() => {
                             onKeyDown={handleKeyDown}
                             onPaste={handlePaste}
                             disabled={loading}
+                            autoFocus
                         />
                     }
                 </div>

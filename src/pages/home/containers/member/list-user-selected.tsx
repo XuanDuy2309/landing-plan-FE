@@ -23,7 +23,8 @@ export const ListUserSelectedContainer = observer(({ type, title }: IProps) => {
 
 const ListUserSelected = observer(({ type, title }: IProps) => {
     const { data, loading, fetchMore, hasMore, onRefresh, filter } = useListUserContext()
-    const { data: dataCreated, setListMember, listMember } = useCreateConversationContext()
+    const { data: dataCreated, listMember } = useCreateConversationContext()
+    console.log(listMember)
     return (
         <div className={classNames("w-full flex flex-col transition-all ease-linear duration-500",
         )}>
@@ -40,7 +41,7 @@ const ListUserSelected = observer(({ type, title }: IProps) => {
                     />
                 </div>
                 <div className="w-full h-full flex flex-col overflow-y-auto">
-                    <div id={"list-member-" + type} className="w-full h-full flex flex-col items-center overflow-y-auto scroll-hide">
+                    <div id={"list_member_" + type} className="w-full h-full flex flex-col items-center overflow-y-auto scroll-hide">
                         <InfiniteScroll
                             dataLength={data.length} //This is important field to render the next data
                             next={() => {
@@ -51,12 +52,12 @@ const ListUserSelected = observer(({ type, title }: IProps) => {
                             loader={<div className="w-full items-center justify-center flex">
                                 <Spin />
                             </div>}
-                            scrollableTarget={"list-member-" + type}
+                            scrollableTarget={"list_member_" + type}
                             style={{ overflow: 'none' }}
                         >
                             <div className="w-full h-full flex flex-col">
                                 {
-                                    !loading && data.map((item, index) => {
+                                    !loading && data.filter(i => !listMember.some(it => it.id === i.id)).map((item, index) => {
                                         return (
                                             <div className={classNames("w-full py-2 px-3 flex items-center space-x-2 cursor-pointer hover:bg-gray-200 border-b border-gray-200",
 
@@ -83,14 +84,12 @@ const ListUserSelected = observer(({ type, title }: IProps) => {
                                                     <span className="text-xs text-gray-500">{item.follower_ids?.length} người theo dõi</span>
                                                 </div>
 
-                                                <CheckBox primary checked={dataCreated.members.some(it => it === item.id)} onChange={(value, e) => {
+                                                <CheckBox primary checked={dataCreated.members.some(it => it.id === item.id)} onChange={(value, e) => {
                                                     if (value && item.id) {
-                                                        dataCreated.members.push(item.id)
-                                                        setListMember([...listMember, item])
+                                                        dataCreated.members.push(item)
                                                         return
                                                     }
-                                                    dataCreated.members = dataCreated.members.filter(it => it !== item.id)
-                                                    setListMember(listMember.filter(it => it.id !== item.id))
+                                                    dataCreated.members = dataCreated.members.filter(it => it.id !== item.id)
                                                 }
                                                 } />
                                             </div>
@@ -101,7 +100,7 @@ const ListUserSelected = observer(({ type, title }: IProps) => {
                         </InfiniteScroll>
                     </div>
                     {
-                        !loading && data.length === 0 &&
+                        !loading && data.filter(i => !listMember.some(it => it.id === i.id)).length === 0 &&
                         <div className="w-full h-10 flex items-center justify-center">
                             <span className="text-gray-500">Không tìm thấy người dùng</span>
                         </div>

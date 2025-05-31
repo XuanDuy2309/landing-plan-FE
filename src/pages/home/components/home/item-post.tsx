@@ -84,6 +84,15 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
             ]
             : []
         )
+        ,
+        {
+            key: '7',
+            label: 'Xem trên map',
+            onClick: () => {
+                navigate(`/?post_id=${item.id}&lat=${item.lat}&lng=${item.lng}`);
+            },
+            icon: <IconBase icon="map-outline" size={16} color={Colors.gray[700]} />,
+        }
     ]
 
     const renderUnit = () => {

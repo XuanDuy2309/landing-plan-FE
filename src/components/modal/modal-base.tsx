@@ -5,9 +5,10 @@ import "./modal-base.css"
 
 interface IProps {
     children: React.ReactNode
+    destroyOnClose?: boolean
 }
 
-export const ModalBase = observer(forwardRef(({ children }: IProps, ref) => {
+export const ModalBase = observer(forwardRef(({ children, destroyOnClose }: IProps, ref) => {
     const [isOpenModal, setOpenModal] = useState(false);
 
     const open = () => {
@@ -28,6 +29,8 @@ export const ModalBase = observer(forwardRef(({ children }: IProps, ref) => {
         className='modal-base'
         closable={false}
         centered={true}
+        onCancel={close}
+        destroyOnClose={destroyOnClose}
     >
         {children}
     </Modal>

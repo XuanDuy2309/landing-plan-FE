@@ -1,5 +1,4 @@
 import classNames from 'classnames';
-import { InputEditing } from './input-editing';
 
 interface IProps {
     type?: 'password';

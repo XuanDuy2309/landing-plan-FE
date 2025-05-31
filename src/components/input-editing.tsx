@@ -35,7 +35,7 @@ export const InputEditing = forwardRef(({ active, maxLength, isLink, autoFocus, 
 
     const onChangeText = (value) => {
         if (type == "number") {
-            if(isNaN(value)) {
+            if (isNaN(value)) {
                 value = ""
             }
         }
@@ -124,7 +124,7 @@ export const InputEditing = forwardRef(({ active, maxLength, isLink, autoFocus, 
                                 }, 200)
                             }}
                             className='group2-hover:visible group2-hover:text-baseGray-60 
-                    group2-focus-within:visible invisible text:gray-900
+                    group2-focus-within:visible visible text:gray-900
                   hover:text-green-400 flex items-center justify-center'
                         >
                             <IconBase icon='edit-outline' color="currentColor" size={"16px"} />

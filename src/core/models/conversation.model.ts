@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx"
+import { UserModel } from "./user-model"
 
 export const enum Type_Conversation {
     Direct = 'direct',
@@ -57,13 +58,14 @@ export class ConversationModel {
     id?: number
     name?: string
     type: Type_Conversation = Type_Conversation.Direct
+    avatar?: string
     created_at?: string
     updated_at?: string
     last_message_id?: number
     last_message_time?: number
     last_message: MessageModel = new MessageModel()
     unread_count: number = 0
-    members: number[] = []
+    members: UserModel[] = []
 
     constructor() {
         makeAutoObservable(this)

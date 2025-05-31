@@ -4,7 +4,8 @@ import React from "react";
 export const enum Type_List {
     User = 1,
     Follower = 2,
-    Following = 3
+    Following = 3,
+    Member = 4
 }
 
 export class ManagerMemberContextType {

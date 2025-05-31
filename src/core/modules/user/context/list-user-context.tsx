@@ -49,6 +49,7 @@ export const ListUserContextProvider = observer(({ children, type, id }: IProps)
         if (type === Type_List.User) { res = await uc.fetchInternal({ ...filter, excludeIds: [sessionStore.profile?.id] }, index, pageSize) }
         if (type === Type_List.Follower) { res = await uc.fetchFollowers({ ...filter, user_id: id ? id : null }, index, pageSize) }
         if (type === Type_List.Following) { res = await uc.fetchFollowing({ ...filter, user_id: id ? id : null }, index, pageSize) }
+        if (type === Type_List.Member) { res = await uc.fetchMembers(id || 0, { ...filter }, index, pageSize) }
         return {
             ...res,
         }

@@ -1,4 +1,4 @@
-import { AuthApi } from "src/core/api";
+import { AuthApi, ConversationsApi } from "src/core/api";
 
 
 export class UserUseCase {
@@ -36,6 +36,20 @@ export class UserUseCase {
         page_size: number = 25
     ): Promise<{ count: number; offset: number; list: any }> {
         const res = await AuthApi.getFollowing({ ...filter, page, page_size });
+        return {
+            list: res.Data?.data,
+            count: res.Data?.total,
+            offset: 0
+        }
+    }
+
+    async fetchMembers(
+        id: number,
+        filter: any,
+        page: number,
+        page_size: number = 25
+    ): Promise<{ count: number; offset: number; list: any }> {
+        const res = await ConversationsApi.getListMember(id, { ...filter, page, page_size });
         return {
             list: res.Data?.data,
             count: res.Data?.total,

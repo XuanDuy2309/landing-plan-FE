@@ -8,6 +8,9 @@ export class DetailConversationContextType {
     fecthData!: () => void
     showDetail: boolean = false
     setShowDetail: (showDetail: boolean) => void = (showDetail: boolean) => { }
+    isMute: boolean = false
+    setIsMute: (isMute: boolean) => void = (isMute: boolean) => { }
+    onUpdateConversation!: () => void
 }
 
 export const DetailConversationContext = React.createContext<DetailConversationContextType>(new DetailConversationContextType());
@@ -19,6 +22,7 @@ interface IProps {
 
 export const DetailConversationContextProvider = observer(({ children, id }: IProps) => {
     const [data, setData] = React.useState<ConversationModel>(new ConversationModel())
+    const [isMute, setIsMute] = React.useState<boolean>(false);
     const [showDetail, setShowDetail] = React.useState<boolean>(false);
 
     const fecthData = async () => {
@@ -29,6 +33,21 @@ export const DetailConversationContextProvider = observer(({ children, id }: IPr
         }
     }
 
+    const onUpdateConversation = async () => {
+        const params: Record<string, string> = {};
+
+        if (data.avatar) params.avatar = data.avatar;
+        if (data.name) params.name = data.name;
+
+        if (Object.keys(params).length === 0) return; // Không có gì để cập nhật
+
+        const res = await ConversationsApi.updateConversation(data.id || 0, params);
+        if (res.Status) {
+            fecthData();
+        }
+    }
+
+
     useEffect(() => {
         fecthData()
     }, [id])
@@ -38,7 +57,10 @@ export const DetailConversationContextProvider = observer(({ children, id }: IPr
             data,
             fecthData,
             showDetail,
-            setShowDetail
+            setShowDetail,
+            isMute,
+            setIsMute,
+            onUpdateConversation
         }}>
             {children}
         </DetailConversationContext.Provider>

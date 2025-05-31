@@ -23,7 +23,6 @@ export class ConversationUseCase {
         page: number,
         page_size: number = 25
     ): Promise<{ count: number; offset: number; list: any }> {
-        console.log(id, filter, page, page_size);
         const res = await ConversationsApi.getListMessage(id, { ...filter, page, page_size });
         return {
             list: res.Data?.data,

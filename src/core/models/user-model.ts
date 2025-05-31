@@ -34,6 +34,9 @@ export class UserModel {
     avatar?: string;
     background?: string;
     created_at?: string;
+    is_online: 0 | 1 = 0;
+    muted_until?: string;
+    nickname?: string;
 
     err_username?: string;
     err_password?: string;

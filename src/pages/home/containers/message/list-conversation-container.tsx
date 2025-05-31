@@ -14,7 +14,7 @@ import { IconBase, ModalBase } from "src/components"
 import { ButtonIcon } from "src/components/button-icon"
 import { getColorFromId } from "src/core/base"
 import { useSocketEvent } from "src/core/hook"
-import { ConversationModel, MessageModel, MessageType } from "src/core/models"
+import { ConversationModel, MessageModel, MessageType, Type_Conversation } from "src/core/models"
 import { ListConversationContextProvider, useListConversationContext, useManagerConversationContext } from "src/core/modules"
 import { useCoreStores } from "src/core/stores"
 import { ModalCreateConversation } from "./modal-create-conversation-container"
@@ -47,17 +47,19 @@ export const ListConversation = observer(() => {
         }
     }, [JSON.stringify(data)])
 
-    useSocketEvent('notification_message', (dataMess: any) => {
+    useSocketEvent('notification_message', (dataMess: MessageModel) => {
         data.forEach((item: ConversationModel) => {
             if (item.id === dataMess.conversation_id) {
+                console.log(item.unread_count)
                 item.unread_count = item.unread_count + 1
-                item.last_message.sender_name = dataMess.sender_name
+                item.last_message = new MessageModel()
+                item.last_message.sender_name = dataMess?.sender_name || ""
                 item.updated_at = moment().format("YYYY-MM-DD HH:mm:ss")
-                item.last_message.content = dataMess.content
-                if (dataMess.type === MessageType.IMAGE) {
+                item.last_message.content = dataMess?.content
+                if (dataMess?.type === MessageType.IMAGE) {
                     item.last_message.content = 'Hình ảnh'
                 }
-                if(dataMess.type === MessageType.FILE) {
+                if (dataMess?.type === MessageType.FILE) {
                     item.last_message.content = 'file'
                 }
             }
@@ -67,13 +69,14 @@ export const ListConversation = observer(() => {
     useSocketEvent('new_message', (dataMess: any) => {
         data.forEach((item: ConversationModel) => {
             if (item.id === dataMess.conversation_id) {
+                item.last_message = new MessageModel()
                 item.last_message.sender_name = dataMess.sender_name
                 item.updated_at = moment().format("YYYY-MM-DD HH:mm:ss")
                 item.last_message.content = dataMess.content
                 if (dataMess.type === MessageType.IMAGE) {
                     item.last_message.content = 'Hình ảnh'
                 }
-                if(dataMess.type === MessageType.FILE) {
+                if (dataMess.type === MessageType.FILE) {
                     item.last_message.content = 'file'
                 }
             }
@@ -100,6 +103,58 @@ export const ListConversation = observer(() => {
         })
     })
 
+    useSocketEvent('conversation_created', (conversation: ConversationModel) => {
+        const newConversation = new ConversationModel()
+        Object.assign(newConversation, conversation)
+        data.unshift(newConversation)
+    })
+
+    useSocketEvent('conversation_updated', (conversation: ConversationModel) => {
+        const newConversation = new ConversationModel()
+        Object.assign(newConversation, conversation)
+        data.forEach((item, index) => {
+            if (item.id === newConversation.id) {
+                data[index] = newConversation
+            }
+        })
+    })
+
+    const renderAvatar = (item: ConversationModel) => {
+        if (!item.id) return null;
+
+        const isDirect = item.type === Type_Conversation.Direct;
+        const targetMember = isDirect
+            ? item.members.find(m => m.id !== sessionStore.profile?.id)
+            : undefined;
+
+        const avatarUrl = isDirect
+            ? targetMember?.avatar
+            : item.avatar;
+
+        const displayChar = isDirect
+            ? (targetMember?.fullname?.charAt(0).toUpperCase() || '?')
+            : (item.name?.charAt(0).toUpperCase() || '?');
+
+        const bgColor = getColorFromId(
+            isDirect ? targetMember?.id || 0 : item.id || 0
+        );
+
+        return (
+            <div className="size-10 flex-none rounded-full overflow-hidden flex items-center justify-center">
+                {avatarUrl ? (
+                    <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                ) : (
+                    <div
+                        className="w-full h-full flex items-center justify-center"
+                        style={{ backgroundColor: bgColor }}
+                    >
+                        <span className="text-lg font-bold text-white">{displayChar}</span>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
 
     return (
         <div className={classNames("w-full flex flex-col transition-all ease-linear duration-500 border-gray-200"
@@ -125,7 +180,7 @@ export const ListConversation = observer(() => {
                     </div>
                 </div>
                 <div className="w-full h-full flex flex-col overflow-y-auto">
-                    <div id={"list-mess"} className="w-full py-4 h-full flex flex-col items-center overflow-y-auto scroll-hide">
+                    <div id={"list_conversation"} className="w-full py-4 h-full flex flex-col items-center overflow-y-auto scroll-hide">
                         <InfiniteScroll
                             dataLength={data.length} //This is important field to render the next data
                             next={() => {
@@ -136,7 +191,7 @@ export const ListConversation = observer(() => {
                             loader={<div className="w-full items-center justify-center flex">
                                 <Spin />
                             </div>}
-                            scrollableTarget={"list-mess"}
+                            scrollableTarget={"list_conversation"}
                             style={{ overflow: 'none' }}
                         >
                             <div className="w-full h-full flex flex-col px-2 rounded">
@@ -157,18 +212,14 @@ export const ListConversation = observer(() => {
                                                 }}
                                                 key={index}
                                             >
-                                                <div className='size-10 flex-none rounded-full flex items-center justify-center overflow-hidden '
-                                                    style={{
-                                                        backgroundColor: getColorFromId(item.id || 0)
-                                                    }}
-                                                >
+                                                {
+                                                    renderAvatar(item)
+                                                }
 
-                                                    <span className="text-2xl font-bold text-white" >{item.name?.charAt(0).toUpperCase()}</span>
-
-
-                                                </div>
                                                 <div className="flex flex-col w-full relative">
-                                                    <span className="text-lg font-medium text-gray-700 line-clamp-1 max-w-[260px] leading-[24px]">{item.name}</span>
+                                                    <span className="text-lg font-medium text-gray-700 line-clamp-1 max-w-[260px] leading-[24px]">
+                                                        {item.type === Type_Conversation.Direct ? item.members.filter((i) => i.id !== sessionStore.profile?.id)[0].fullname : item.name}
+                                                    </span>
                                                     <div className="w-full flex items-center justify-between max-w-[260px]">
                                                         {item.last_message && <span className="text-xs text-gray-500 line-clamp-1">{item.last_message.sender_name}: {item.last_message.content}</span>}
                                                         <span className="flex-none text-gray-500">{item.updated_at ? dayjs(item.updated_at).fromNow() : ''}</span>
@@ -195,13 +246,13 @@ export const ListConversation = observer(() => {
                     }
                 </div>
             </div>
-            <ModalBase ref={modalRef}>
-                <ModalCreateConversation onSave={() => {
-                    modalRef.current?.close()
-                    onRefresh()
-                }} onClose={() => {
-                    modalRef.current?.close()
-                }} />
+            <ModalBase ref={modalRef} destroyOnClose>
+                <ModalCreateConversation
+                    onSave={() => {
+                        modalRef.current?.close()
+                    }} onClose={() => {
+                        modalRef.current?.close()
+                    }} />
             </ModalBase>
         </div>
     )

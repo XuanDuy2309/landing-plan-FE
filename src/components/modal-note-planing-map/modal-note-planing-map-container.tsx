@@ -10,6 +10,7 @@ interface IProps {
     onCancel?: () => void;
     label?: string;
     centered?: boolean;
+    onClickDropdown?: (text: string) => void
 }
 
 export const ModalNoteLandingMap = observer(
@@ -55,22 +56,6 @@ export const ModalNoteLandingMap = observer(
                     normalizedCode.includes(normalizedSearchCode);
             });
         }, [searchText, searchCode]);
-
-        const items: MenuProps['items'] = [
-            {
-                key: 1,
-                label: 'Hỏi chat bot',
-                onClick: () => {
-
-                }
-            },
-            // {
-            //     key: 2,
-            //     label: 'Mặt đường',
-            //     onClick: () => {
-            //     }
-            // },
-        ]
 
         return (
             <Modal
@@ -118,22 +103,38 @@ export const ModalNoteLandingMap = observer(
 
                             {/* Updated Data rows to use filteredData */}
                             <div className='h-[400px] overflow-y-auto'>
-                                {filteredData.map((item, index) => (
-                                    <div key={index} className='grid grid-cols-12 hover:bg-gray-50 border-b border-gray-100 py-2 min-h-14'>
-                                        <div className='col-span-1 px-4 flex items-center'>{index + 1}</div>
-                                        <div className='col-span-8 px-4  flex items-center'>
-                                            <Dropdown menu={{ items }} trigger={['click', 'hover']} >
-                                                <span>{item.name}</span>
-                                            </Dropdown>
-                                        </div>
+                                {filteredData.map((item, index) => {
+                                    const dropdownItems: MenuProps['items'] = [
+                                        {
+                                            key: '1',
+                                            label: 'Hỏi chat bot',
+                                            onClick: () => {
+                                                const combinedText = `${item.name} - ${item.code}`;
+                                                props.onClickDropdown?.(combinedText);
+                                            },
+                                        },
+                                    ];
+
+                                    return (
                                         <div
-                                            className='col-span-3 text-center px-4 items-center justify-center flex'
-                                            style={{ backgroundColor: item.color }}
+                                            key={index}
+                                            className="grid grid-cols-12 hover:bg-gray-50 border-b border-gray-100 py-2 min-h-14"
                                         >
-                                            {item.code}
+                                            <div className="col-span-1 px-4 flex items-center">{index + 1}</div>
+                                            <div className="col-span-8 px-4 flex items-center">
+                                                <Dropdown menu={{ items: dropdownItems }} trigger={['click', 'hover']}>
+                                                    <span className="cursor-pointer">{item.name}</span>
+                                                </Dropdown>
+                                            </div>
+                                            <div
+                                                className="col-span-3 text-center px-4 items-center justify-center flex"
+                                                style={{ backgroundColor: item.color }}
+                                            >
+                                                {item.code}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>

@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import { observer } from 'mobx-react'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Colors } from 'src/assets'
 import { IconBase } from 'src/components'
 import { NominatimResult } from 'src/core/models'
@@ -11,6 +12,7 @@ export const SearchBoxLandingMap = observer(() => {
     const { filter, handleSearch, listResultSearch, setListResultSearch, loading, handleReverseVietMap } = useListSearchBoxLandingPlan()
     const [keyWord, setKeyWord] = useState("")
     const { placement, setPlacement, setOpenSidebar, openSidebar } = useManagementLandingPlan()
+    const navigate = useNavigate()
 
     const handleSelect = async (item: NominatimResult) => {
         if (!item.isVietMapSearch) {
@@ -62,13 +64,20 @@ export const SearchBoxLandingMap = observer(() => {
                         />
                         {!loading ? <button
                             onClick={() => handleSearch(keyWord)}
-                            className='w-[56px] h-full'>
-                            <IconBase icon='search-outline' size={24} color={Colors.gray[500]} />
+                            className='w-[56px] h-full text-gray-500 hover:text-blue-400'>
+                            <IconBase icon='search-outline' size={24} color={"currentColor"} />
                         </button> : (
                             <div className="size-[24px] mr-[12px] animate-spin">
                                 <IconBase icon='loading-outline' size={20} color={Colors.gray[500]} />
                             </div>
                         )}
+                        <button
+                            onClick={() => {
+                                navigate('/home')
+                            }}
+                            className='w-[56px] h-full hover:text-blue-400 text-gray-500'>
+                            <IconBase icon='home-outline' size={24} color={"currentColor"} />
+                        </button>
                     </div>
                     {/* <button className='w-[54px] h-full'>
                         <IconBase icon='search-outline' size={24} color={Colors.gray[500]} />

@@ -1,9 +1,12 @@
 import debounce from "debounce";
 import L from "leaflet";
+import 'leaflet-routing-machine';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import 'leaflet/dist/leaflet.css';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { LayersControl, MapContainer, Marker, Pane, Polygon, Polyline, Popup, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
+import { useSearchParams } from "react-router-dom";
 import { Colors } from 'src/assets';
 import { isValidPolygon } from 'src/core/base';
 import { LandingPlanModel, NominatimResult, SelectedLocationModel } from 'src/core/models';
@@ -11,11 +14,22 @@ import { FilterPostContextType, useManagementLandingPlan, usePostContext } from 
 import { useCoreStores } from 'src/core/stores';
 import './leaflet-map-container.css';
 import { ListPostMarkerLeafletMap } from "./list-post-marker-leaflet-map";
-import { RoutingMachineLeafletMap } from "./routing-machine-leaflet-map";
 
 export const LeafletMapContainer = observer(() => {
+    const [searchParams] = useSearchParams();
     const { location } = useCoreStores().sessionStore
-    const { placement, polygon, selectedLocation, setSelectedLocation, coordinates, pointsArea, landingPlanMap, opacity, selectedLandingPlan } = useManagementLandingPlan()
+    const {
+        placement,
+        polygon,
+        selectedLocation,
+        setSelectedLocation,
+        coordinates,
+        pointsArea,
+        landingPlanMap,
+        opacity,
+        selectedLandingPlan,
+        setHoveredPostId
+    } = useManagementLandingPlan();
     const { data, filter, onRefresh } = usePostContext()
 
     const calculateDistance = useMemo(() => {
@@ -28,22 +42,56 @@ export const LeafletMapContainer = observer(() => {
         sessionStore.requestLocation();
     }, [])
 
+    const postId = useMemo(() => {
+        return searchParams.get('post_id')
+    }, [searchParams])
+
+    const latParams = useMemo(() => {
+        return searchParams.get('lat')
+    }, [searchParams])
+
+    const lngParams = useMemo(() => {
+        return searchParams.get('lng')
+    }, [searchParams])
+
+    useEffect(() => {
+        // Set post ID if present
+        if (postId) {
+            setHoveredPostId(Number(postId));
+        }
+
+        // Set location if both lat and lng are present
+        if (latParams && lngParams && postId) {
+            const numLat = Number(latParams);
+            const numLng = Number(lngParams);
+
+            // Only set if values are valid numbers
+            if (!isNaN(numLat) && !isNaN(numLng)) {
+                setSelectedLocation({
+                    lat: numLat,
+                    lng: numLng,
+                    radius: 1000 // Default radius or calculate based on map bounds
+                });
+            }
+        }
+    }, [searchParams]); // Only run when URL params change
+
+
     return (
         <MapContainer
             style={{ width: '100%', height: '100%', zIndex: 0 }}
-            center={[location.lat, location.lng]}
+            center={[Number(latParams) || location.lat, Number(lngParams) || location.lng]}
             zoom={14}
             maxZoom={22}
             minZoom={8}
             attributionControl={true}
         >
             <MapEvents setSelectedLocation={setSelectedLocation} filter={filter} onRefresh={onRefresh} />
-            <MapViewUpdater placement={placement} setSelectedLocation={setSelectedLocation} landingPlan={selectedLandingPlan} />
-            {pointsArea.routeTo && <RoutingMachineLeafletMap
+            <MapViewUpdater placement={placement} setSelectedLocation={setSelectedLocation} landingPlan={selectedLandingPlan} latParams={Number(latParams)} lngParams={Number(lngParams)} />
+            {pointsArea.routeTo && pointsArea.isRouting && <RoutingMachine
                 from={[location.lat, location.lng]}
                 to={[pointsArea.routeTo[0], pointsArea.routeTo[1]]}
-                isRouting={pointsArea.isRouting}
-                onChangeLocation={(lat, lng) => { setSelectedLocation({ lat, lng }) }}
+            // onChangeLocation={(lat, lng) => { setSelectedLocation({ lat, lng }) }}
             />}
             <LayersControl>
                 <LayersControl.BaseLayer checked name="Map mặc định">
@@ -210,9 +258,11 @@ interface IProps2 {
     placement: NominatimResult
     setSelectedLocation: (selectedLocation: SelectedLocationModel) => void
     landingPlan?: LandingPlanModel
+    latParams?: number
+    lngParams?: number
 }
 
-const MapViewUpdater = observer(({ placement, setSelectedLocation, landingPlan }: IProps2) => {
+const MapViewUpdater = observer(({ placement, setSelectedLocation, landingPlan, latParams, lngParams }: IProps2) => {
     const map = useMap();
     const { location } = useCoreStores().sessionStore;
     const { shouldFlyToLandingPlan, setShouldFlyToLandingPlan } = useManagementLandingPlan();
@@ -248,6 +298,13 @@ const MapViewUpdater = observer(({ placement, setSelectedLocation, landingPlan }
     }, [landingPlan, shouldFlyToLandingPlan, map]);
 
     useEffect(() => {
+        if (latParams && lngParams) {
+            map.flyTo([latParams, lngParams], 18, {
+                animate: true,
+                duration: 1,
+            });
+            return
+        }
         const handleGoToLocation = () => {
             if (location?.lat && location?.lng) {
                 map.flyTo([location.lat, location.lng], 18, {
@@ -281,16 +338,32 @@ interface IProps3 {
 const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3) => {
     // const { getInfoPlacement } = useManagementLandingPlan()
     const map = useMap();
-    const { searchCoordinatesLocation, pointsArea } = useManagementLandingPlan()
+    const { searchCoordinatesLocation, pointsArea, setHoveredPostId } = useManagementLandingPlan();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const isInitialMount = useRef(true);
 
     useMapEvents({
 
         moveend: async (e) => {
+            if (isInitialMount.current && searchParams.get('post_id')) {
+                isInitialMount.current = false;
+                return;
+            }
+
             const bounds = map.getBounds();
             const center = map.getCenter();
             const zoom = map.getZoom();
             const { lat, lng } = center;
             const radius = center.distanceTo(bounds.getNorthEast()); // bán kính tính bằng mét
+            setSearchParams(prev => {
+                const newParams = new URLSearchParams(prev);
+                newParams.set('lat', lat.toString());
+                newParams.set('lng', lng.toString());
+                newParams.delete('post_id'); // Remove post_id from URL
+                return newParams;
+            }, { replace: true });
+            setHoveredPostId(null);
+
             debounce(() => {
                 if (filter) {
                     filter.lat = lat;
@@ -299,6 +372,7 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
                     onRefresh && onRefresh();
                 }
             }, 300)();
+
         },
 
         click: async (e) => {
@@ -313,8 +387,8 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
                 return
             }
             if (pointsArea.isRouting) {
-                pointsArea.routeTo = [lat, lng]
                 setSelectedLocation({ lat, lng })
+                pointsArea.isRouting = false
                 // setSelectedLocation({lat: undefined, lng: undefined})
                 return
             }
@@ -330,3 +404,63 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
     return null;
 });
 
+interface RoutingProps {
+    from: [number, number];
+    to: [number, number];
+}
+
+const RoutingMachine = observer(({ from, to }: RoutingProps) => {
+    const map = useMap();
+    const routingControlRef = useRef<L.Routing.Control | null>(null);
+
+    useEffect(() => {
+        if (!map || !from || !to) return;
+
+        // Nếu đã có routing control cũ, xóa nó trước
+        if (routingControlRef.current) {
+            map.removeControl(routingControlRef.current);
+        }
+
+        // Tạo routing control mới
+        const routingControl = L.Routing.control({
+            waypoints: [
+                L.latLng(from[0], from[1]),
+                L.latLng(to[0], to[1])
+            ],
+            lineOptions: {
+                styles: [{ color: 'blue', weight: 4 }],
+                extendToWaypoints: true,
+                missingRouteTolerance: 100
+            },
+            altLineOptions: {
+                styles: [
+                    { color: 'gray', opacity: 0.4, weight: 3 }
+                ],
+                extendToWaypoints: true,
+                missingRouteTolerance: 100
+            },
+            router: L.Routing.osrmv1({
+                serviceUrl: `https://router.project-osrm.org/route/v1`,
+                language: 'vi'
+            }),
+            fitSelectedRoutes: true,
+            // addWaypoints: false,
+            useZoomParameter: true,
+            // show: false // Ẩn control panel mặc định
+        });
+
+        // Lưu reference để cleanup
+        routingControlRef.current = routingControl;
+        routingControl.addTo(map);
+
+        // Clean up khi component unmount hoặc dependencies thay đổi
+        return () => {
+            if (routingControlRef.current) {
+                map.removeControl(routingControlRef.current);
+                routingControlRef.current = null;
+            }
+        };
+    }, [map, from[0], from[1], to[0], to[1]]); // Thêm dependencies cụ thể
+
+    return null;
+});

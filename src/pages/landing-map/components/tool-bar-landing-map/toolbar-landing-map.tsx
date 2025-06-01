@@ -5,12 +5,14 @@ import { Collapse } from 'react-collapse';
 import { Colors } from 'src/assets';
 import { IconBase } from 'src/components';
 import { ModalNoteLandingMap } from 'src/components/modal-note-planing-map/modal-note-planing-map-container';
-import { useManagementLandingPlan } from 'src/core/modules';
+import { ChatBotModel } from 'src/core/models/chat-bot-model';
+import { useListChatbotContext, useManagementLandingPlan } from 'src/core/modules';
 import { ToolbarButton } from './button-toolbar-landing-map';
 
 export const ToolbarLandingMap = observer(() => {
     const [isOpen, setIsOpen] = useState(false);
     const { pointsArea, opacity, setOpacity, landingPlanMap } = useManagementLandingPlan()
+    const { message, setOpenDropdown, data, handleSendMessage, isOpenDropdown } = useListChatbotContext()
     const modalNoteLandingRef = useRef<any>(null);
     const handleToggleDraw = () => {
         pointsArea.isDraw = !pointsArea.isDraw;
@@ -29,17 +31,17 @@ export const ToolbarLandingMap = observer(() => {
         window.dispatchEvent(event);
     };
 
-    const handleToggleRouting = () => {
-        pointsArea.isRouting = !pointsArea.isRouting
-        if (pointsArea.isRouting) {
-            pointsArea.routeTo = undefined
-        }
-    }
+    // const handleToggleRouting = () => {
+    //     pointsArea.isRouting = !pointsArea.isRouting
+    //     if (pointsArea.isRouting) {
+    //         pointsArea.routeTo = undefined
+    //     }
+    // }
 
     const buttons = [
         { onClick: handleToggleDraw, icon: 'pin-outline', title: 'Đo đạc khu vực', active: pointsArea.isDraw },
         { onClick: handleReset, icon: 'delete-outline', title: 'Đặt lại khu vực', active: false },
-        { onClick: handleToggleRouting, icon: 'location-outline', title: 'Chỉ đường', active: pointsArea.isRouting },
+        // { onClick: handleToggleRouting, icon: 'location-outline', title: 'Chỉ đường', active: pointsArea.isRouting },
         { onClick: handleGoToMyLocation, icon: 'map-outline1', title: 'Định vị', active: false },
         { onClick: () => modalNoteLandingRef.current?.open(), icon: 'note-outline', title: 'Kí hiệu bản đồ quy hoạch', active: false },
     ];
@@ -79,6 +81,17 @@ export const ToolbarLandingMap = observer(() => {
                 ref={modalNoteLandingRef}
                 onCancel={() => modalNoteLandingRef.current?.close()}
                 centered
+                onClickDropdown={async (text) => {
+                    const temp = new ChatBotModel()
+                    temp.message = text
+                    temp.isMine = true
+                    data.push(temp)
+                    Object.assign(message, new ChatBotModel())
+                    if (!isOpenDropdown) setOpenDropdown(true)
+                    const res = await handleSendMessage(temp)
+                    if (res.Status) {
+                    }
+                }}
             />
         </>
     )

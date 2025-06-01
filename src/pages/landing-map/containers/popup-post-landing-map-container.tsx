@@ -46,7 +46,7 @@ export const PopupPostLandingMapContainer = memo(observer((props: IProps) => {
                     }}
                 />
                 <ButtonLoading
-                    label="Chi tiết"
+                    label="Chỉ đường"
                     template="ActionBlue"
                     className="!h-8 w-[100px] flex items-center justify-center text-[14px] leading-[16px] font-medium"
                     onClick={(e) => {

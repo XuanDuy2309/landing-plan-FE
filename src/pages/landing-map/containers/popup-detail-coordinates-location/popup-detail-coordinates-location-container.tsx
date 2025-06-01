@@ -39,6 +39,7 @@ export const PopupDetailCoordinatesLocationContainer = observer(() => {
                     <ButtonIcon
                         icon='close-outline'
                         onClick={() => {
+                            handleClear()
                         }}
                         size='xxs'
                     />

@@ -1,6 +1,6 @@
 import classNames from "classnames"
 import { observer } from "mobx-react"
-import { use, useEffect, useState } from "react"
+import { useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Colors } from "src/assets"
 import { IconBase } from "src/components"
@@ -12,12 +12,12 @@ export const SidebarSettingLayout = observer(() => {
     const menuSidebar = [
         {
             icon: "profile-outline",
-            title: "Info setting",
+            title: "Thông tin tài khoản",
             link: '/settings/info'
         },
         {
             icon: 'resetpassword-outline',
-            title: 'Change password',
+            title: 'Đổi mật khẩu',
             link: '/settings/pass'
         }
     ]

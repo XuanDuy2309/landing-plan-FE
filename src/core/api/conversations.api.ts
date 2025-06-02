@@ -16,5 +16,6 @@ export const ConversationsApi = {
     addMember: (id: number, params?: any) => server.post(`/conversations/${id}/members`, params),
     removeMember: (id: number, id_member: number, params?: any) => server.delete(`/conversations/${id}/members/${id_member}`, params),
     updateRoleMember: (id: number, id_member: number, params?: any) => server.patch(`/conversations/${id}/members/${id_member}/role`, params),
-    updateMuteMember: (id: number, params?: any) => server.patch(`/conversations/${id}/setting`, params),
+    updateMuteMember: (id: number, params?: any) => server.patch(`/conversations/${id}/settings`, params),
+    updateNickName: (id: number, member_id: number, params?: any) => server.patch(`/conversations/${id}/members/${member_id}/nickname`, params),
 }

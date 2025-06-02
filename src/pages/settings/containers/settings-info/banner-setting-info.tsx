@@ -54,7 +54,7 @@ export const BannerSettingInfo = observer(() => {
                     </div>
                     <ButtonLoading
                         size="xs"
-                        label="Edit background"
+                        label="Thay đổi ảnh bìa"
                         className="flex items-center justify-center rounded cursor-pointer"
                         template="ActionBase"
                         iconLeft="edit-outline"

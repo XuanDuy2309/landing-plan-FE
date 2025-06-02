@@ -4,7 +4,7 @@ import { ConversationModel } from "src/core/models";
 
 export class ManagerConversationContextType {
     selectedId: number | undefined = undefined
-    setSelectedId: (id: number) => void = () => { }
+    setSelectedId: (id: number|undefined) => void = () => { }
     itemUpdate: ConversationModel | undefined = undefined
     setItemUpdate: (item: ConversationModel | undefined) => void = () => { }
 }

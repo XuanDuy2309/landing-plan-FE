@@ -4,7 +4,7 @@ import moment from "moment"
 import { useCallback, useRef, useState } from "react"
 import InfiniteScroll from "react-infinite-scroll-component"
 import { useSocketEvent } from "src/core/hook"
-import { MessageModel } from "src/core/models"
+import { MessageModel, MessageType, UserModel } from "src/core/models"
 import {
     useListMessageContext,
     useManagerConversationContext
@@ -27,7 +27,6 @@ export const ListMessageContent = observer(() => {
     const [typing, setTyping] = useState<TypingType>();
 
     useSocketEvent<MessageModel>('new_message', (mess) => {
-        console.log(mess)
         if (mess.conversation_id === selectedId) {
             mess.is_new = true
             data.unshift(mess)
@@ -54,6 +53,42 @@ export const ListMessageContent = observer(() => {
                     data[index] = mess
                 }
             })
+        }
+    })
+
+    // Thêm thành viên mới
+    useSocketEvent('member_added', (payload: { conversation_id: number, user: UserModel, by_user: UserModel }) => {
+        if (payload.conversation_id === selectedId) {
+            const systemMessage = new MessageModel()
+            systemMessage.type = MessageType.SYSTEM
+            systemMessage.content = `${payload.by_user.nickname || payload.by_user.fullname} đã thêm ${payload.user.nickname || payload.user.fullname} vào nhóm`
+            systemMessage.created_at = moment().format('YYYY-MM-DD HH:mm:ss')
+            systemMessage.conversation_id = selectedId
+            data.unshift(systemMessage)
+        }
+    })
+
+    // Xóa thành viên
+    useSocketEvent('member_removed', (payload: { conversation_id: number, user: UserModel, by_user: UserModel }) => {
+        if (payload.conversation_id === selectedId) {
+            const systemMessage = new MessageModel()
+            systemMessage.type = MessageType.SYSTEM
+            systemMessage.content = `${payload.by_user.nickname || payload.by_user.fullname} đã xóa ${payload.user.nickname || payload.user.fullname} khỏi nhóm`
+            systemMessage.created_at = moment().format('YYYY-MM-DD HH:mm:ss')
+            systemMessage.conversation_id = selectedId
+            data.unshift(systemMessage)
+        }
+    })
+
+    // Thành viên rời nhóm
+    useSocketEvent('member_left', (payload: { conversation_id: number, user: UserModel }) => {
+        if (payload.conversation_id === selectedId) {
+            const systemMessage = new MessageModel()
+            systemMessage.type = MessageType.SYSTEM
+            systemMessage.content = `${payload.user.nickname || payload.user.fullname} đã rời khỏi nhóm`
+            systemMessage.created_at = moment().format('YYYY-MM-DD HH:mm:ss')
+            systemMessage.conversation_id = selectedId
+            data.unshift(systemMessage)
         }
     })
 

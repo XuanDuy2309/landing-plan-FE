@@ -1,9 +1,8 @@
 import { observer } from "mobx-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Colors } from "src/assets";
 import { IconBase } from "src/components";
-import { AuthApi } from "src/core/api";
+import { getColorFromId } from "src/core/base";
 import { useCoreStores } from "src/core/stores";
 
 interface IProps {
@@ -16,7 +15,7 @@ export const DropdownSettingHeader = observer(({ onSelect }: IProps) => {
     const listOptions = [
         {
             icon: 'settings-outline',
-            title: 'Setting account',
+            title: 'Thiết lập tài khoản',
             onclick: () => {
                 navigate('/settings/info')
                 onSelect && onSelect()
@@ -24,7 +23,7 @@ export const DropdownSettingHeader = observer(({ onSelect }: IProps) => {
         },
         {
             icon: 'logout-outline',
-            title: 'Logout',
+            title: 'Đăng xuất',
             onclick: () => {
                 handleLogout()
                 onSelect && onSelect()
@@ -42,7 +41,19 @@ export const DropdownSettingHeader = observer(({ onSelect }: IProps) => {
                 onSelect && onSelect()
             }}
         >
-            <img src={sessionStore.profile?.avatar} alt="" className="size-10 rounded-full" />
+            <div className='size-10 rounded-full flex items-center bg-gray-200 justify-center overflow-hidden'
+                style={{
+                    backgroundColor: getColorFromId(sessionStore.profile?.id || 0)
+                }}
+            >
+                {
+                    sessionStore.profile && sessionStore.profile?.avatar ?
+                        <img src={sessionStore.profile.avatar} alt="" className="size-full object-cover" />
+                        :
+                        <span className="text-2xl font-bold text-white">{sessionStore.profile?.fullname?.charAt(0).toUpperCase()}</span>
+
+                }
+            </div>
             <span className="text-xl font-medium text-gray-900">{sessionStore.profile?.fullname}</span>
         </div>
         <div className="w-full flex flex-col">

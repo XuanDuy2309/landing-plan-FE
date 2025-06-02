@@ -3,10 +3,10 @@ import classNames from "classnames"
 import { observer } from "mobx-react"
 import moment from "moment"
 import { useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { Colors } from "src/assets"
 import { ButtonLoading, IconBase } from "src/components"
-import { DetailMemberContextProvider, Type_List, useDetailMemberContext, useManagerMemberContext } from "src/core/modules"
+import { DetailMemberContextProvider, Type_List, useDetailMemberContext, useManagerConversationContext, useManagerMemberContext } from "src/core/modules"
 import { BannerDetailMember } from "../containers/member/banner-detail-member"
 import { ListImageDetailMember } from "../containers/member/list-image-detail-member"
 import { MemberPostContainer } from "../containers/member/member-post-container"
@@ -30,6 +30,8 @@ export const ProfileDetailScreen = observer(() => {
 const ProfileDetail = observer(() => {
     const [activeTab, setActiveTab] = useState(0);
     const { data, loading, isFollow, onFollow, onUnFollow } = useDetailMemberContext();
+    const { setSelectedId } = useManagerConversationContext();
+    const navigate = useNavigate();
     const dataTabs = [
         {
             label: "Bài viết",
@@ -53,8 +55,9 @@ const ProfileDetail = observer(() => {
         {
             key: '1',
             label: 'Tin nhắn',
-            onClick: () => {
-
+            onClick: async () => {
+                // Navigate to message screen
+                navigate('/home/message?user_id=' + data.id, { replace: true });
             },
             icon: <IconBase icon="mesage" size={16} color={'currentColor'} />
         },

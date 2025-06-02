@@ -4,17 +4,20 @@ import dayjs from "dayjs"
 import 'dayjs/locale/vi'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import debounce from "debounce"
+import { toJS } from "mobx"
 import { observer } from "mobx-react"
 import moment from "moment"
 import 'moment/locale/vi'; // import ngôn ngữ tiếng Việt
 import { useEffect, useRef } from "react"
 import InfiniteScroll from "react-infinite-scroll-component"
+import { useSearchParams } from "react-router-dom"
 import { Colors } from "src/assets"
 import { IconBase, ModalBase } from "src/components"
 import { ButtonIcon } from "src/components/button-icon"
+import { ConversationsApi } from "src/core/api"
 import { getColorFromId } from "src/core/base"
 import { useSocketEvent } from "src/core/hook"
-import { ConversationModel, MessageModel, MessageType, Type_Conversation } from "src/core/models"
+import { ConversationModel, MessageModel, MessageType, Type_Conversation, UserModel } from "src/core/models"
 import { ListConversationContextProvider, useListConversationContext, useManagerConversationContext } from "src/core/modules"
 import { useCoreStores } from "src/core/stores"
 import { ModalCreateConversation } from "./modal-create-conversation-container"
@@ -37,20 +40,53 @@ export const ListConversation = observer(() => {
     const { selectedId, setSelectedId } = useManagerConversationContext()
     const modalRef = useRef<any>(null)
     const { sessionStore } = useCoreStores()
+    const [searchParams] = useSearchParams();
+    const userId = searchParams.get("user_id");
+
+    const getConversationByUserId = async (id) => {
+        // Tìm conversation đã tồn tại
+        const existingConversation = data.find((item: ConversationModel) =>
+            item.type === Type_Conversation.Direct &&
+            item.members.some((m: UserModel) => m.id === id)
+        );
+
+        if (existingConversation) {
+            // Nếu đã có conversation thì focus vào nó
+            setSelectedId(existingConversation.id || 0);
+            return;
+        }
+
+        // Nếu chưa có thì tạo mới
+        const params = {
+            type: Type_Conversation.Direct,
+            members: [id],
+        }
+        const res = await ConversationsApi.addConversation(params)
+        if (res.Status) {
+            setSelectedId(res.Data.data.id)
+        }
+    }
+    useEffect(() => {
+        const messCount = toJS(data).reduce((total, item) => total + item.unread_count, 0)
+        sessionStore.setNewMessageCount(messCount)
+    }, [data])
+    
+    const hasCalledRef = useRef(false);
 
     useEffect(() => {
-        if (data.length > 0) {
-            const messCount = data.reduce((total: number, item: any) => {
-                return total + item.unread_count
-            }, 0)
-            sessionStore.setNewMessageCount(messCount)
+        if (userId && !hasCalledRef.current) {
+            hasCalledRef.current = true;
+            getConversationByUserId(Number(userId)).then(() => {
+                window.history.replaceState(null, '', window.location.pathname)
+            });
         }
-    }, [JSON.stringify(data)])
+    }, [userId]);
+
+
 
     useSocketEvent('notification_message', (dataMess: MessageModel) => {
         data.forEach((item: ConversationModel) => {
             if (item.id === dataMess.conversation_id) {
-                console.log(item.unread_count)
                 item.unread_count = item.unread_count + 1
                 item.last_message = new MessageModel()
                 item.last_message.sender_name = dataMess?.sender_name || ""
@@ -66,13 +102,14 @@ export const ListConversation = observer(() => {
         })
     })
 
-    useSocketEvent('new_message', (dataMess: any) => {
+    useSocketEvent('new_message', (dataMess: MessageModel) => {
         data.forEach((item: ConversationModel) => {
             if (item.id === dataMess.conversation_id) {
                 item.last_message = new MessageModel()
                 item.last_message.sender_name = dataMess.sender_name
                 item.updated_at = moment().format("YYYY-MM-DD HH:mm:ss")
                 item.last_message.content = dataMess.content
+                item.last_message.sender_nickname = dataMess.sender_nickname
                 if (dataMess.type === MessageType.IMAGE) {
                     item.last_message.content = 'Hình ảnh'
                 }
@@ -87,6 +124,7 @@ export const ListConversation = observer(() => {
         data.forEach((item, index) => {
             if (item.id === mess.conversation_id) {
                 item.last_message.content = mess.content
+                item.last_message.sender_nickname = mess.sender_nickname
                 item.updated_at = moment().format("YYYY-MM-DD HH:mm:ss")
                 item.last_message.sender_name = mess.sender_name
             }
@@ -97,6 +135,7 @@ export const ListConversation = observer(() => {
         data.forEach((item, index) => {
             if (item.id === mess.conversation_id) {
                 item.last_message.content = mess.content
+                item.last_message.sender_nickname = mess.sender_nickname
                 item.updated_at = moment().format("YYYY-MM-DD HH:mm:ss")
                 item.last_message.sender_name = mess.sender_name
             }
@@ -109,12 +148,47 @@ export const ListConversation = observer(() => {
         data.unshift(newConversation)
     })
 
+    useSocketEvent('added_to_conversation', (conversation: ConversationModel) => {
+        const newConversation = new ConversationModel()
+        Object.assign(newConversation, conversation)
+        data.unshift(newConversation)
+    })
+
+    useSocketEvent('leave_conversation', (message: MessageModel) => {
+        if (message.conversation_id) {
+            onRefresh()
+        }
+    })
+
     useSocketEvent('conversation_updated', (conversation: ConversationModel) => {
         const newConversation = new ConversationModel()
         Object.assign(newConversation, conversation)
         data.forEach((item, index) => {
             if (item.id === newConversation.id) {
                 data[index] = newConversation
+            }
+        })
+    })
+
+    useSocketEvent('conversation_deleted', (conversation: ConversationModel) => {
+        if (conversation.id) {
+            onRefresh()
+            setSelectedId(undefined)
+        }
+    })
+
+    useSocketEvent("nickname_updated", (dataUser: any) => {
+        data.forEach((item: ConversationModel) => {
+            if (dataUser.conversation_id === item.id && item.last_message.sender_id === dataUser.id) {
+                item.last_message.sender_nickname = dataUser.nickname
+                item.last_message.sender_name = dataUser.fullname
+                const isDirect = item.type === Type_Conversation.Direct;
+                const targetMember = isDirect
+                    ? item.members.find(m => m.id !== sessionStore.profile?.id)
+                    : undefined;
+                if (targetMember) {
+                    targetMember.nickname = dataUser.nickname;
+                }
             }
         })
     })
@@ -157,7 +231,7 @@ export const ListConversation = observer(() => {
 
 
     return (
-        <div className={classNames("w-full flex flex-col transition-all ease-linear duration-500 border-gray-200"
+        <div className={classNames("w-full flex flex-col min-h-0 transition-all ease-linear duration-500 border-gray-200"
         )}>
             <div className="w-full h-12 flex flex-none items-center justify-between px-3 ">
                 <span className="text-lg font-medium text-gray-700">{"Tin nhắn"}</span>
@@ -182,11 +256,14 @@ export const ListConversation = observer(() => {
                 <div className="w-full h-full flex flex-col overflow-y-auto">
                     <div id={"list_conversation"} className="w-full py-4 h-full flex flex-col items-center overflow-y-auto scroll-hide">
                         <InfiniteScroll
-                            dataLength={data.length} //This is important field to render the next data
+                            dataLength={data.length}
                             next={() => {
-                                fetchMore()
+                                // Chỉ fetchMore khi thực sự cần
+                                if (data.length > 0) {
+                                    fetchMore()
+                                }
                             }}
-                            hasMore={hasMore()}
+                            hasMore={hasMore() && data.length > 0}
                             refreshFunction={onRefresh}
                             loader={<div className="w-full items-center justify-center flex">
                                 <Spin />
@@ -207,9 +284,11 @@ export const ListConversation = observer(() => {
                                             )}
                                                 onClick={() => {
                                                     setSelectedId(item.id || 0)
+                                                    const unread = item.unread_count
                                                     item.unread_count = 0
-                                                    sessionStore.setNewMessageCount(sessionStore.new_message_count - item.unread_count)
+                                                    sessionStore.setNewMessageCount(sessionStore.new_message_count - unread)
                                                 }}
+
                                                 key={index}
                                             >
                                                 {
@@ -218,10 +297,10 @@ export const ListConversation = observer(() => {
 
                                                 <div className="flex flex-col w-full relative">
                                                     <span className="text-lg font-medium text-gray-700 line-clamp-1 max-w-[260px] leading-[24px]">
-                                                        {item.type === Type_Conversation.Direct ? item.members.filter((i) => i.id !== sessionStore.profile?.id)[0].fullname : item.name}
+                                                        {item.type === Type_Conversation.Direct ? (item.members.find(m => m.id !== sessionStore.profile?.id)?.nickname || item.members.find(m => m.id !== sessionStore.profile?.id)?.fullname) : item.name}
                                                     </span>
                                                     <div className="w-full flex items-center justify-between max-w-[260px]">
-                                                        {item.last_message && <span className="text-xs text-gray-500 line-clamp-1">{item.last_message.sender_name}: {item.last_message.content}</span>}
+                                                        {item.last_message && <span className="text-xs text-gray-500 line-clamp-1">{item.last_message.sender_nickname || item.last_message.sender_name}: {item.last_message.content}</span>}
                                                         <span className="flex-none text-gray-500">{item.updated_at ? dayjs(item.updated_at).fromNow() : ''}</span>
                                                     </div>
                                                     {

@@ -16,7 +16,8 @@ export const enum MessageType {
     EMOJI = 'emoji',
     AUDIO_CALL = 'audio_call',
     VIDEO_CALL = 'video_call',
-    MENTION = 'mention'
+    MENTION = 'mention',
+    SYSTEM = 'system'
 }
 
 export const enum Status_Conversation {
@@ -41,6 +42,7 @@ export class MessageModel {
     mentioned_users: any = []
     sender_id?: number
     sender_name?: string
+    sender_nickname?: string
     sender_avatar?: string
     is_new: boolean = false
     is_edited: boolean = false
@@ -48,6 +50,7 @@ export class MessageModel {
     reply_sender_id?: number
     reply_sender_name?: string
     reply_type?: MessageType
+    reply_sender_nickname?: string
 
     constructor() {
         makeAutoObservable(this)

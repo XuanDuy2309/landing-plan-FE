@@ -8,7 +8,8 @@ import { Colors } from "src/assets"
 import { IconBase } from "src/components"
 import { ModalConfirm } from "src/components/modal-confirm/modal-confim"
 import { getColorFromId } from "src/core/base"
-import { MessageModel, MessageType } from "src/core/models"
+import { useSocketEvent } from "src/core/hook"
+import { MessageModel, MessageType, UserModel } from "src/core/models"
 import { useListMessageContext } from "src/core/modules"
 import { useCoreStores } from "src/core/stores"
 
@@ -93,6 +94,13 @@ export const ItemMessage = observer(({ message, index, messages }: IProps) => {
             </div>
         )
     }
+
+    useSocketEvent("nickname_updated", (data: UserModel) => {
+        if (message.sender_id === data.id) {
+            message.sender_nickname = data.nickname
+            message.sender_name = data.fullname
+        }
+    })
     return (
 
         <div
@@ -104,6 +112,9 @@ export const ItemMessage = observer(({ message, index, messages }: IProps) => {
                 {
                     'mt-4': !isSequence
                 },)}>
+            {!isMine && !isSequence && message.type !== MessageType.SYSTEM && (
+                <span className="text-sm text-gray-600 ml-12 mb-1 block">{message.sender_nickname || message.sender_name}</span>
+            )}
             {message.reply_id && (
                 <div className={classNames("flex items-center space-x-2",
                     {
@@ -115,9 +126,9 @@ export const ItemMessage = observer(({ message, index, messages }: IProps) => {
                 )}>
                     <IconBase icon="share-outline" size={16} color={Colors.gray[600]} />
                     {isMine ? (
-                        <span>Bạn đã trả lời {isMyMessage(message.reply_sender_id || 0) ? "chính mình" : message.reply_sender_name}</span>
+                        <span>Bạn đã trả lời {isMyMessage(message.reply_sender_id || 0) ? "chính mình" : (message.reply_sender_nickname || message.reply_sender_name)}</span>
                     ) : (
-                        <span>{message.sender_name} đã trả lời tin nhắn của {isMyMessage(message.reply_sender_id || 0) ? "bạn" : message.reply_sender_name}</span>
+                        <span>{message.sender_nickname || message.sender_name} đã trả lời tin nhắn của {isMyMessage(message.reply_sender_id || 0) ? "bạn" : (message.reply_sender_nickname || message.reply_sender_name)}</span>
                     )}
 
                 </div>
@@ -164,93 +175,104 @@ export const ItemMessage = observer(({ message, index, messages }: IProps) => {
                     "-mt-2": message.reply_id
                 },
                 {
-                    'flex-row-reverse': isMine
+                    'flex-row-reverse': isMine && message.type !== MessageType.SYSTEM
+                },
+                {
+                    'justify-center': message.type === MessageType.SYSTEM
                 },
                 {
                     'animate-fade-in': message.is_new
                 })
             }  >
+                {/* System message */}
+                {message.type === MessageType.SYSTEM && (
+                    <div className="w-full flex justify-center">
+                        <div className="px-4">
+                            <span className="text-sm text-gray-600 font-medium">{message.content}</span>
+                        </div>
+                    </div>
+                )}
 
+                {/* Normal message */}
+                {message.type !== MessageType.SYSTEM && (
+                    <>
+                        {!isMine && isEndOfSequence && (
+                            <div className="w-8 h-8 mt-2 rounded-full bg-gray-300 overflow-hidden flex-shrink-0 mb-5 flex items-center justify-center"
+                                style={{ backgroundColor: getColorFromId(message.sender_id || 0) }}>
+                                {message.sender_avatar ? (
+                                    <img src={message.sender_avatar} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="text-2xl font-bold text-white">
+                                        {message.sender_name?.charAt(0).toUpperCase()}
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                        {!isMine && !isEndOfSequence && <div className="w-8 flex-shrink-0" />}
 
-                {
-                    !isMine && isEndOfSequence && (
-                        <div
-                            className="w-8 h-8 mt-2 rounded-full bg-gray-300 overflow-hidden flex-shrink-0 mb-5 flex items-center justify-center"
-                            style={{ backgroundColor: getColorFromId(message.sender_id || 0) }}
-                        >
-                            {message.sender_avatar ? (
-                                <img src={message.sender_avatar} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                                <span className="text-2xl font-bold text-white">
-                                    {message.sender_name?.charAt(0).toUpperCase()}
-                                </span>
+                        <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'} max-w-[60%] relative group`}>
+                            {/* Message actions */}
+                            <div className={`absolute ${isMine ? 'left-0 -translate-x-full' : 'right-0 translate-x-full'} top-1/2 -translate-1/2 hidden group-hover:flex items-center space-x-1 px-2`}>
+                                <button className="p-1 flex-none hover:bg-gray-100 rounded-full cursor-pointer"
+                                    onClick={() => setReplyMess(message)}
+                                >
+                                    <IconBase icon="share-outline" size={16} color={Colors.gray[600]} />
+                                </button>
+                                {message.content && (
+                                    <button className="p-1 flex-none hover:bg-gray-100 rounded-full"
+                                        onClick={() => handleCopyText()}
+                                    >
+                                        <IconBase icon="copy-outline" size={16} color={Colors.gray[600]} />
+                                    </button>
+                                )}
+                                {message.content && message.type === MessageType.TEXT && isMyMessage(message.sender_id || 0) && (
+                                    <Dropdown trigger={['click']} menu={{ items }}>
+                                        <button className="p-1 flex-none hover:bg-gray-100 rounded-full">
+                                            <IconBase icon="more-2" size={16} color={Colors.gray[600]} />
+                                        </button>
+                                    </Dropdown>
+                                )}
+                            </div>
+
+                            {/* File/Image preview */}
+                            {message.type !== MessageType.TEXT && (
+                                <Tooltip
+                                    title={moment(message.created_at).format('HH:mm DD/MM/YYYY')}
+                                    placement={isMine ? 'left' : 'right'}
+                                >
+                                    <div className="mb-1">
+                                        {renderFilePreview(message.type, message.content || '')}
+                                    </div>
+                                </Tooltip>
+                            )}
+
+                            {/* Text message */}
+                            {message.type === MessageType.TEXT && (
+                                <Tooltip
+                                    title={moment(message.created_at).format('HH:mm DD/MM/YYYY')}
+                                    placement={isMine ? 'left' : 'right'}
+                                >
+                                    <div
+                                        className={`px-4 py-2 rounded-2xl break-words select-text ${isMine
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-gray-100 text-gray-900'}`}
+                                    >
+                                        <span className="whitespace-pre-line">{message.content}</span>
+                                    </div>
+                                </Tooltip>
                             )}
                         </div>
-                    )
-                }
-                {!isMine && !isEndOfSequence && <div className="w-8 flex-shrink-0" />}
-
-                <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'} max-w-[60%] relative group`}>
-                    {/* Message actions */}
-                    <div className={`absolute ${isMine ? 'left-0 -translate-x-full' : 'right-0 translate-x-full'} top-1/2 -translate-1/2 hidden group-hover:flex items-center space-x-1 px-2`}>
-                        <button className="p-1 flex-none hover:bg-gray-100 rounded-full cursor-pointer"
-                            onClick={() => setReplyMess(message)}
-                        >
-                            <IconBase icon="share-outline" size={16} color={Colors.gray[600]} />
-                        </button>
-                        {message.content && (
-                            <button className="p-1 flex-none hover:bg-gray-100 rounded-full"
-                                onClick={() => handleCopyText()}
-                            >
-                                <IconBase icon="copy-outline" size={16} color={Colors.gray[600]} />
-                            </button>
-                        )}
-                        {message.content && message.type === MessageType.TEXT && isMyMessage(message.sender_id || 0) && (
-                            <Dropdown trigger={['click']} menu={{ items }}>
-                                <button className="p-1 flex-none hover:bg-gray-100 rounded-full">
-                                    <IconBase icon="more-2" size={16} color={Colors.gray[600]} />
-                                </button>
-                            </Dropdown>
-                        )}
-                    </div>
-
-                    {/* File/Image preview */}
-                    {message.type !== MessageType.TEXT && (
-                        <Tooltip
-                            title={moment(message.created_at).format('HH:mm DD/MM/YYYY')}
-                            placement={isMine ? 'left' : 'right'}
-                        >
-                            <div className="mb-1">
-                                {renderFilePreview(message.type, message.content || '')}
-                            </div>
-                        </Tooltip>
-                    )}
-
-                    {/* Text message */}
-                    {message.type === MessageType.TEXT && (
-                        <Tooltip
-                            title={moment(message.created_at).format('HH:mm DD/MM/YYYY')}
-                            placement={isMine ? 'left' : 'right'}
-                        >
-                            <div
-                                className={`px-4 py-2 rounded-2xl break-words select-text ${isMine
-                                    ? 'bg-blue-500 text-white'
-                                    : 'bg-gray-100 text-gray-900'}`}
-                            >
-                                <span className="whitespace-pre-line">{message.content}</span>
-                            </div>
-                        </Tooltip>
-                    )}
-                </div>
-                <ModalConfirm
-                    ref={modalRef}
-                    label="Xoá tin nhắn"
-                    onConfirm={async () => {
-                        modalRef.current?.close()
-                        await onDeleteMessage(message.conversation_id, message.id)
-                    }}
-                    onCancel={() => modalRef.current?.close()}
-                />
+                        <ModalConfirm
+                            ref={modalRef}
+                            label="Xoá tin nhắn"
+                            onConfirm={async () => {
+                                modalRef.current?.close()
+                                await onDeleteMessage(message.conversation_id, message.id)
+                            }}
+                            onCancel={() => modalRef.current?.close()}
+                        />
+                    </>
+                )}
             </div >
         </div>
     )

@@ -45,8 +45,8 @@ const CreateConversationContainer = observer(({ onSave, onClose }: IProps) => {
                         const res = itemUpdate ? await onAddNewMember() : await onSubmit()
                         if (res.Status) {
                             toast.success(res.Message)
-                            onSave()
                             onRefresh()
+                            onSave()
                             return
                         }
                         toast.error(res.Message)

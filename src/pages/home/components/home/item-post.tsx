@@ -57,8 +57,7 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
             key: '3',
             label: 'Liên hệ ngay',
             onClick: () => {
-                navigate(`/home/profile/${item.create_by_id}`)
-
+                navigate(`/home/message?user_id=${item.create_by_id}`);
             },
         },
         ...(item.create_by_id === user?.id

@@ -24,7 +24,6 @@ export const ListUserSelectedContainer = observer(({ type, title }: IProps) => {
 const ListUserSelected = observer(({ type, title }: IProps) => {
     const { data, loading, fetchMore, hasMore, onRefresh, filter } = useListUserContext()
     const { data: dataCreated, listMember } = useCreateConversationContext()
-    console.log(listMember)
     return (
         <div className={classNames("w-full flex flex-col transition-all ease-linear duration-500",
         )}>

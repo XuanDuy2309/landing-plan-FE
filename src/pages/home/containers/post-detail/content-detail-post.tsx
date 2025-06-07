@@ -193,6 +193,10 @@ export const ContentDetailPost = observer(() => {
                         <span>{data.in_alley ? typeAlley[data.in_alley].label : ""}</span>
                     </div>
                     <div className="w-full flex items-center space-x-2 ">
+                        <span className=" w-[140px]">Loại đất:</span>
+                        <span className="line-clamp-1">{data.type_landing_name} ({data.type_landing_code})</span>
+                    </div>
+                    <div className="w-full flex items-center space-x-2 ">
                         <span className=" w-[140px]">Diện tích:</span>
                         <span>{data.area} m2</span>
                     </div>

@@ -32,6 +32,7 @@ export const PopupPostLandingMapContainer = memo(observer((props: IProps) => {
                         {props.item.title}
                     </span>
                     <span>Diện tích: <strong >{props.item.area} m²</strong> - {formatMoney(Number(props.item?.price_for_buy), 1, 'vn')}</span>
+                    <span>Loại đất: <strong >{props.item.type_landing_name} ({props.item.type_landing_code})</strong></span>
                 </div>
             </div>
 

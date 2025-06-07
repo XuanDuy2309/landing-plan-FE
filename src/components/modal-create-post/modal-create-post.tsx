@@ -14,9 +14,11 @@ interface IProps {
     type?: Purpose_Post
     onSave: (item?: string) => void
     onClose: () => void
+    lat?: number
+    lng?: number
 }
 
-export const ModalCreatePost = observer(({ type, onSave, onClose }: IProps) => {
+export const ModalCreatePost = observer(({ type, onSave, onClose, lat, lng }: IProps) => {
     return <CreatePostContextProvider>
         <CreatePostContainer type={type} onSave={onSave} onClose={onClose} />
     </CreatePostContextProvider>

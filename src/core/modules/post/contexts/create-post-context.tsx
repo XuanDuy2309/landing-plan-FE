@@ -23,6 +23,8 @@ export const CreatePostContext = React.createContext<CreatePostContextType>(new 
 
 interface IProps {
     children: React.ReactNode
+    lat?: number
+    lng?: number
 }
 
 export const enum ActionMap {
@@ -31,7 +33,7 @@ export const enum ActionMap {
     Get_width_height = 3
 }
 
-export const CreatePostContextProvider = observer(({ children }: IProps) => {
+export const CreatePostContextProvider = observer(({ children, lat, lng }: IProps) => {
     const [data, setData] = React.useState<PostModel>(new PostModel());
     const [loading, setLoading] = React.useState<boolean>(false);
     const [openMap, setOpenMap] = React.useState<boolean>(false);
@@ -183,6 +185,12 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
             }
         }
 
+        // kiem tra bat buoc loai dat
+        if (!data.type_landing_id) {
+            isValid = false
+            data.err_type_landing = 'Vui lòng chọn loại đất'
+        }
+
         return isValid
     }
 
@@ -224,6 +232,7 @@ export const CreatePostContextProvider = observer(({ children }: IProps) => {
             "owner_name": data.owner_name,
             "owner_phone": data.owner_phone,
             "group_id": data.group_id,
+            "type_landing_id": data.type_landing_id
         }
 
         let res: BaseResponse = {

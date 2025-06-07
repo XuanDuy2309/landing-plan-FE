@@ -3,6 +3,7 @@ import { observer } from "mobx-react";
 import { Colors } from "src/assets";
 import { Purpose_Post, Type_Asset_Enum } from "src/core/models";
 import { useCreatePostContext } from "src/core/modules";
+import { DropdownSelectLandingType } from "../dropdown-select-landing-type";
 import { IconBase } from "../icon-base";
 import { ModalMapContainer } from "../modal-map";
 import { RadioGroup } from "../radio-group";
@@ -155,6 +156,16 @@ export const ContentCreatePost = observer(() => {
                                 <IconBase icon='arrowdown' size={16} color={Colors.gray[700]} />
                             </div>
                         </Dropdown>
+                    </div>
+                    <div className="px-3 w-[512px]">
+                        <DropdownSelectLandingType
+                            onSelect={(item) => {
+                                data.type_landing_id = item.id
+                                data.type_landing = item
+                            }}
+                            value={data.type_landing?.name}
+                            error={data.err_type_landing}
+                        />
                     </div>
                 </div>
                 <TitleDescription />

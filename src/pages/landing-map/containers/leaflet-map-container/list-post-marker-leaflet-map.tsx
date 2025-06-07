@@ -62,9 +62,9 @@ export const ListPostMarkerLeafletMap = observer(() => {
                 const hasPolygon = Array.isArray(coordinates) && coordinates.length >= 3;
 
                 return (
-                    <Pane key={item.id || index} name={`pane-${item.id}`} style={{ zIndex: 9999999 }}>
-                        <Fragment key={item.id || index}>
-                            {lat && lng && (
+                    <Fragment key={item.id || index}>
+                        {lat && lng && (
+                            <Pane key={item.id || index} name={`pane-${item.id}`} style={{ zIndex: 9999999 }}>
                                 <Marker
                                     pane={`pane-${item.id}`}
                                     position={[lat, lng]}
@@ -83,22 +83,22 @@ export const ListPostMarkerLeafletMap = observer(() => {
                                         />
                                     </Popup>
                                 </Marker>
-                            )}
+                            </Pane>
+                        )}
 
-                            {hasPolygon && (
-                                <Polygon
-                                    positions={coordinates.map(([lng, lat]: number[]) => [lat, lng])}
-                                    pathOptions={{
-                                        color: hoveredPostId === item.id ? Colors.red[500] : getColorFromId(item.id!),
-                                        fillOpacity: 0.2,
-                                        weight: 2,
-                                    }}
-                                >
-                                    {map.getZoom() > 18 && <Tooltip direction="center" permanent>{item.title} - {item.area} m²</Tooltip>}
-                                </Polygon>
-                            )}
-                        </Fragment>
-                    </Pane>
+                        {hasPolygon && (
+                            <Polygon
+                                positions={coordinates.map(([lng, lat]: number[]) => [lat, lng])}
+                                pathOptions={{
+                                    color: hoveredPostId === item.id ? Colors.red[500] : getColorFromId(item.id!),
+                                    fillOpacity: 0.2,
+                                    weight: 2,
+                                }}
+                            >
+                                {map.getZoom() > 18 && <Tooltip direction="center" permanent>{item.title} - {item.area} m²</Tooltip>}
+                            </Polygon>
+                        )}
+                    </Fragment>
                 );
             })}
         </>

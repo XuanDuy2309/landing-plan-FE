@@ -119,21 +119,28 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
     }
 
     const searchLandingPlan = async (lat: number, lon: number, radius?: number) => {
-        const params = {
-            lat: lat,
-            lon: lon,
-            radius: radius
-        }
-        const res = await LandingPlanApi.searchLandingPlan(params)
-        if (res.Status) {
-            setLandingPlanMap(res.Data.data)
-            setSelectedLandingPlan(res.Data.data[0])
+        try {
+            const [res, res2] = await Promise.all([
+                LandingPlanApi.searchLandingPlan({ lat, lon, radius }),
+                LandingPlanApi.searchLandingPlan({ lat, lon })
+            ]);
+
+            if (res.Status && res2.Status) {
+                setLandingPlanMap(res.Data.data);
+                if (res2.Data.data.length > 0) {
+                    setSelectedLandingPlan(res2.Data.data[0]);
+                }
+            } else {
+                setLandingPlanMap([]);
+                setSelectedLandingPlan(undefined);
+            }
+        } catch (error) {
+            console.error("searchLandingPlan error:", error);
+            setLandingPlanMap([]);
+            setSelectedLandingPlan(undefined);
+        } finally {
             setShouldFlyToLandingPlan(false);
-            return
         }
-        setShouldFlyToLandingPlan(false);
-        setLandingPlanMap([])
-        setSelectedLandingPlan(undefined)
     }
 
 

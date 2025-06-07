@@ -1,5 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import moment from "moment";
+import { LandingTypeModel } from "./landing-type-model";
 
 export enum Type_Post {
     Public = 1,
@@ -131,6 +132,12 @@ export class PostModel {
     err_step_bid?: string;
     err_max_bid?: string;
 
+    type_landing_id?: number
+    type_landing?: LandingTypeModel
+    type_landing_code?: string
+    type_landing_name?: string
+    type_landing_color?: string
+    err_type_landing?: string
 
     constructor() {
         makeAutoObservable(this)

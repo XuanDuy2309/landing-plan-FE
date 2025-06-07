@@ -1,14 +1,21 @@
 import { observer } from 'mobx-react'
-import React from 'react'
-import { ButtonLoading } from 'src/components'
+import React, { useRef } from 'react'
+import { ButtonLoading, ModalBase, ModalCreatePost } from 'src/components'
 import { ButtonIcon } from 'src/components/button-icon'
 import { useManagementLandingPlan } from 'src/core/modules'
 
 export const PopupDetailCoordinatesLocationContainer = observer(() => {
     const { coordinates, placementInfo, setPlacementInfo, pointsArea, selectedLocation } = useManagementLandingPlan()
     const [_, forceUpdate] = React.useReducer(x => x + 1, 0)
+    const modalRef = useRef<any>(null)
 
-    if (!placementInfo) return null
+    if (!placementInfo) return <>
+        <ModalBase
+            ref={modalRef}
+        >
+            <ModalCreatePost onClose={() => { modalRef.current.close() }} onSave={(item) => { modalRef.current.close() }} />
+        </ModalBase>
+    </>
 
     // const renderAddres = () => {
     //   if(coordinates.address) {
@@ -29,33 +36,46 @@ export const PopupDetailCoordinatesLocationContainer = observer(() => {
     }
 
     return (
-        <div className="w-[480px] space-y-3 px-3 pt-3 absolute bottom-6 left-1/2 -translate-x-1/2 bg-white z-[99999] shadow-lg rounded-[4px] text-gray-900 text-[14px] leading-[20px]">
-            <div className="flex items-start justify-between">
-                <div className='flex flex-col'>
-                    <span className='font-medium text-[15px] line-clamp-2'>{placementInfo.display_name}</span>
-                    <span className='text-[12px] text-blue-600'>{selectedLocation.lat}, {selectedLocation.lng}</span>
+        <>
+            <div className="w-[480px] space-y-3 px-3 pt-3 absolute bottom-6 left-1/2 -translate-x-1/2 bg-white z-[99999] shadow-lg rounded-[4px] text-gray-900 text-[14px] leading-[20px]">
+                <div className="flex items-start justify-between">
+                    <div className='flex flex-col'>
+                        <span className='font-medium text-[15px] line-clamp-2'>{placementInfo.display_name}</span>
+                        <span className='text-[12px] text-blue-600'>{selectedLocation.lat}, {selectedLocation.lng}</span>
+                    </div>
+                    <div className="flex flex-none">
+                        <ButtonIcon
+                            icon='close-outline'
+                            onClick={() => {
+                                handleClear()
+                            }}
+                            size='xxs'
+                        />
+                    </div>
                 </div>
-                <div className="flex flex-none">
-                    <ButtonIcon
-                        icon='close-outline'
-                        onClick={() => {
-                            handleClear()
-                        }}
-                        size='xxs'
-                    />
+
+                <div className="w-full flex items-center justify-end space-x-2 px-1 flex-none h-14 border-t border-gray-200">
+                    <ButtonLoading label="Huỷ bỏ" template="ActionBase" size="xs" onClick={() => {
+                        handleClear()
+                    }} />
+                    {/* <ButtonLoading iconLeft='location-outline' label="Đăng bài" template="ActionBlueOutline" size="xs" onClick={() => {
+                        modalRef.current.open();
+                        handleClear()
+                    }} /> */}
+                    <ButtonLoading iconLeft='share-outline' label="Chỉ đường" template="ActionBlue" size="xs" onClick={() => {
+                        handleSubmit()
+                    }} />
                 </div>
+
             </div>
 
-            <div className="w-full flex items-center justify-end space-x-2 px-1 flex-none h-14 border-t border-gray-200">
-                <ButtonLoading label="Huỷ bỏ" template="ActionBase" size="xs" onClick={() => {
-                    handleClear()
-                }} />
-                <ButtonLoading iconLeft='share-outline' label="Chỉ đường" template="ActionBlue" size="xs" onClick={() => {
-                    handleSubmit()
-                }} />
-            </div>
+            <ModalBase
+                ref={modalRef}
+            >
+                <ModalCreatePost onClose={() => { modalRef.current.close() }} onSave={(item) => { modalRef.current.close() }} />
+            </ModalBase>
 
-        </div>
+        </>
     )
 }
 )

@@ -5,7 +5,7 @@ import { ButtonIcon } from 'src/components/button-icon'
 import { ActionMap, useCreatePostContext, useManagementLandingPlan } from 'src/core/modules'
 
 export const PopupDetailLocationContainer = observer(() => {
-    const { placementInfo, setPlacementInfo } = useManagementLandingPlan()
+    const { placementInfo, setPlacementInfo, selectedLocation } = useManagementLandingPlan()
     const { data, setOpenMap, action, setAction, setMessage } = useCreatePostContext()
     const { pointsArea, opacity, setOpacity } = useManagementLandingPlan()
 
@@ -27,8 +27,8 @@ export const PopupDetailLocationContainer = observer(() => {
     const handleSubmit = () => {
         if (action === ActionMap.Select_location) {
             data.address = placementInfo.display_name
-            data.lat = Number(placementInfo.lat)
-            data.lng = Number(placementInfo.lon)
+            data.lat = Number(selectedLocation.lat)
+            data.lng = Number(selectedLocation.lng)
             setAction(ActionMap.Select_coordinate)
             pointsArea.isDraw = true;
             if (pointsArea.isDraw) {

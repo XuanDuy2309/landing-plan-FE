@@ -24,7 +24,7 @@ export const MessageChatBotContainer = observer(() => {
 
     return (
         <div
-            className='h-[350px] w-[300px] rounded-[4px] bg-white shadow-[0_2px_4px_rgba(0,0,0,0.2),0_-1px_0px_rgba(0,0,0,0.02)] min-h-0 flex flex-col'
+            className='h-[600px] w-[500px] rounded-[4px] bg-white shadow-[0_2px_4px_rgba(0,0,0,0.2),0_-1px_0px_rgba(0,0,0,0.02)] min-h-0 flex flex-col'
         >
             <ChatBotHeader />
             <ListMessageChatBotContainer />

@@ -18,6 +18,7 @@ export const ModalMapEvents = observer(({ setSelectedLocation, pointsArea }: IPr
             const { lat, lng } = e.latlng;
             if (!pointsArea.isDraw && !pointsArea.isRouting) {
                 map.setView([lat, lng], map.getZoom());
+                console.log('click', lat, lng)
                 setSelectedLocation({ lat, lng })
                 return
             }

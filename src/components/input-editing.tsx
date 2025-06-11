@@ -45,7 +45,6 @@ export const InputEditing = forwardRef(({ active, maxLength, isLink, autoFocus, 
     }
 
     const clearInput = () => {
-        console.log('clearInput')
         setStr('')
         if (onChange)
             onChange("")

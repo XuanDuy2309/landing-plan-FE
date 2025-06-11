@@ -20,4 +20,5 @@ export const AuthApi = {
     checkFollow: (params?: any) => server.get('/user/check_follow', params),
     getListUser: (params?: any) => server.get('/user', params),
     getDetailUser: (params?: any) => server.get('/user/' + params.id, params),
+    deleteUpload: (id?: number) => server.delete('/auth/delete/' + id),
 }

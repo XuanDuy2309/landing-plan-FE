@@ -55,15 +55,6 @@ export const LeafletMapCore = observer(({ MapEvent, MapViewUpdater, RoutingMachi
                     />
                 </LayersControl.BaseLayer>
             </LayersControl>
-            {landingPlanMap && landingPlanMap.folder_path && <TileLayer
-                url={`http://localhost:3000/${landingPlanMap?.folder_path}/{z}/{x}/{y}.png`}
-                // pane="overlayPane"
-                minZoom={12}
-                maxZoom={18}
-                opacity={opacity}
-                zIndex={999}
-                tms={true}
-            />}
 
             {selectedLocation.lat && selectedLocation.lng && (
                 <Marker position={[Number(selectedLocation.lat), Number(selectedLocation.lng)]}>

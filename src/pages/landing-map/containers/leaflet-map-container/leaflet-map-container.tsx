@@ -265,7 +265,7 @@ interface IProps2 {
 const MapViewUpdater = observer(({ placement, setSelectedLocation, landingPlan, latParams, lngParams }: IProps2) => {
     const map = useMap();
     const { location } = useCoreStores().sessionStore;
-    const { shouldFlyToLandingPlan, setShouldFlyToLandingPlan } = useManagementLandingPlan();
+    const { shouldFlyToLandingPlan, setShouldFlyToLandingPlan, openSidebar } = useManagementLandingPlan();
 
     useEffect(() => {
         if (placement?.lat && placement?.lon) {
@@ -325,7 +325,7 @@ const MapViewUpdater = observer(({ placement, setSelectedLocation, landingPlan, 
         return () => {
             window.removeEventListener('go-to-current-location', handleGoToLocation);
         };
-    }, [map, location.lat, location.lng]);
+    }, [map, location.lat, location.lng, openSidebar]);
 
     return null;
 });
@@ -338,7 +338,7 @@ interface IProps3 {
 const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3) => {
     // const { getInfoPlacement } = useManagementLandingPlan()
     const map = useMap();
-    const { searchCoordinatesLocation, pointsArea, setHoveredPostId } = useManagementLandingPlan();
+    const { searchCoordinatesLocation, pointsArea, setHoveredPostId, setListCoordinates, listCoordinates } = useManagementLandingPlan();
     const [searchParams, setSearchParams] = useSearchParams();
     const isInitialMount = useRef(true);
 
@@ -377,6 +377,22 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
 
         click: async (e) => {
             const { lat, lng } = e.latlng;
+            
+            // Khi vẽ xong polygon (isDraw = false) và có ít nhất 3 điểm
+            if (!pointsArea.isDraw && pointsArea.points.length >= 3) {
+                const coordinate = pointsArea.points.map((item) => {
+                    return item.join(' ') 
+                }).join(', ')
+                console.log('coordinate', coordinate)
+                // Thêm polygon mới vào listCoordinates
+                setListCoordinates([...listCoordinates, 'POLYGON((' + coordinate + '))'])
+                // Reset points để vẽ polygon mới
+                pointsArea.points = [];
+                pointsArea.area = 0;
+                return;
+            }
+
+            // Logic chọn vị trí và routing
             if (!pointsArea.isDraw && !pointsArea.isRouting) {
                 map.setView([lat, lng], map.getZoom());
                 const center = map.getCenter();
@@ -392,6 +408,7 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
                 // setSelectedLocation({lat: undefined, lng: undefined})
                 return
             }
+
             pointsArea.addPoint([lng, lat])
         },
 

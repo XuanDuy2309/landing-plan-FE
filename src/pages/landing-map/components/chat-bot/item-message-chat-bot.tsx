@@ -17,7 +17,7 @@ export const ItemMessageChatBot = observer(({ content, isBot }: IProps) => {
             }
         )}>
             <div className={classNames(
-                "flex flex-col max-w-[70%] md:max-w-[60%]",
+                "flex flex-col max-w-[80%] md:max-w-[80%]",
                 {
                     'items-end': !isBot, // User: căn phải
                     'items-start': isBot // Bot: căn trái

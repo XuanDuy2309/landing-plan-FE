@@ -1,5 +1,6 @@
 import { Spin } from "antd";
 import { observer } from "mobx-react";
+import { toast } from "react-toastify";
 import { ButtonLoading } from "src/components";
 import { ImageContextProvider, useImageContext, useUserContext } from "src/core/modules";
 import { SelectFileCase } from "src/core/services";
@@ -22,7 +23,7 @@ export const ProfileImageScreen = observer(({ id }: IProps) => {
 
 
 const SelectImage = observer(() => {
-    const { data, dataVideo, loading, onUpload } = useImageContext();
+    const { data, dataVideo, loading, onUpload, onDeleteMedia, onRefresh } = useImageContext();
     const { onUpdateAvatar, onUpdateBackground } = useUserContext();
 
     const handleUpload = async (type: string) => {
@@ -37,7 +38,17 @@ const SelectImage = observer(() => {
     const actionItemImage = {
         updateAvatar: (image: string) => onUpdateAvatar(image),
         updateBackground: (image: string) => onUpdateBackground(image),
-        deleteImage: (id: number) => { console.log(id) }
+        deleteImage: async (id: number) => {
+            await onDeleteMedia(id).then((res) => {
+                if (res.Status) {
+                    toast.success("Xóa thành công");
+                }
+                onRefresh();
+            }).catch((err) => {
+                toast.error("Xóa thất bại");
+                console.error(err);
+            })
+        }
     }
     return (
         <div className="w-full flex flex-col items-center space-y-3 py-4">
@@ -56,7 +67,7 @@ const SelectImage = observer(() => {
                             {
                                 data.map((item, index) => {
                                     return (
-                                        <ItemMyImage key={index} item={item.link} action={actionItemImage} />
+                                        <ItemMyImage id={item.id} key={index} item={item.link} action={actionItemImage} />
                                     )
                                 })
                             }

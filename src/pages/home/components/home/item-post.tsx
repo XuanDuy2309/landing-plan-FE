@@ -53,13 +53,6 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
             }]
             : []
         ),
-        {
-            key: '3',
-            label: 'Liên hệ ngay',
-            onClick: () => {
-                navigate(`/home/message?user_id=${item.create_by_id}`);
-            },
-        },
         ...(item.create_by_id === user?.id
             ? [{
                 key: '5',
@@ -81,7 +74,15 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                 danger: true,
             }
             ]
-            : []
+            : [
+                {
+                    key: '3',
+                    label: 'Liên hệ ngay',
+                    onClick: () => {
+                        navigate(`/home/message?user_id=${item.create_by_id}`);
+                    },
+                },
+            ]
         )
         ,
         {
@@ -217,6 +218,15 @@ export const ItemPost = observer(({ item, onLike, onUnlike }: IProps) => {
                         color={!item.like_by_ids.includes(user.id || 0) ? Colors.gray[700] : Colors.blue[600]} />
                     <span>Thích</span>
                 </div>
+                {Number(item.purpose) === Purpose_Post.For_Auction && <div
+                    className="w-full h-10 flex items-center justify-center space-x-2 rounded hover:bg-gray-200 cursor-pointer"
+                    onClick={() => {
+                        navigate(`/auction/${item.id}`);
+                    }}
+                >
+                    <IconBase icon='auction-outline' size={20} color={Colors.gray[700]} />
+                    <span>Tham gia đáu giá</span>
+                </div>}
                 <div
                     className="w-full h-10 flex items-center justify-center space-x-2 rounded hover:bg-gray-200 cursor-pointer"
                     onClick={() => {

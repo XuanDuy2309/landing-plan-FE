@@ -130,6 +130,7 @@ export class PointsMapModel {
                 // Tính vị trí của nhãn diện tích
                 const center = turf.centerOfMass(polygon).geometry.coordinates;
                 this.areaLabelPosition = [center[1], center[0]]; // [lat, lng]
+               
             }
         }
     }

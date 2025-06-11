@@ -152,7 +152,6 @@ export const InfoConversationContainer = observer(() => {
         const currentMember = data.members.find(member => member.id === profileId);
         if (!currentMember) return;
 
-        console.log("Current member:", currentMember.muted_until);
         // Update mute status
         setIsMute(checkIsMute(currentMember.muted_until));
 

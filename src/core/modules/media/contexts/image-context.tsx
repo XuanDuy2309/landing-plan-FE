@@ -8,6 +8,8 @@ export class ImageContextType {
     dataVideo: any = [];
     loading: boolean = false
     onUpload = (file: File, type?: string) => { }
+    onDeleteMedia!: (id?: number) => Promise<BaseResponse>;
+    onRefresh = () => { }
 }
 
 export const ImageContext = React.createContext<ImageContextType>(new ImageContextType());
@@ -70,13 +72,25 @@ export const ImageContextProvider = observer(({ children, id }: IProps) => {
         }
     }
 
-    useEffect(() => {
+
+    const onDeleteMedia = async (id?: number) => {
+        setLoading(true);
+        const res = await AuthApi.deleteUpload(id);
+        setLoading(false);
+        return res;
+    }
+
+    const onRefresh = () => {
         fetchData();
         fetchDataVideo();
+    }
+
+    useEffect(() => {
+        onRefresh();
     }, [])
 
     return (
-        <ImageContext.Provider value={{ data, dataVideo, loading, onUpload }}>
+        <ImageContext.Provider value={{ data, dataVideo, loading, onUpload, onDeleteMedia, onRefresh }}>
             {children}
         </ImageContext.Provider>
     )

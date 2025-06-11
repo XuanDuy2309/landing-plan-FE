@@ -40,7 +40,7 @@ export const PopupPostLandingMapContainer = memo(observer((props: IProps) => {
                 <ButtonLoading
                     label="Huỷ bỏ"
                     template="ActionBase"
-                    className="!h-8 w-[100px] flex items-center justify-center text-[14px] leading-[16px] font-medium"
+                    className="!h-8 w-full flex items-center justify-center text-[14px] leading-[16px] font-medium"
                     onClick={(e) => {
                         onCancel(e)
                         close()
@@ -49,7 +49,7 @@ export const PopupPostLandingMapContainer = memo(observer((props: IProps) => {
                 <ButtonLoading
                     label="Chỉ đường"
                     template="ActionBlue"
-                    className="!h-8 w-[100px] flex items-center justify-center text-[14px] leading-[16px] font-medium"
+                    className="!h-8 w-full flex items-center justify-center text-[14px] leading-[16px] font-medium"
                     onClick={(e) => {
                         onConfirm(e)
                         close()

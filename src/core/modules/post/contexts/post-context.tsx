@@ -17,6 +17,8 @@ export class FilterPostContextType extends IContextFilter {
     @observable lat?: number
     @observable lng?: number
     @observable range?: number
+    @observable type_landing_ids: number[] = []
+    @observable type_landing: any = []
     constructor() {
         super();
         makeObservable(this)

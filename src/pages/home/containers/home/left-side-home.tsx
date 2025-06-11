@@ -6,6 +6,7 @@ import { ButtonLoading, InputUnit } from "src/components"
 import { ButtonIcon } from "src/components/button-icon"
 import { Purpose_Post, Type_Asset_Enum } from "src/core/models"
 import { FilterPostContextType, usePostContext } from "src/core/modules"
+import { DropdownSelectLandingTypeV2 } from "../../components/home/dropdown-select-type-landing"
 
 export const LeftSideHome = observer(() => {
     const [show, setShow] = useState<boolean>(true)
@@ -131,7 +132,7 @@ export const LeftSideHome = observer(() => {
                                             { 'bg-blue-100 text-blue-800': filter.type_asset.some((x) => x === item.key) },
                                         )}
                                             onClick={() => {
-                                                console.log(filter.type_asset)
+                                                // console.log(filter.type_asset)
                                                 if (filter.type_asset.some((x) => x === item.key)) {
                                                     filter.type_asset = filter.type_asset.filter((x) => x !== item.key)
                                                     return
@@ -145,6 +146,40 @@ export const LeftSideHome = observer(() => {
                                 })
                             }
                         </div>
+                    </div>
+                    <div className="w-full flex flex-col space-y-2">
+                        <span className="text-base font-medium text-gray-700">Loại đất:</span>
+                        <div className="w-full flex items-center gap-1 flex-wrap">
+                            {
+                                filter.type_landing.map((item, index) => {
+                                    return (
+                                        <div key={index} className={classNames("px-3 py-2  bg-blue-100 text-gray-700 flex items-center justify-center space-x-2 rounded  cursor-pointer ",
+                                        )}
+                                            style={{ backgroundColor: item.color }}
+                                            onClick={() => {
+                                                if (filter.type_landing.some((x) => x.id === item.id)) {
+                                                    filter.type_landing = filter.type_landing.filter((x) => x.id !== item.id)
+                                                    filter.type_landing_ids = filter.type_landing.map((x) => x.id)
+                                                }
+                                            }}
+                                        >
+                                            <span className="text-base font-medium ">{item.code}</span>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                        <DropdownSelectLandingTypeV2
+                            onSelect={(item) => {
+                                if (filter.type_landing.some((x) => x.id === item.id)) {
+                                    filter.type_landing = filter.type_landing.filter((x) => x.id !== item.id)
+                                    filter.type_landing_ids = filter.type_landing.map((x) => x !== item.id)
+                                } else {
+                                    filter.type_landing.push(item)
+                                    filter.type_landing_ids = filter.type_landing.map((x) => x.id)
+                                }
+                            }}
+                        />
                     </div>
                     <div className="w-full flex flex-col space-y-2">
                         <span className="text-base font-medium text-gray-700">Khoảng giá:</span>

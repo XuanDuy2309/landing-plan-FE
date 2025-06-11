@@ -46,6 +46,27 @@ export const ContentAuctionContainer = observer(() => {
         },
     ];
 
+    const items2: MenuProps['items'] = [
+        {
+            key: 1,
+            label: 'Nhắn tin',
+            onClick: () => {
+                navigate(`/home/message?user_id=${data.create_by_id}`);
+            },
+        },
+        {
+            key: 2,
+            label: 'Gọi điện trực tiếp',
+            onClick: () => {
+                if (data.create_by_phone) {
+                    window.location.href = `tel:${data.create_by_phone}`;
+                } else {
+                    toast.warning('Không có số điện thoại của người đăng');
+                }
+            },
+        },
+    ];
+
     const handleChangeSlider = (value: number) => {
         dataAuction.err_price = undefined
         const startPrice = ((data.bids[0]?.price ?? data.price_current) ?? 0) + (data.bid_step ?? 0)
@@ -155,9 +176,18 @@ export const ContentAuctionContainer = observer(() => {
                             <span>{formatMoney(data.max_bid, 1, 'vn') + ' VND'}</span>
                         </div>
                     </div>
-                    <div className="w-full flex items-center space-x-2">
-                        <span className="w-[160px] text-start">Chủ sở hữu (dự kiến):</span>
-                        <span>{data.bids[0] ? data.bids[0].user_name : '---'}</span>
+                    <div className="w-full flex items-center space-x-4">
+                        <div className="flex items-center space-x-2">
+                            <span className="w-[160px] text-start">Chủ sở hữu (dự kiến):</span>
+                            <span>{data.bids[0] ? data.bids[0].user_name : '---'}</span>
+                        </div>
+
+                        {
+                            moment().isAfter(data.end_date) && data.bids[0] && data.bids[0].user_id === sessionStore.profile?.id &&
+                            <Dropdown trigger={["click"]} menu={{ items: items2 }}>
+                                <div><ButtonLoading label="Liên hệ chủ đất" template="ActionBlue" size="xs" onClick={() => { }} /></div>
+                            </Dropdown>
+                        }
                     </div>
                 </div>
             </div>
@@ -193,7 +223,7 @@ export const ContentAuctionContainer = observer(() => {
                                 onClick={() => {
                                     modalRef.current.open()
                                 }}
-                                disabled={auctionStatus !== 'in_progress'}
+                                disabled={auctionStatus !== 'in_progress' || data.create_by_id === sessionStore.profile?.id}
                                 className="flex-none h-[42px]"
                             />
                             <ButtonLoading
@@ -203,7 +233,7 @@ export const ContentAuctionContainer = observer(() => {
                                 onClick={() => {
                                     dataAuction.price = (data.max_bid ?? 0) + ((data.bids[0]?.price || data.price_current) ?? 0)
                                 }}
-                                disabled={auctionStatus !== 'in_progress'}
+                                disabled={auctionStatus !== 'in_progress' || data.create_by_id === sessionStore.profile?.id}
                                 className="flex-none h-[42px]"
                             />
                         </div>

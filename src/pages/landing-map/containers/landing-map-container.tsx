@@ -20,7 +20,9 @@ export const LandingMapContainer = observer(() => {
                 <ToolbarLandingMap />
                 <PopupDetailCoordinatesLocationContainer />
                 <ChatBotContainer />
-                <div className='w-full h-full'> <LeafletMapContainer /></div>
+                <div className='w-full h-full'>
+                    <LeafletMapContainer />
+                </div>
             </div>
         </div>
     )

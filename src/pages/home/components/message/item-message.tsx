@@ -2,11 +2,12 @@ import { Dropdown, MenuProps, Tooltip } from "antd"
 import classNames from "classnames"
 import { observer } from "mobx-react"
 import moment from "moment"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { toast } from "react-toastify"
 import { Colors } from "src/assets"
 import { IconBase } from "src/components"
 import { ModalConfirm } from "src/components/modal-confirm/modal-confim"
+import { ModalPreviewMessage } from "src/components/modal-preview-message/modal-preview-message"
 import { getColorFromId } from "src/core/base"
 import { useSocketEvent } from "src/core/hook"
 import { MessageModel, MessageType, UserModel } from "src/core/models"
@@ -29,6 +30,7 @@ export const ItemMessage = observer(({ message, index, messages }: IProps) => {
     const isSequence = prevMessage?.sender_id === message.sender_id
     const isEndOfSequence = nextMessage?.sender_id !== message.sender_id
     const { setItemUpdate, itemUpdate, onDeleteMessage, setReplyMess, setCopyMess } = useListMessageContext()
+    const [openModalPreview, setOpenModalPreview] = useState<boolean>(false)
     const modalRef = useRef<any>(null)
 
     const items: MenuProps['items'] = [
@@ -63,7 +65,7 @@ export const ItemMessage = observer(({ message, index, messages }: IProps) => {
 
         if (type === MessageType.IMAGE) {
             return (
-                <div className="max-w-[200px] cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="max-w-[200px] cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setOpenModalPreview(true)}>
                     <img
                         src={content}
                         alt="Message image"
@@ -75,10 +77,11 @@ export const ItemMessage = observer(({ message, index, messages }: IProps) => {
 
         if (type === MessageType.VIDEO) {
             return (
-                <div className="max-w-[400px] cursor-pointer hover:opacity-90 transition-opacity overflow-hidden">
+                <div className="max-w-[400px] cursor-pointer hover:opacity-90 transition-opacity overflow-hidden"
+                    onClick={() => setOpenModalPreview(true)}
+                >
                     <video
                         src={content}
-                        controls
                         className="w-full h-full object-contain rounded-lg"
                     />
                 </div>
@@ -274,6 +277,9 @@ export const ItemMessage = observer(({ message, index, messages }: IProps) => {
                     </>
                 )}
             </div >
+            {openModalPreview && <ModalPreviewMessage onClose={() => {
+                setOpenModalPreview(false)
+            }} />}
         </div>
     )
 })

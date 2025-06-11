@@ -1,12 +1,20 @@
 import { Skeleton } from "antd"
 import { observer } from "mobx-react"
+import React from "react"
 import { useListChatbotContext } from "src/core/modules"
 import { ItemMessageChatBot } from "../../components/chat-bot/item-message-chat-bot"
 
 export const ListMessageChatBotContainer = observer(() => {
     const { data, message, loading } = useListChatbotContext()
+    const containerRef = React.useRef<HTMLDivElement>(null)
+
+    React.useEffect(() => {
+        if (containerRef.current) {
+            containerRef.current.scrollTop = containerRef.current.scrollHeight
+        }
+    }, [data, data.length, loading])
     return (
-        <div className="p-3 flex flex-col h-full overflow-y-auto bg-white min-h-0">
+        <div className="p-3 flex flex-col h-full overflow-y-auto bg-white min-h-0" ref={containerRef}>
             <div className="flex flex-col w-full">
                 {data && data.length > 0 && data.map((item, index) => (
                     <ItemMessageChatBot key={index} content={item.message} isBot={!item.isMine} />

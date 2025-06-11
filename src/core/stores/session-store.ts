@@ -69,8 +69,10 @@ export class SessionStore {
     }
 
     setLocation(lat: number, lng: number) {
-        this.location = { lat, lng };
+        this.location.lat = lat;
+        this.location.lng = lng;
     }
+
 
     requestLocation() {
         if (!navigator.geolocation) {
@@ -85,12 +87,31 @@ export class SessionStore {
                 });
             },
             (error) => {
-                console.error("Lỗi khi lấy vị trí:", error);
+                let errorMessage = "Không thể xác định vị trí của bạn";
+
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = "Vui lòng cấp quyền truy cập vị trí cho trang web";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = "Không thể xác định vị trí. Vui lòng kiểm tra GPS và kết nối mạng";
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = "Quá thời gian chờ xác định vị trí";
+                        break;
+                }
+
+                console.error(errorMessage, error);
                 runInAction(() => {
-                    this.setLocation(0, 0); // Đặt tọa độ mặc định nếu xảy ra lỗi
+                    // Sử dụng tọa độ mặc định của Hà Nội nếu không lấy được vị trí
+                    this.setLocation(21.0283334, 105.854041);
                 });
             },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            {
+                enableHighAccuracy: true,
+                timeout: 20000, // Tăng timeout lên 20s
+                maximumAge: 30000 // Cache vị trí trong 30s
+            }
         );
     }
 

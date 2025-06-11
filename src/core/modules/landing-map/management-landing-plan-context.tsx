@@ -32,6 +32,8 @@ export class ManagementLandingPlanContextType {
     setSelectedLandingPlan = (selectedLandingPlan: LandingPlanModel | undefined) => { }
     shouldFlyToLandingPlan = false
     setShouldFlyToLandingPlan = (val: boolean) => { }
+    listCoordinates: string[] = []
+    setListCoordinates!: (lisCoordinates: string[]) => void
 }
 
 export const ManagementLandingPlanContext = createContext<ManagementLandingPlanContextType>(
@@ -46,6 +48,7 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
     const [placement, setPlacement] = useState<NominatimResult>(new NominatimResult())
     const [selectedLocation, setSelectedLocation] = useState<SelectedLocationModel>(new SelectedLocationModel())
     const [coordinates, setCoordinates] = useState<CoordinateSearchLocationModel>(new CoordinateSearchLocationModel());
+    const [listCoordinates, setListCoordinates] = useState<string[]>([]);
 
     const [polygon, setPolygon] = useState<any>(null);
     const [placementInfo, setPlacementInfo] = useState<NominatimResult>();
@@ -182,6 +185,8 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
                 setSelectedLandingPlan,
                 shouldFlyToLandingPlan,
                 setShouldFlyToLandingPlan,
+                listCoordinates,
+                setListCoordinates
             }}
         >
             {children}

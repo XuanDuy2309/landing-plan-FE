@@ -129,14 +129,14 @@ export const CreatePostContextProvider = observer(({ children, lat, lng }: IProp
                 data.err_date_end = 'Vui lòng nhập ngày kết thúc'
                 isValid = false
             }
-            if (data.start_date && moment(data.start_date).isSameOrBefore(moment().startOf('day').add(1, 'day'))) {
-                data.err_date_start = 'Ngày bắt đầu muộn nhất vào ngày mai'
-                isValid = false
-            }
-            if (data.end_date && moment(data.end_date).isSameOrBefore(data.start_date)) {
-                data.err_date_end = 'Ngày kết thúc phải sau ngày bắt đầu'
-                isValid = false
-            }
+            // if (data.start_date && moment(data.start_date).isSameOrBefore(moment().startOf('day').add(1, 'day'))) {
+            //     data.err_date_start = 'Ngày bắt đầu muộn nhất vào ngày mai'
+            //     isValid = false
+            // }
+            // if (data.end_date && moment(data.end_date).isSameOrBefore(data.start_date)) {
+            //     data.err_date_end = 'Ngày kết thúc phải sau ngày bắt đầu'
+            //     isValid = false
+            // }
         }
 
         // Kiểm tra tài sản có tầng / phòng

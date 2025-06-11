@@ -8,6 +8,7 @@ export const ConversationsApi = {
     deleteConversation: (id: number) => server.delete(`/conversations/${id}`),
 
     getListMessage: (id: number, params?: any) => server.get(`/conversations/${id}/messages`, params),
+    getListMedia: (id: number, params?: any) => server.get(`/conversations/${id}/media`, params),
     sendMessage: (id: number, params?: any) => server.post(`/conversations/${id}/messages`, params),
     updateMessage: (idConversation: number, idMessage: number, params?: any) => server.put(`/conversations/${idConversation}/messages/${idMessage}`, params),
     deleteMessage: (idConversation: number, idMessage: number, params?: any) => server.delete(`/conversations/${idConversation}/messages/${idMessage}`, params),

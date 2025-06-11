@@ -60,7 +60,7 @@ export const HeaderHome = observer(() => {
 
     const handleSelectNotification = (item?: NotificationModel) => {
         setOpenNotification(false)
-        console.log('item', item)
+        // console.log('item', item)
         if (!item) return
         if (Number(item.type) === NotificationType.LIKE) {
             navigate(`/post/${item.post_id}`)

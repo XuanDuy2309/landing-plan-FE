@@ -4,9 +4,9 @@ import debounce from 'debounce';
 import { observer } from 'mobx-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Colors } from 'src/assets';
+import { IconBase } from 'src/components';
 import { LandingPlanModel } from 'src/core/models';
 import { ListLandingTypeProvider } from 'src/core/modules';
-import { IconBase } from '../icon-base';
 
 interface IProps {
     className?: string;
@@ -18,7 +18,7 @@ interface IProps {
     error?: string
 }
 
-export const DropdownSelectLandingType = ({
+export const DropdownSelectLandingTypeV2 = ({
     className = '',
     onSelect,
     value,
@@ -35,14 +35,8 @@ export const DropdownSelectLandingType = ({
         setKeyword(value);
     }, 300);
 
-    const handleBlur = () => {
-        setTimeout(() => {
-            setIsOpen(false);
-        }, 100);
-    };
     return (
         <div className='flex gap-2 items-start'>
-            <span className='text-base font-medium text-gray-700 flex-none' style={{ width: widthLabel }}>{"Chọn loại đất"}:</span>
             <div className='w-full flex flex-col gap-1'>
                 <Dropdown
                     dropdownRender={() => <SelectItemLandingType keyword={keyword} onSelect={(item) => {

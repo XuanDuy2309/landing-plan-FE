@@ -89,8 +89,8 @@ export const ContentDetailPost = observer(() => {
     }
 
     const typeAlley = {
-        0: { label: 'Trong hẻm', icon: 'user-outline' },
-        1: { label: 'Mặt đường', icon: 'user-outline' },
+        1: { label: 'Trong hẻm', icon: 'user-outline' },
+        2: { label: 'Mặt đường', icon: 'user-outline' },
     }
     const renderUnit = () => {
         if (Number(data.purpose) === Purpose_Post.For_Sell) {

@@ -3,7 +3,7 @@ import moment from "moment";
 import React, { useEffect } from "react";
 import { PostApi } from "src/core/api";
 import { BaseResponse } from "src/core/config";
-import { PostModel, Purpose_Post, Type_Asset_Enum } from "../../../models";
+import { LandingTypeModel, PostModel, Purpose_Post, Type_Asset_Enum } from "../../../models";
 import { usePostContext } from "./post-context";
 
 export class CreatePostContextType {
@@ -25,6 +25,7 @@ interface IProps {
     children: React.ReactNode
     lat?: number
     lng?: number
+    landingType?: LandingTypeModel
 }
 
 export const enum ActionMap {
@@ -33,7 +34,7 @@ export const enum ActionMap {
     Get_width_height = 3
 }
 
-export const CreatePostContextProvider = observer(({ children, lat, lng }: IProps) => {
+export const CreatePostContextProvider = observer(({ children, lat, lng, landingType }: IProps) => {
     const [data, setData] = React.useState<PostModel>(new PostModel());
     const [loading, setLoading] = React.useState<boolean>(false);
     const [openMap, setOpenMap] = React.useState<boolean>(false);
@@ -276,6 +277,19 @@ export const CreatePostContextProvider = observer(({ children, lat, lng }: IProp
             initData(itemUpdate)
         }
     }, [itemUpdate])
+
+    useEffect(() => {
+        if (lat) {
+            data.lat = lat
+        }
+        if (lng) {
+            data.lng = lng
+        }
+        if (landingType) {
+            data.type_landing = landingType
+            data.type_landing_id = landingType.id
+        }
+    }, [lat, lng, landingType])
 
     return (
         <CreatePostContext.Provider value={{ data, loading, openMap, action, message, setOpenMap, setAction, setMessage, onSubmit, onClear }}>

@@ -5,7 +5,7 @@ import { ButtonIcon } from 'src/components/button-icon'
 import { useManagementLandingPlan } from 'src/core/modules'
 
 export const PopupDetailCoordinatesLocationContainer = observer(() => {
-    const { coordinates, placementInfo, setPlacementInfo, pointsArea, selectedLocation } = useManagementLandingPlan()
+    const { coordinates, placementInfo, setPlacementInfo, pointsArea, selectedLocation, landingType } = useManagementLandingPlan()
     const [_, forceUpdate] = React.useReducer(x => x + 1, 0)
     const modalRef = useRef<any>(null)
 
@@ -58,10 +58,9 @@ export const PopupDetailCoordinatesLocationContainer = observer(() => {
                     <ButtonLoading label="Huỷ bỏ" template="ActionBase" size="xs" onClick={() => {
                         handleClear()
                     }} />
-                    {/* <ButtonLoading iconLeft='location-outline' label="Đăng bài" template="ActionBlueOutline" size="xs" onClick={() => {
+                    <ButtonLoading iconLeft='location-outline' label="Đăng bài" template="ActionBlueOutline" size="xs" onClick={() => {
                         modalRef.current.open();
-                        handleClear()
-                    }} /> */}
+                    }} />
                     <ButtonLoading iconLeft='share-outline' label="Chỉ đường" template="ActionBlue" size="xs" onClick={() => {
                         handleSubmit()
                     }} />
@@ -72,7 +71,10 @@ export const PopupDetailCoordinatesLocationContainer = observer(() => {
             <ModalBase
                 ref={modalRef}
             >
-                <ModalCreatePost onClose={() => { modalRef.current.close() }} onSave={(item) => { modalRef.current.close() }} />
+                <ModalCreatePost
+                    onClose={() => { modalRef.current.close() }}
+                    onSave={(item) => { modalRef.current.close() }}
+                    lat={selectedLocation.lat} lng={selectedLocation.lng} landingType={landingType} />
             </ModalBase>
 
         </>

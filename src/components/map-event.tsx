@@ -15,7 +15,7 @@ export const MapEvents = observer(() => {
             if (!pointsArea.isDraw && !pointsArea.isRouting) {
                 map.setView([lat, lng], map.getZoom());
                 setSelectedLocation({ lat, lng })
-                searchCoordinatesLocation(lat, lng)
+                // searchCoordinatesLocation(lat, lng)
                 return
             }
             if (pointsArea.isRouting) {

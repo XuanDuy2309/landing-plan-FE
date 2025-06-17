@@ -9,6 +9,7 @@ import { LayersControl, MapContainer, Marker, Pane, Polygon, Polyline, Popup, Ti
 import { useSearchParams } from "react-router-dom";
 import { Colors } from 'src/assets';
 import { isValidPolygon } from 'src/core/base';
+import { baseUrl } from "src/core/config";
 import { LandingPlanModel, NominatimResult, SelectedLocationModel } from 'src/core/models';
 import { FilterPostContextType, useManagementLandingPlan, usePostContext } from 'src/core/modules';
 import { useCoreStores } from 'src/core/stores';
@@ -128,7 +129,7 @@ export const LeafletMapContainer = observer(() => {
             <Pane name="customOverlayPane" style={{ zIndex: 400 }}>
                 {selectedLandingPlan && selectedLandingPlan.folder_path && (
                     <TileLayer
-                        url={`${selectedLandingPlan.folder_path}/{z}/{x}/{y}.png`}
+                        url={`${baseUrl}/landing-plan/${selectedLandingPlan.folder_path}/{z}/{x}/{y}.png`}
                         pane="customOverlayPane"
                         minZoom={0}
                         maxZoom={30}
@@ -338,7 +339,7 @@ interface IProps3 {
 const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3) => {
     // const { getInfoPlacement } = useManagementLandingPlan()
     const map = useMap();
-    const { searchCoordinatesLocation, pointsArea, setHoveredPostId, setListCoordinates, listCoordinates } = useManagementLandingPlan();
+    const { searchCoordinatesLocation, pointsArea, setHoveredPostId, setListCoordinates, listCoordinates, detectLandType } = useManagementLandingPlan();
     const [searchParams, setSearchParams] = useSearchParams();
     const isInitialMount = useRef(true);
 
@@ -377,11 +378,11 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
 
         click: async (e) => {
             const { lat, lng } = e.latlng;
-            
+
             // Khi vẽ xong polygon (isDraw = false) và có ít nhất 3 điểm
             if (!pointsArea.isDraw && pointsArea.points.length >= 3) {
                 const coordinate = pointsArea.points.map((item) => {
-                    return item.join(' ') 
+                    return item.join(' ')
                 }).join(', ')
                 console.log('coordinate', coordinate)
                 // Thêm polygon mới vào listCoordinates
@@ -400,6 +401,7 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
                 const radius = center.distanceTo(bounds.getNorthEast());
                 setSelectedLocation({ lat, lng, radius })
                 searchCoordinatesLocation(lat, lng)
+                detectLandType(lat, lng, map.getZoom())
                 return
             }
             if (pointsArea.isRouting) {

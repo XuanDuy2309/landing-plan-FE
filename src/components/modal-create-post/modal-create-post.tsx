@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { toast } from "react-toastify"
 import { Colors } from "src/assets"
 import { getColorFromId } from "src/core/base"
-import { Purpose_Post, Type_Post } from "src/core/models"
+import { LandingTypeModel, Purpose_Post, Type_Post } from "src/core/models"
 import { CreatePostContextProvider, useCreatePostContext, usePostContext, useUserContext } from "src/core/modules"
 import { ButtonLoading } from "../Button"
 import { IconBase } from "../icon-base"
@@ -16,10 +16,11 @@ interface IProps {
     onClose: () => void
     lat?: number
     lng?: number
+    landingType?: LandingTypeModel
 }
 
-export const ModalCreatePost = observer(({ type, onSave, onClose, lat, lng }: IProps) => {
-    return <CreatePostContextProvider>
+export const ModalCreatePost = observer(({ type, onSave, onClose, lat, lng, landingType }: IProps) => {
+    return <CreatePostContextProvider lat={lat} lng={lng} landingType={landingType}>
         <CreatePostContainer type={type} onSave={onSave} onClose={onClose} />
     </CreatePostContextProvider>
 })

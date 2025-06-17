@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react'
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { LandingPlanApi, SearchLandingPlanReverseApi } from 'src/core/api'
-import { CoordinateSearchLocationModel, LandingPlanModel, NominatimResult, PointsMapModel, SelectedLocationModel } from 'src/core/models'
+import { LandingMapApi, LandingPlanApi, SearchLandingPlanReverseApi } from 'src/core/api'
+import { CoordinateSearchLocationModel, LandingPlanModel, LandingTypeModel, NominatimResult, PointsMapModel, SelectedLocationModel } from 'src/core/models'
 
 export class ManagementLandingPlanContextType {
     setPlacement = (placement: NominatimResult) => { }
@@ -34,6 +34,8 @@ export class ManagementLandingPlanContextType {
     setShouldFlyToLandingPlan = (val: boolean) => { }
     listCoordinates: string[] = []
     setListCoordinates!: (lisCoordinates: string[]) => void
+    detectLandType: (lat: number, lon: number, zoom?: number) => void = async () => { }
+    landingType: LandingTypeModel | undefined
 }
 
 export const ManagementLandingPlanContext = createContext<ManagementLandingPlanContextType>(
@@ -61,6 +63,8 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
 
     const [opacity, setOpacity] = useState<number>(1);
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
+
+    const [landingType, setLandingType] = useState<LandingTypeModel>();
 
     const [hoveredPostId, setHoveredPostId] = useState<number | null>(null);
 
@@ -146,6 +150,22 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
         }
     }
 
+    const detectLandType = async (lat: number, lon: number, zoom?: number) => {
+        try {
+            const res = await LandingMapApi.detectLandType({ lat, lon, zoom });
+            if (res.Status) {
+                setLandingType(res.Data.data)
+            } else {
+                setLandingType(undefined)
+            }
+        } catch (error) {
+            setLandingPlanMap([]);
+            setSelectedLandingPlan(undefined);
+            return undefined;
+        } finally {
+            setShouldFlyToLandingPlan(false);
+        }
+    }
 
     useEffect(() => {
         if (selectedLocation && selectedLocation.lat && selectedLocation.lng) {
@@ -186,7 +206,9 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
                 shouldFlyToLandingPlan,
                 setShouldFlyToLandingPlan,
                 listCoordinates,
-                setListCoordinates
+                setListCoordinates,
+                detectLandType,
+                landingType
             }}
         >
             {children}

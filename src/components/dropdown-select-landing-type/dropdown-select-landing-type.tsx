@@ -139,7 +139,7 @@ export const SelectItemLandingType = observer(({ keyword, onSelect, isHideButton
                             >
                                 <div className='flex flex-col px-3 py-2.5 justify-center text-gray-700 text-lmd'>
                                     <div className='flex items-center gap-2'>
-                                        <div className="size-4 flex-none rounded-xs" style={{ backgroundColor: item.color }}></div>
+                                        <div className="size-4 flex-none rounded-xs border border-gray-200" style={{ backgroundColor: item.color }}></div>
                                         <span className='font-medium text-gray-900'>{item.name}</span>
                                     </div>
                                     <span className='text-gray-500 text-start text-[12px] pl-[24px]'>Mã: {item.code}</span>

@@ -32,7 +32,7 @@ export const SideBarLandingMapContainer = observer(({ }: IProps) => {
         setShouldFlyToLandingPlan(true);
     };
 
-    console.log(listCoordinates)
+    // console.log(listCoordinates)
     return (
         <div className='w-full h-full bg-white min-h-0 flex-none'>
             <div className="w-full flex-none  py-1 px-2 flex items-center justify-between cursor-pointer border-b border-gray-100 h-[52px]"

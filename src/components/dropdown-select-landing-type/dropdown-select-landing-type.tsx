@@ -120,8 +120,19 @@ export const SelectItemLandingType = observer(({ keyword, onSelect, isHideButton
             ...provider.filter,
             query: keyword,
         });
-        provider.refreshData()
-    }, [keyword]);
+        onRefreshData()
+    }, [keyword, excludeIds?.length]);
+
+    const onRefreshData = async () => {
+        await provider.refreshData()
+        let filteredData = provider.data.filter(x => !excludeIds?.includes(x.id))
+        if (filteredData.length === 0 && excludeIds) {
+            provider.fetchMore()
+            filteredData = provider.data.filter(x => !excludeIds.includes(x.id))
+        }
+
+        provider.data = filteredData
+    }
 
     return (
         <>

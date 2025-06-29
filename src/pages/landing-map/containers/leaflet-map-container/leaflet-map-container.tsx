@@ -406,7 +406,8 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
             }
             if (pointsArea.isRouting) {
                 setSelectedLocation({ lat, lng })
-                pointsArea.isRouting = false
+                pointsArea.routeTo = [lat, lng]
+                // pointsArea.isRouting = false
                 // setSelectedLocation({lat: undefined, lng: undefined})
                 return
             }

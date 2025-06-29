@@ -70,7 +70,7 @@ export const ListPostMarkerLeafletMap = observer(() => {
                                     position={[lat, lng]}
                                     icon={L.divIcon({
                                         className: 'custom-marker',
-                                        html: `<div style="width: 16px; height: 16px; background: green; border-radius: 50%; border: 2px solid white;"></div>`,
+                                        html: `<div style="width: 20px; height: 20px; background: ${item.type_landing_color || "green"}; border-radius: 50%; border: 2px solid white;"></div>`,
                                     })}
                                 >
                                     <Popup pane={`pane-${item.id}`}>

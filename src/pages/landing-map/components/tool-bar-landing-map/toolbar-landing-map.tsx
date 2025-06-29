@@ -31,17 +31,17 @@ export const ToolbarLandingMap = observer(() => {
         window.dispatchEvent(event);
     };
 
-    // const handleToggleRouting = () => {
-    //     pointsArea.isRouting = !pointsArea.isRouting
-    //     if (pointsArea.isRouting) {
-    //         pointsArea.routeTo = undefined
-    //     }
-    // }
+    const handleToggleRouting = () => {
+        pointsArea.isRouting = !pointsArea.isRouting
+        if (pointsArea.isRouting) {
+            pointsArea.routeTo = undefined
+        }
+    }
 
     const buttons = [
         { onClick: handleToggleDraw, icon: 'pin-outline', title: 'Đo đạc khu vực', active: pointsArea.isDraw },
         { onClick: handleReset, icon: 'delete-outline', title: 'Đặt lại khu vực', active: false },
-        // { onClick: handleToggleRouting, icon: 'location-outline', title: 'Chỉ đường', active: pointsArea.isRouting },
+        { onClick: handleToggleRouting, icon: 'location-outline', title: 'Chỉ đường', active: pointsArea.isRouting },
         { onClick: handleGoToMyLocation, icon: 'map-outline1', title: 'Định vị', active: false },
         { onClick: () => modalNoteLandingRef.current?.open(), icon: 'note-outline', title: 'Kí hiệu bản đồ quy hoạch', active: false },
     ];

@@ -75,7 +75,7 @@ const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
         </div>
         <div className="w-full h-full overflow-y-auto flex flex-col">
             {!openMap && <div className="w-full flex-none p-3 border-gray-200 flex items-center space-x-3">
-                <div className='size-14 rounded-full flex items-center bg-gray-200 justify-center overflow-hidden'
+                <div className='size-14 rounded-full flex items-center bg-gray-200 justify-center overflow-hidden flex-none'
                     style={{
                         backgroundColor: getColorFromId(user?.id || 0)
                     }}

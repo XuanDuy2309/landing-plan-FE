@@ -319,6 +319,10 @@ input[type='number'] {
     -moz-appearance: textfield;
 }
 
+input {
+    outline: none;
+}
+
 :where(.css-dev-only-do-not-override-d7wtnm).ant-tabs-top>.ant-tabs-nav {
     margin: 0;
 }
@@ -340,4 +344,16 @@ button {
 
 .infinite-scroll-component__outerdiv {
     width: 100%;
+}
+
+@keyframes backdropAnimation {
+
+    0%,
+    100% {
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    50% {
+        transform: translateY(-40%) scale(1);
+    }
 }

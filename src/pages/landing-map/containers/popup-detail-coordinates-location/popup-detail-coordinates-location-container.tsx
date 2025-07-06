@@ -3,11 +3,13 @@ import React, { useRef } from 'react'
 import { ButtonLoading, ModalBase, ModalCreatePost } from 'src/components'
 import { ButtonIcon } from 'src/components/button-icon'
 import { useManagementLandingPlan } from 'src/core/modules'
+import { useCoreStores } from 'src/core/stores'
 
 export const PopupDetailCoordinatesLocationContainer = observer(() => {
     const { coordinates, placementInfo, setPlacementInfo, pointsArea, selectedLocation, landingType } = useManagementLandingPlan()
     const [_, forceUpdate] = React.useReducer(x => x + 1, 0)
     const modalRef = useRef<any>(null)
+    const { sessionStore } = useCoreStores()
 
     if (!placementInfo) return <>
         <ModalBase
@@ -58,9 +60,9 @@ export const PopupDetailCoordinatesLocationContainer = observer(() => {
                     <ButtonLoading label="Huỷ bỏ" template="ActionBase" size="xs" onClick={() => {
                         handleClear()
                     }} />
-                    <ButtonLoading iconLeft='location-outline' label="Đăng bài" template="ActionBlueOutline" size="xs" onClick={() => {
+                    {sessionStore.profile && <ButtonLoading iconLeft='location-outline' label="Đăng bài" template="ActionBlueOutline" size="xs" onClick={() => {
                         modalRef.current.open();
-                    }} />
+                    }} />}
                     <ButtonLoading iconLeft='share-outline' label="Chỉ đường" template="ActionBlue" size="xs" onClick={() => {
                         handleSubmit()
                     }} />

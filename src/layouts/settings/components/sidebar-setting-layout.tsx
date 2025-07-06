@@ -24,7 +24,7 @@ export const SidebarSettingLayout = observer(() => {
     return (
         <div className="w-[360px] h-full flex flex-col bg-white shadow border-r border-gray-300">
             <div className="w-full p-4 border-b border-gray-200 flex-none">
-                <span className="text-2xl font-semibold text-gray-700">Settings account</span>
+                <span className="text-2xl font-semibold text-gray-700">Cài đặt tài khoản</span>
             </div>
             <div className="p-4 flex flex-col w-full h-full overflow-y-auto">
                 {

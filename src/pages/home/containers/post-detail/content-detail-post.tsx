@@ -264,7 +264,7 @@ export const ContentDetailPost = observer(() => {
                     data.description &&
                     <div className="w-full flex flex-col">
                         <span className="text-xl font-bold text-gray-900">Mô tả:</span>
-                        <span>{data.description}</span>
+                        <span className="whitespace-pre-line">{data.description}</span>
                     </div>
                 }
             </div>

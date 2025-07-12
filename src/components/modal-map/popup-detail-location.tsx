@@ -5,7 +5,7 @@ import { ButtonIcon } from 'src/components/button-icon'
 import { ActionMap, useCreatePostContext, useManagementLandingPlan } from 'src/core/modules'
 
 export const PopupDetailLocationContainer = observer(() => {
-    const { placementInfo, setPlacementInfo, selectedLocation } = useManagementLandingPlan()
+    const { placementInfo, setPlacementInfo, selectedLocation, landingType } = useManagementLandingPlan()
     const { data, setOpenMap, action, setAction, setMessage } = useCreatePostContext()
     const { pointsArea, opacity, setOpacity } = useManagementLandingPlan()
 
@@ -29,6 +29,8 @@ export const PopupDetailLocationContainer = observer(() => {
             data.address = placementInfo.display_name
             data.lat = Number(selectedLocation.lat)
             data.lng = Number(selectedLocation.lng)
+            data.type_landing = landingType
+            data.type_landing_id = landingType?.id
             setAction(ActionMap.Select_coordinate)
             pointsArea.isDraw = true;
             if (pointsArea.isDraw) {
@@ -53,7 +55,10 @@ export const PopupDetailLocationContainer = observer(() => {
     return (
         <div className="w-[480px] space-y-3 px-3 pt-3 absolute bottom-6 left-1/2 -translate-x-1/2 bg-white z-[99999] shadow-lg rounded-[4px] text-gray-900 text-[14px] leading-[20px]">
             <div className="flex items-start justify-between">
-                <span className='font-medium text-[15px] line-clamp-2'>{placementInfo.display_name}</span>
+                <div className='flex flex-col'>
+                    <span className='font-medium text-[15px] line-clamp-2'>{placementInfo.display_name}</span>
+                    {landingType?.code && <span className='font-medium text-[12px]'>Loại đất {landingType?.code} - {landingType?.name}</span>}
+                </div>
 
                 <div className="flex flex-none">
                     <ButtonIcon

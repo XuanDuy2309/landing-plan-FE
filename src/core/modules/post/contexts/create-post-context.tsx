@@ -250,7 +250,7 @@ export const CreatePostContextProvider = observer(({ children, lat, lng, landing
             }
             return res
         }
-
+ 
         res = await PostApi.createPost(params);
         if (res.Status) {
             onClear()
@@ -270,6 +270,13 @@ export const CreatePostContextProvider = observer(({ children, lat, lng, landing
     const initData = (itemUpdate: PostModel) => {
         Object.assign(data, itemUpdate);
         data.is_owner = itemUpdate.owner_phone ? false : true
+        const temp = new LandingTypeModel();
+        temp.id = itemUpdate.type_landing_id || undefined
+        temp.name = itemUpdate.type_landing_name || undefined
+        temp.code = itemUpdate.type_landing_code || undefined
+        temp.color = itemUpdate.type_landing_color || undefined
+        data.type_landing = temp;
+        data.type_landing_id = temp.id
     }
 
     useEffect(() => {

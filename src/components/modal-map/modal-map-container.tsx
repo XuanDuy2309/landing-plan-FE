@@ -1,11 +1,9 @@
-import { ManagementLandingPlanProvider, useManagementLandingPlan } from "src/core/modules";
 import { observer } from "mobx-react";
-import { ModalHeaderLandingMap } from "./header-modal-landing-map";
+import { ManagementLandingPlanProvider, useCreatePostContext } from "src/core/modules";
 import { LeafletMapCore } from "../leaf-map-core";
 import { MapViewUpdater } from "../map-view-update";
-import { RoutingMachine } from "../map-routing";
+import { ModalHeaderLandingMap } from "./header-modal-landing-map";
 import { ModalMapEvents } from "./modal-map-event";
-import { PopupDetailCoordinatesLocationContainer } from "src/pages/landing-map/containers/popup-detail-coordinates-location/popup-detail-coordinates-location-container";
 import { PopupDetailLocationContainer } from "./popup-detail-location";
 
 export const ModalMapContainer = observer(() => {
@@ -17,13 +15,14 @@ export const ModalMapContainer = observer(() => {
 });
 
 export const MapContainer = observer(() => {
+    const { data } = useCreatePostContext()
 
     return (
         <div className='relative flex-none h-full w-full bg-white'>
             <ModalHeaderLandingMap />
             <PopupDetailLocationContainer />
             <LeafletMapCore
-                MapViewUpdater={(props) => <MapViewUpdater placement={props.placement} setSelectedLocation={props.setSelectedLocation} />}
+                MapViewUpdater={(props) => <MapViewUpdater placement={props.placement} setSelectedLocation={props.setSelectedLocation} lat={data.lat} lng={data.lng}/>}
                 MapEvent={(props) => <ModalMapEvents pointsArea={props.pointsArea} setSelectedLocation={props.setSelectedLocation} />} />
         </div>
     )

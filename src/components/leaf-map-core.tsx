@@ -17,7 +17,7 @@ interface IProps {
 export const LeafletMapCore = observer(({ MapEvent, MapViewUpdater, RoutingMachine }: IProps) => {
     const { sessionStore } = useCoreStores()
     const { location } = sessionStore
-    const { polygon, selectedLocation, setSelectedLocation, placement, isDraw, coordinates, pointsArea, landingPlanMap, opacity } = useManagementLandingPlan()
+    const { polygon, selectedLocation, setSelectedLocation, placement, isDraw, coordinates, pointsArea, detectLandType } = useManagementLandingPlan()
     const calculateDistance = useMemo(() => {
         return pointsArea.calculateDistance() || 0
     }, [pointsArea.currentMousePos, pointsArea.points]);
@@ -34,7 +34,13 @@ export const LeafletMapCore = observer(({ MapEvent, MapViewUpdater, RoutingMachi
             attributionControl={true}
 
         >
-            {MapEvent && <MapEvent setSelectedLocation={setSelectedLocation} pointsArea={pointsArea} />}
+            {MapEvent && <MapEvent setSelectedLocation={(selectedLocation) => {
+                setSelectedLocation(selectedLocation)
+                if (selectedLocation.lat && selectedLocation.lng) {
+                    detectLandType(selectedLocation.lat, selectedLocation.lng, 18)
+                }
+            }}
+                pointsArea={pointsArea} />}
             {MapViewUpdater && <MapViewUpdater placement={placement} setSelectedLocation={setSelectedLocation} />}
             {RoutingMachine && pointsArea.routeTo && pointsArea.isRouting && <RoutingMachine from={[location.lat, location.lng]} to={[pointsArea.routeTo[0], pointsArea.routeTo[1]]} />}
             <LayersControl>

@@ -1,10 +1,10 @@
 import { observer } from "mobx-react"
-import { ItemImageCreate } from "./item-image-create"
-import { ButtonLoading } from "../Button"
+import { Colors } from "src/assets"
 import { AuthApi } from "src/core/api"
 import { SelectFileCase } from "src/core/services"
-import { Colors } from "src/assets"
+import { ButtonLoading } from "../Button"
 import { IconBase } from "../icon-base"
+import { ItemImageCreate } from "./item-image-create"
 import { ItemVideoCreate } from "./item-video-create-post"
 
 interface IProps {
@@ -28,7 +28,6 @@ export const AddNewMedia = observer(({ type, label, data, err, onChange }: IProp
             onChange([...data, ...res.Data.data])
             return
         }
-        console.log(res.Message)
     }
 
     const handleUpload = async (type: string) => {

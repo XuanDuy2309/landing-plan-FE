@@ -14,7 +14,7 @@ export class SelectFileCase {
                 input.multiple = this.multiple;
             }
             if (this.type === "image") {
-                input.accept = "image/jpeg, image/png";
+                input.accept = "image/jpeg, image/png, image/webp";
             }
             if (this.type === "video") {
                 input.accept = "video/mp4,video/x-m4v,video/*";

@@ -56,6 +56,7 @@ export const LoginForm2 = ({ isSignup, setIsSignup }: IProps) => {
             return;
         }
         setErr(res.Message)
+        console.log('res', res)
     }
 
 

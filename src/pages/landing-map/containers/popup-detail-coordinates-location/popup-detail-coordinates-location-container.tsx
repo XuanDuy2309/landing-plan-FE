@@ -43,6 +43,7 @@ export const PopupDetailCoordinatesLocationContainer = observer(() => {
                 <div className="flex items-start justify-between">
                     <div className='flex flex-col'>
                         <span className='font-medium text-[15px] line-clamp-2'>{placementInfo.display_name}</span>
+                        <span className='text-[12px] '>Loại đất: {landingType?.code} - {landingType?.name}</span>
                         <span className='text-[12px] text-blue-600'>{selectedLocation.lat}, {selectedLocation.lng}</span>
                     </div>
                     <div className="flex flex-none">

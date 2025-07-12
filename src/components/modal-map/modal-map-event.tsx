@@ -3,6 +3,7 @@ import { useMap, useMapEvents } from "react-leaflet";
 import { PointsMapModel, SelectedLocationModel } from "src/core/models";
 
 
+
 interface IProps {
     setSelectedLocation: (selectedLocation: SelectedLocationModel) => void
     pointsArea: PointsMapModel
@@ -10,6 +11,7 @@ interface IProps {
 
 export const ModalMapEvents = observer(({ setSelectedLocation, pointsArea }: IProps) => {
     const map = useMap();
+
     useMapEvents({
 
         moveend: async (e) => {
@@ -18,7 +20,6 @@ export const ModalMapEvents = observer(({ setSelectedLocation, pointsArea }: IPr
             const { lat, lng } = e.latlng;
             if (!pointsArea.isDraw && !pointsArea.isRouting) {
                 map.setView([lat, lng], map.getZoom());
-                console.log('click', lat, lng)
                 setSelectedLocation({ lat, lng })
                 return
             }

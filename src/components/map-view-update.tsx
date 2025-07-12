@@ -16,7 +16,7 @@ export const MapViewUpdater = observer(({ placement, setSelectedLocation, lat, l
     const { location } = useCoreStores().sessionStore;
 
     useEffect(() => {
-        if (lat && lng) {
+        if (lat && lng && !placement.lat && !placement.lon) {
             map.flyTo([lat, lng], map.getZoom(), {
                 animate: true,
                 easeLinearity: 0.2,

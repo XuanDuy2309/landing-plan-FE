@@ -10,7 +10,7 @@ export const TitleDescription = observer(() => {
                 <span>Tiêu đề:</span>
                 <input type="text"
                     className="outline-none w-full rounded border px-2 py-1 border-gray-200"
-                    value={data.title}
+                    value={data.title || ""}
                     onChange={(e) => {
                         data.title = e.target.value
                     }}
@@ -22,7 +22,7 @@ export const TitleDescription = observer(() => {
                 <span>Tiện ích, mô tả BĐS:</span>
                 <textarea
                     className="outline-none w-full h-24 rounded border px-2 py-1 border-gray-200"
-                    value={data.description}
+                    value={data.description || ""}
                     onChange={(e) => {
                         data.description = e.target.value
                     }}

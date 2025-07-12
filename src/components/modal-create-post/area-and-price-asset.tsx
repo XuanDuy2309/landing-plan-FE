@@ -35,7 +35,7 @@ export const AreaAndPriceAsset = observer(() => {
                     <div className="w-full flex items-center space-x-2">
                         <InputLabel
                             label="Long"
-                            value={data.lng}
+                            value={data.lng || ""}
                             onChange={(value) => {
                                 data.lng = value ? Number(value) : undefined
                             }}
@@ -45,7 +45,7 @@ export const AreaAndPriceAsset = observer(() => {
                         />
                         <InputLabel
                             label="Lat"
-                            value={data.lat}
+                            value={data.lat || ""}
                             onChange={(value) => {
                                 data.lat = value ? Number(value) : undefined
                             }}

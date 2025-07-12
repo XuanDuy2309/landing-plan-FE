@@ -66,8 +66,8 @@ const CreatePostContainer = observer(({ type, onSave, onClose }: IProps) => {
             <div
                 className="absolute right-3 size-9 text-gray-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-200"
                 onClick={() => {
-                    onClose()
                     onClear()
+                    onClose()
                 }}
             >
                 <IconBase icon='close-outline' size={24} />

@@ -6,6 +6,7 @@ import { useNotificationStore } from "./core/context";
 import { socketService } from "./core/services";
 import { useCoreStores } from "./core/stores";
 import { HomeLayout } from "./layouts/home/home-layout";
+import { AdminRoutes } from "./pages/admin/routes";
 import { AuthRoutes } from "./pages/auth/routes";
 import { HomeRoutes } from "./pages/home/routes";
 import { AuctionScreen } from "./pages/home/screens/auction-screen";
@@ -34,6 +35,11 @@ export const AppRouter = observer(() => {
             <Router>
                 <Routes>
                     <Route path="/" element={<LandingMapRoutes />} />
+                    <Route path="admin/*" element={
+                        <RequireAuth>
+                            <AdminRoutes />
+                        </RequireAuth>} />
+
                     <Route path="auth/*" element={
                         <SkipAuth>
                             <AuthRoutes />
@@ -80,8 +86,13 @@ const SkipAuth = observer(({ children }: { children: JSX.Element }) => {
         );
     }
 
-    // Nếu đã đăng nhập và có route trước đó, quay về route đó
+    // Nếu đã đăng nhập, kiểm tra role và điều hướng
     if (sessionStore.session?.access_token) {
+        // Kiểm tra nếu user có role admin
+        if (sessionStore.profile?.role === 'admin') {
+            return <Navigate to="/admin" replace />;
+        }
+        // Nếu không phải admin thì điều hướng về route trước đó hoặc /home
         const from = location.state?.from || '/home';
         return <Navigate to={from} replace />;
     }

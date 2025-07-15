@@ -34,7 +34,7 @@ export const PopupDetailLocationContainer = observer(() => {
             setAction(ActionMap.Select_coordinate)
             pointsArea.isDraw = true;
             if (pointsArea.isDraw) {
-                setMessage("Xác định đường bao BĐS của bạn bằng chọn trên bản đồ")
+                setMessage("Xác định đường ranh BĐS của bạn bằng chọn trên bản đồ")
                 pointsArea.points = [];
                 pointsArea.area = 0;
             }
@@ -77,7 +77,7 @@ export const PopupDetailLocationContainer = observer(() => {
                 }} />
                 {
                     pointsArea.points.length > 0 && (
-                        <ButtonLoading label="Chọn lại đường bao" template="ActionOrange" size="xs" onClick={() => {
+                        <ButtonLoading label="Chọn lại đường ranh" template="ActionOrange" size="xs" onClick={() => {
                             pointsArea.reset()
                             pointsArea.isDraw = true
                         }} />

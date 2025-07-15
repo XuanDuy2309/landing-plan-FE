@@ -1,3 +1,4 @@
+export * from './admin';
 export * from './authen';
 export * from './chat-bot';
 export * from './conversation';

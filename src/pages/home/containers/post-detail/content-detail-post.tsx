@@ -23,7 +23,7 @@ export const ContentDetailPost = observer(() => {
         if (Number(data.purpose) !== Purpose_Post.For_Auction) return;
 
         const interval = setInterval(() => {
-            const now = moment();
+            const now = moment().add(-7, 'hours');
             const startDate = moment(data.start_date);
             const endDate = moment(data.end_date);
 
@@ -42,12 +42,14 @@ export const ContentDetailPost = observer(() => {
                 const distance = endDate.valueOf() - now.valueOf();
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const timeString = moment.utc(distance).format("HH:mm:ss");
-                setCountdownTime(`Phiên đấu giá sẽ bắt đầu sau: ${days > 0 ? days + ' ngày ' : ''}${timeString}`);
+                setCountdownTime(`Còn lại: ${days > 0 ? days + ' ngày ' : ''}${timeString}`);
             }
         }, 1000);
 
         return () => clearInterval(interval);
     }, [data.start_date, data.end_date, data.purpose]);
+
+    console.log(moment(data.start_date).valueOf(), moment(data.start_date))
     const listOption: MenuProps['items'] = [
         {
             key: '1',
@@ -67,6 +69,7 @@ export const ContentDetailPost = observer(() => {
             key: '3',
             label: 'Liên hệ ngay',
             onClick: () => {
+                navigate(`/home/message?user_id=${data.create_by_id}`);
             },
         },
     ]

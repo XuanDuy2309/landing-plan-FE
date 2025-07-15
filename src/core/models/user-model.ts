@@ -22,6 +22,7 @@ export class UserModel {
     password?: string;
     phone_number?: string;
     email?: string;
+    last_login?: string
     address?: string;
     confirm_password?: string;
     fullname?: string;

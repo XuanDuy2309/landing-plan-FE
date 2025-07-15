@@ -56,7 +56,7 @@ export const AreaAndPriceAsset = observer(() => {
                     </div>
                 </div>
                 <div className="w-full flex items-start space-x-2">
-                    <span className="text-base font-medium text-gray-700">Đường bao:</span>
+                    <span className="text-base font-medium text-gray-700">Đường ranh:</span>
                     <div className="flex flex-col space-x-0.5 cursor-pointer" onClick={() => {
                         handleShowMap()
                     }}>
@@ -64,12 +64,12 @@ export const AreaAndPriceAsset = observer(() => {
                             <div className="flex items-center space-x-2 cursor-pointer"
                                 onClick={() => setOpenMap(true)}>
                                 <IconBase icon='location-outline' size={16} color={Colors.blue[600]} />
-                                <span className="text-blue-600">Thêm đường bao</span>
+                                <span className="text-blue-600">Thêm đường ranh</span>
                             </div>
                             :
                             <div className="flex items-center space-x-2 cursor-pointer">
                                 <IconBase icon='edit-outline' size={16} color={Colors.blue[600]} />
-                                <span className="text-blue-600">Sửa đường bao</span>
+                                <span className="text-blue-600">Sửa đường ranh</span>
                             </div>
                         }
                         {data.err_coordinate && <span className="text-red-400">{data.err_coordinate}</span>}

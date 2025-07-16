@@ -2,6 +2,8 @@
 import { makeObservable } from "mobx";
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
+import { AuthApi } from "src/core/api";
+import { BaseResponse } from "src/core/config";
 import { UserModel } from "src/core/models";
 import { useCoreStores } from "src/core/stores";
 import { IBaseContextType, IContextFilter, useBaseContextProvider } from "../../../context";
@@ -20,6 +22,7 @@ export class FilterListUserContextType extends IContextFilter {
 export class ListUserContextType extends IBaseContextType<UserModel, FilterListUserContextType> {
     onLikeUser: (id: number) => Promise<any> = async (id: number) => { }
     onUnLikeUser: (id: number) => Promise<any> = async (id: number) => { }
+    onToggleStatus: (id: number) => Promise<any> = async (id: number) => { }
 }
 
 export const ListUserContext = React.createContext<ListUserContextType>(new ListUserContextType());
@@ -69,8 +72,22 @@ export const ListUserContextProvider = observer(({ children, type, id }: IProps)
         context.onRefresh()
     }, [])
 
+    const changeStatusUser = async (id: number) => {
+        let res: BaseResponse = {
+            Status: false,
+            Data: undefined,
+            Message: "",
+            Code: undefined
+        }
+        res = await AuthApi.toggleStatus({ id })
+        if (res.Status) {
+            return res
+        }
+        return
+    }
+
     return (
-        <ListUserContext.Provider value={{ ...context, onLikeUser, onUnLikeUser }}>
+        <ListUserContext.Provider value={{ ...context, onLikeUser, onUnLikeUser, onToggleStatus: changeStatusUser }}>
             {children}
         </ListUserContext.Provider>
     )

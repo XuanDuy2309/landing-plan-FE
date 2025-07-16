@@ -1,10 +1,14 @@
-import { Button, Form, Input, Modal, Select, Switch, Table, Tag } from "antd";
+import { Form, Input, Modal, Select, Switch, Tag } from "antd";
 import type { ColumnsType } from 'antd/es/table';
 import { observer } from "mobx-react";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { Colors } from "src/assets";
 import { ButtonIcon } from "src/components/button-icon";
+import { Type_List } from "src/core/modules";
+import { ListUserContextProvider, useListUserContext } from "src/core/modules/user/context";
+import { HeaderUserAdmin } from "src/layouts/admins/components/user-admin/header-user-admin";
+import { ListAdminUserContainer } from "src/layouts/admins/containers/user-admin/list-admin-user-container";
 
 interface UserData {
     id: number;
@@ -25,8 +29,9 @@ export const UsersScreen = observer(() => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
     const [form] = Form.useForm();
-
+    const { setCreate, isCreate, data: dataUser } = useListUserContext()
     // Mock data for testing
+    console.log("Data user:", dataUser);
     useEffect(() => {
         setData([
             {
@@ -186,124 +191,80 @@ export const UsersScreen = observer(() => {
     };
 
     return (
-        <div className="w-full h-full flex flex-col">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Quản lý người dùng</h1>
-            </div>
+        <ListUserContextProvider type={Type_List.User}>
+            <div className="w-full h-full flex flex-col overflow-y-auto min-h-0">
+                {/* Header */}
+                <HeaderUserAdmin />
 
-            {/* Filters */}
-            <div className="flex space-x-4 mb-6">
-                <Input.Search
-                    placeholder="Tìm kiếm theo tên, email, số điện thoại..."
-                    style={{ width: 300 }}
-                    onSearch={(value) => console.log('Search:', value)}
-                />
-                <Select
-                    placeholder="Trạng thái"
-                    style={{ width: 150 }}
-                    options={[
-                        { value: 'all', label: 'Tất cả' },
-                        { value: 'active', label: 'Hoạt động' },
-                        { value: 'blocked', label: 'Đã khóa' },
-                    ]}
-                    onChange={(value) => console.log('Status:', value)}
-                />
-                <Select
-                    placeholder="Vai trò"
-                    style={{ width: 150 }}
-                    options={[
-                        { value: 'all', label: 'Tất cả' },
-                        { value: 'admin', label: 'Admin' },
-                        { value: 'user', label: 'User' },
-                    ]}
-                    onChange={(value) => console.log('Role:', value)}
-                />
-                <Button type="default" onClick={() => console.log('Reset filters')}>
-                    Đặt lại
-                </Button>
-            </div>
-
-            {/* Table */}
-            <Table
-                columns={columns}
-                dataSource={data}
-                rowKey="id"
-                loading={loading}
-                pagination={{
-                    total: data.length,
-                    pageSize: 10,
-                    showSizeChanger: true,
-                    showTotal: (total) => `Tổng ${total} người dùng`
-                }}
-            />
-
-            {/* Edit Modal */}
-            <Modal
-                title="Chỉnh sửa thông tin người dùng"
-                open={showEditModal}
-                onCancel={() => setShowEditModal(false)}
-                onOk={handleSave}
-                okText="Lưu"
-                cancelText="Hủy"
-            >
-                <Form
-                    form={form}
-                    layout="vertical"
-                    className="mt-4"
+                {/* Filters */}
+                <ListAdminUserContainer />
+                {/* Edit Modal */}
+                <Modal
+                    title="Chỉnh sửa thông tin người dùng"
+                    open={showEditModal}
+                    onCancel={() => setShowEditModal(false)}
+                    onOk={handleSave}
+                    okText="Lưu"
+                    cancelText="Hủy"
                 >
-                    <Form.Item
-                        name="fullname"
-                        label="Họ tên"
-                        rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        className="mt-4"
                     >
-                        <Input />
-                    </Form.Item>
+                        <Form.Item
+                            name="fullname"
+                            label="Họ tên"
+                            rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}
+                        >
+                            <Input />
+                        </Form.Item>
 
-                    <Form.Item
-                        name="email"
-                        label="Email"
-                        rules={[
-                            { required: true, message: 'Vui lòng nhập email' },
-                            { type: 'email', message: 'Email không hợp lệ' }
-                        ]}
-                    >
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item
-                        name="phone"
-                        label="Số điện thoại"
-                        rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item
-                        name="role"
-                        label="Vai trò"
-                    >
-                        <Select
-                            options={[
-                                { value: 'admin', label: 'Admin' },
-                                { value: 'user', label: 'User' },
+                        <Form.Item
+                            name="email"
+                            label="Email"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập email' },
+                                { type: 'email', message: 'Email không hợp lệ' }
                             ]}
-                        />
-                    </Form.Item>
+                        >
+                            <Input />
+                        </Form.Item>
 
-                    <Form.Item
-                        name="status"
-                        label="Trạng thái"
-                        valuePropName="checked"
-                    >
-                        <Switch
-                            checkedChildren="Hoạt động"
-                            unCheckedChildren="Đã khóa"
-                            defaultChecked={selectedUser?.status === 'active'}
-                        />
-                    </Form.Item>
-                </Form>
-            </Modal>
-        </div>
+                        <Form.Item
+                            name="phone"
+                            label="Số điện thoại"
+                            rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="role"
+                            label="Vai trò"
+                        >
+                            <Select
+                                options={[
+                                    { value: 'admin', label: 'Admin' },
+                                    { value: 'user', label: 'User' },
+                                ]}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="status"
+                            label="Trạng thái"
+                            valuePropName="checked"
+                        >
+                            <Switch
+                                checkedChildren="Hoạt động"
+                                unCheckedChildren="Đã khóa"
+                                defaultChecked={selectedUser?.status === 'active'}
+                            />
+                        </Form.Item>
+                    </Form>
+                </Modal>
+            </div>
+        </ListUserContextProvider>
     );
 });

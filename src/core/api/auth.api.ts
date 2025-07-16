@@ -21,4 +21,5 @@ export const AuthApi = {
     getListUser: (params?: any) => server.get('/user', params),
     getDetailUser: (params?: any) => server.get('/user/' + params.id, params),
     deleteUpload: (id?: number) => server.delete('/auth/delete/' + id),
+    toggleStatus: (params?: any) => server.put('/user/toggle_status', params),
 }

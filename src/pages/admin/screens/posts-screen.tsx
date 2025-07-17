@@ -1,55 +1,41 @@
-import { Button, Input, Select, Table, Tag, Tooltip } from "antd";
+import { Select, Table, Tag, Tooltip } from "antd";
 import type { ColumnsType } from 'antd/es/table';
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { toast } from "react-toastify";
 import { Colors } from "src/assets";
 import { ButtonIcon } from "src/components/button-icon";
+import { PostDetailModal } from "src/components/modal/post-detail";
+import { PostApi } from "src/core/api";
 import { formatMoney } from "src/core/base";
-import { Purpose_Post } from "src/core/models";
+import { PostModel, Purpose_Post, Status_Post } from "src/core/models";
+import { PostContextProvider, usePostContext } from "src/core/modules";
 
-interface PostData {
-    id: number;
-    title: string;
-    create_by_name: string;
-    status: 'active' | 'pending' | 'rejected';
-    purpose: number;
-    price: number;
-    area: number;
-    create_at: string;
-}
 
 export const PostsScreen = observer(() => {
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<PostData[]>([]);
+    return (
+        <PostContextProvider>
+            <PostsContainer />
+        </PostContextProvider>
+    )
+})
 
-    // Mock data for testing
-    useEffect(() => {
-        setData([
-            {
-                id: 1,
-                title: "Nhà phố Quận 7",
-                create_by_name: "Nguyễn Văn A",
-                status: "active",
-                purpose: Purpose_Post.For_Sell,
-                price: 2000000000,
-                area: 100,
-                create_at: "2025-07-15T10:00:00"
-            },
-            {
-                id: 2,
-                title: "Căn hộ cho thuê",
-                create_by_name: "Trần Thị B",
-                status: "pending",
-                purpose: Purpose_Post.For_Rent,
-                price: 15000000,
-                area: 50,
-                create_at: "2025-07-14T15:30:00"
-            }
-        ]);
-    }, []);
+const PostsContainer = observer(() => {
+    const { data, loading, filter, onRefresh, total, pageSize, indexPage, onNext, onPrev } = usePostContext();
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [selectedPost, setSelectedPost] = useState<PostModel>();
 
-    const columns: ColumnsType<PostData> = [
+    let pageSizeTemp = pageSize * indexPage;
+    if (pageSize * indexPage >= total) {
+        pageSizeTemp = total;
+    }
+    let showIndexTemp = 1;
+    if (indexPage > 1) {
+        showIndexTemp = indexPage * pageSize - pageSize;
+    }
+
+    const columns: ColumnsType<PostModel> = [
         {
             title: 'ID',
             dataIndex: 'id',
@@ -77,13 +63,13 @@ export const PostsScreen = observer(() => {
             width: 120,
             render: (status) => (
                 <Tag color={
-                    status === 'active' ? 'success' :
-                    status === 'pending' ? 'warning' :
-                    'error'
+                    Number(status) === Status_Post.Process ? 'success' :
+                        Number(status) === Status_Post.Coming_Soon ? 'warning' :
+                            'error'
                 }>
-                    {status === 'active' ? 'Đã duyệt' :
-                     status === 'pending' ? 'Chờ duyệt' :
-                     'Từ chối'}
+                    {Number(status) === Status_Post.Process ? 'Đã duyệt' :
+                        Number(status) === Status_Post.Coming_Soon ? 'Chờ duyệt' :
+                            'Từ chối'}
                 </Tag>
             )
         },
@@ -93,19 +79,19 @@ export const PostsScreen = observer(() => {
             width: 120,
             render: (purpose) => (
                 <Tag color={
-                    purpose === Purpose_Post.For_Sell ? 'green' :
-                    purpose === Purpose_Post.For_Rent ? 'blue' :
-                    'red'
+                    Number(purpose) === Purpose_Post.For_Sell ? 'green' :
+                        Number(purpose) === Purpose_Post.For_Rent ? 'blue' :
+                            'red'
                 }>
-                    {purpose === Purpose_Post.For_Sell ? 'Bán' :
-                     purpose === Purpose_Post.For_Rent ? 'Cho thuê' :
-                     'Đấu giá'}
+                    {Number(purpose) === Purpose_Post.For_Sell ? 'Bán' :
+                        Number(purpose) === Purpose_Post.For_Rent ? 'Cho thuê' :
+                            'Đấu giá'}
                 </Tag>
             )
         },
         {
             title: 'Giá',
-            dataIndex: 'price',
+            dataIndex: 'price_for_buy',
             width: 150,
             render: (price) => formatMoney(price, 1, 'vn') + ' VNĐ'
         },
@@ -127,22 +113,22 @@ export const PostsScreen = observer(() => {
             width: 120,
             render: (_, record) => (
                 <div className="flex space-x-2">
-                    <ButtonIcon 
-                        icon="eye-outline" 
+                    <ButtonIcon
+                        icon="eye-outline"
                         size="xxs"
                         color={Colors.blue[600]}
                         onClick={() => handleView(record)}
                     />
-                    {record.status === 'pending' && (
+                    {Number(record.status) === Status_Post.Coming_Soon && (
                         <>
-                            <ButtonIcon 
-                                icon="checkmark-outline" 
+                            <ButtonIcon
+                                icon="done-outline"
                                 size="xxs"
                                 color={Colors.green[600]}
                                 onClick={() => handleApprove(record)}
                             />
-                            <ButtonIcon 
-                                icon="close-outline" 
+                            <ButtonIcon
+                                icon="close-outline"
                                 size="xxs"
                                 color={Colors.red[600]}
                                 onClick={() => handleReject(record)}
@@ -154,73 +140,109 @@ export const PostsScreen = observer(() => {
         },
     ];
 
-    const handleView = (record: PostData) => {
-        // TODO: Implement view post detail
-        console.log('View post:', record);
+    const handleView = (record: PostModel) => {
+        setSelectedPost(record);
+        setShowDetailModal(true);
     };
 
-    const handleApprove = (record: PostData) => {
-        // TODO: Implement approve post
-        console.log('Approve post:', record);
+    const handleApprove = async (record: PostModel) => {
+        record.status = Status_Post.Process
+        if (!record.id) return
+        const res = await PostApi.updatePost(record.id, { status: record.status })
+        if (res.Status) {
+            toast.success(res.Message)
+            onRefresh()
+            return
+        }
+        toast.error(res.Message)
     };
 
-    const handleReject = (record: PostData) => {
-        // TODO: Implement reject post
-        console.log('Reject post:', record);
+    const handleReject = async (record: PostModel) => {
+        record.status = Status_Post.End
+        if (!record.id) return
+        const res = await PostApi.updatePost(record.id, { status: record.status })
+        if (res.Status) {
+            toast.success(res.Message)
+            onRefresh()
+            return
+        }
+        toast.error(res.Message)
+
     };
 
     return (
-        <div className="w-full h-full flex flex-col">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Quản lý bài đăng</h1>
+        <div className="w-full h-full flex flex-col min-h-0">
+            <div className="w-full flex flex-col">
+                <div className="flex justify-between items-center mb-6 h-8">
+                    <h1 className="text-2xl font-bold text-gray-900">Quản lý bài đăng</h1>
+                </div>
+
+                <div className="flex items-center justify-between px-4">
+                    <div className="flex space-x-4 mb-6">
+                        <div className="w-[300px] h-8 border border-gray-200 flex items-center rounded">
+                            <input type="text" onChange={(e) => { filter.query = e.target.value }} className="w-full h-full text-xs px-3"
+                                placeholder="Tìm kiếm theo địa chỉ"
+                            />
+                            <ButtonIcon icon="search-outline" size="xxs"
+                                color={Colors.gray[300]}
+                                onClick={() => {
+                                    onRefresh()
+                                }} />
+                        </div>
+
+                        <Select
+                            placeholder="Trạng thái"
+                            style={{ width: 150 }}
+                            options={[
+                                { value: 4, label: 'Tất cả' },
+                                { value: Status_Post.Process, label: 'Đã duyệt' },
+                                { value: Status_Post.Coming_Soon, label: 'Chờ duyệt' },
+                                { value: Status_Post.End, label: 'Từ chối' },
+                            ]}
+                            onChange={(value) => {
+                                filter.status = value === 4 ? undefined : value
+                                onRefresh()
+                            }}
+                        />
+
+                        <Select
+                            placeholder="Mục đích"
+                            style={{ width: 150 }}
+                            options={[
+                                { value: [], label: 'Tất cả' },
+                                { value: Purpose_Post.For_Sell, label: 'Bán' },
+                                { value: Purpose_Post.For_Rent, label: 'Cho thuê' },
+                                { value: Purpose_Post.For_Auction, label: 'Đấu giá' },
+                            ]}
+                            onChange={(value) => {
+                                filter.purpose = value ? [value] : []
+                                onRefresh()
+                            }}
+                        />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <ButtonIcon icon="arrowleft" size="xxs" color={Colors.gray[400]} onClick={onPrev} />
+                        <span>{showIndexTemp}-{pageSizeTemp} của {total} bài đăng</span>
+                        <ButtonIcon icon="arrowright" size="xxs" color={Colors.gray[400]} onClick={onNext} />
+                    </div>
+                </div>
             </div>
 
-            {/* Filters */}
-            <div className="flex space-x-4 mb-6">
-                <Input.Search 
-                    placeholder="Tìm kiếm theo tiêu đề..." 
-                    style={{ width: 300 }}
-                    onSearch={(value) => console.log('Search:', value)}
+            <div className="flex-1 overflow-y-auto">
+                <Table
+                    columns={columns}
+                    dataSource={data}
+                    loading={loading}
+                    rowKey="id"
+                    pagination={false}
                 />
-                <Select
-                    placeholder="Trạng thái"
-                    style={{ width: 150 }}
-                    options={[
-                        { value: 'all', label: 'Tất cả' },
-                        { value: 'active', label: 'Đã duyệt' },
-                        { value: 'pending', label: 'Chờ duyệt' },
-                        { value: 'rejected', label: 'Từ chối' },
-                    ]}
-                    onChange={(value) => console.log('Status:', value)}
-                />
-                <Select
-                    placeholder="Mục đích"
-                    style={{ width: 150 }}
-                    options={[
-                        { value: 'all', label: 'Tất cả' },
-                        { value: Purpose_Post.For_Sell, label: 'Bán' },
-                        { value: Purpose_Post.For_Rent, label: 'Cho thuê' },
-                        { value: Purpose_Post.For_Auction, label: 'Đấu giá' },
-                    ]}
-                    onChange={(value) => console.log('Purpose:', value)}
-                />
-                <Button type="default" onClick={() => console.log('Reset filters')}>
-                    Đặt lại
-                </Button>
             </div>
-
-            {/* Table */}
-            <Table 
-                columns={columns}
-                dataSource={data}
-                rowKey="id"
-                loading={loading}
-                pagination={{
-                    total: data.length,
-                    pageSize: 10,
-                    showSizeChanger: true,
-                    showTotal: (total) => `Tổng ${total} bài đăng`
+            <PostDetailModal
+                post={selectedPost}
+                visible={showDetailModal}
+                onClose={() => {
+                    setShowDetailModal(false);
+                    setSelectedPost(undefined);
                 }}
             />
         </div>

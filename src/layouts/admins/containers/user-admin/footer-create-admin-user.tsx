@@ -12,6 +12,7 @@ export const FooterCreateAdminUser = observer(() => {
     const handleSubmit = async () => {
         showLoading()
         let res = await onSubmit();
+        // console.log('ok')
         if (res?.Status) {
             onClear();
             onRefresh()

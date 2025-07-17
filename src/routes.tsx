@@ -36,9 +36,11 @@ export const AppRouter = observer(() => {
                 <Routes>
                     <Route path="/" element={<LandingMapRoutes />} />
                     <Route path="admin/*" element={
-                        <RequireAuth>
+                        <RequireAuth requireAdmin>
                             <AdminRoutes />
-                        </RequireAuth>} />
+                        </RequireAuth>
+                    } />
+
 
                     <Route path="auth/*" element={
                         <SkipAuth>
@@ -100,11 +102,10 @@ const SkipAuth = observer(({ children }: { children: JSX.Element }) => {
     return children;
 });
 
-const RequireAuth = observer(({ children }: { children: JSX.Element }) => {
+const RequireAuth = observer(({ children, requireAdmin = false }: { children: JSX.Element, requireAdmin?: boolean }) => {
     const { sessionStore } = useCoreStores();
     const location = useLocation();
 
-    // Đợi cho đến khi sessionStore được khởi tạo hoàn toàn
     if (!sessionStore.isInitialized) {
         return (
             <div className="w-full h-full flex items-center justify-center">
@@ -113,12 +114,13 @@ const RequireAuth = observer(({ children }: { children: JSX.Element }) => {
         );
     }
 
-    // Chỉ chuyển hướng khi không có session
     if (!sessionStore.session?.access_token) {
-        // Lưu lại route hiện tại để sau khi login sẽ quay lại
         return <Navigate to="/auth/login" state={{ from: location.pathname + location.search }} replace />;
     }
 
-    // Nếu có session, giữ nguyên route hiện tại
+    if (requireAdmin && sessionStore.profile?.role !== 'admin') {
+        return <Navigate to="/home" replace />;
+    }
+
     return children;
 });

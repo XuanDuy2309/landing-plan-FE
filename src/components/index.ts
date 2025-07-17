@@ -17,5 +17,6 @@ export * from './modal-map';
 export * from './modal-select-image';
 export * from './modal-select-position';
 export * from './modal/modal-base';
+export * from './modal/post-detail';
 export * from './overlay-system';
 export * from './radio-group';

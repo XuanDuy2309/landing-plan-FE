@@ -1,10 +1,10 @@
 
-import { makeObservable } from "mobx";
+import { makeObservable, observable } from "mobx";
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
 import { AuthApi } from "src/core/api";
 import { BaseResponse } from "src/core/config";
-import { UserModel } from "src/core/models";
+import { Role, Status, UserModel } from "src/core/models";
 import { useCoreStores } from "src/core/stores";
 import { IBaseContextType, IContextFilter, useBaseContextProvider } from "../../../context";
 import { Type_List } from "../../members";
@@ -12,6 +12,8 @@ import { UserUseCase } from "../usecase";
 
 
 export class FilterListUserContextType extends IContextFilter {
+    @observable status?: Status
+    @observable role?: Role
 
     constructor() {
         super();
@@ -50,9 +52,12 @@ export const ListUserContextProvider = observer(({ children, type, id }: IProps)
             offset: 0
         }
         if (type === Type_List.User) { res = await uc.fetchInternal({ ...filter, excludeIds: [sessionStore.profile?.id] }, index, pageSize) }
-        if (type === Type_List.Follower) { res = await uc.fetchFollowers({ ...filter, user_id: id ? id : null }, index, pageSize) }
-        if (type === Type_List.Following) { res = await uc.fetchFollowing({ ...filter, user_id: id ? id : null }, index, pageSize) }
-        if (type === Type_List.Member) { res = await uc.fetchMembers(id || 0, { ...filter }, index, pageSize) }
+        else if (type === Type_List.Follower) { res = await uc.fetchFollowers({ ...filter, user_id: id ? id : null }, index, pageSize) }
+        else if (type === Type_List.Following) { res = await uc.fetchFollowing({ ...filter, user_id: id ? id : null }, index, pageSize) }
+        else if (type === Type_List.Member) { res = await uc.fetchMembers(id || 0, { ...filter }, index, pageSize) }
+        else {
+            res = await uc.fetchInternal({ ...filter }, index, pageSize)
+        }
         return {
             ...res,
         }

@@ -1,67 +1,45 @@
-import { Button, Input, Modal, Select, Table, Tag, Tooltip } from "antd";
+import { Button, Select, Table, Tag, Tooltip } from "antd";
 import type { ColumnsType } from 'antd/es/table';
 import { observer } from "mobx-react";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
+import { toast } from "react-toastify";
 import { Colors } from "src/assets";
+import { ModalBase, PostDetailModal } from "src/components";
 import { ButtonIcon } from "src/components/button-icon";
+import { ModalConfirm } from "src/components/modal-confirm/modal-confim";
+import { BidsApi, PostApi } from "src/core/api";
 import { formatMoney } from "src/core/base";
-
-interface AuctionData {
-    id: number;
-    title: string;
-    create_by_name: string;
-    status: 'not_started' | 'in_progress' | 'ended' | 'cancelled';
-    price_start: number;
-    price_current: number;
-    start_date: string;
-    end_date: string;
-    total_bids: number;
-}
-
-interface BidHistory {
-    id: number;
-    user_name: string;
-    bid_amount: number;
-    bid_time: string;
-}
+import { BIDModel, PostModel, Purpose_Post, Status_Post } from "src/core/models";
+import { PostContextProvider, usePostContext } from "src/core/modules";
 
 export const AuctionsScreen = observer(() => {
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<AuctionData[]>([]);
-    const [showBidHistory, setShowBidHistory] = useState(false);
-    const [selectedAuction, setSelectedAuction] = useState<AuctionData | null>(null);
-    const [bidHistory, setBidHistory] = useState<BidHistory[]>([]);
+    return (
+        <PostContextProvider purpose={Purpose_Post.For_Auction}>
+            <AuctionsContainer />
+        </PostContextProvider>
+    )
+})
 
-    // Mock data for testing
-    useEffect(() => {
-        setData([
-            {
-                id: 1,
-                title: "Nhà phố Quận 7",
-                create_by_name: "Nguyễn Văn A",
-                status: "in_progress",
-                price_start: 2000000000,
-                price_current: 2500000000,
-                start_date: "2025-07-15T10:00:00",
-                end_date: "2025-07-20T10:00:00",
-                total_bids: 15
-            },
-            {
-                id: 2,
-                title: "Căn hộ Quận 2",
-                create_by_name: "Trần Thị B",
-                status: "not_started",
-                price_start: 1500000000,
-                price_current: 1500000000,
-                start_date: "2025-07-20T15:00:00",
-                end_date: "2025-07-25T15:00:00",
-                total_bids: 0
-            }
-        ]);
-    }, []);
 
-    const columns: ColumnsType<AuctionData> = [
+const AuctionsContainer = observer(() => {
+    const { data, loading, total, pageSize, filter, onRefresh, indexPage, onNext, onPrev } = usePostContext()
+    const [selectedAuction, setSelectedAuction] = useState<PostModel>();
+    const [bidHistory, setBidHistory] = useState<BIDModel[]>([]);
+    const [showDetailModal, setShowDetailModal] = useState<boolean>(false)
+    const modalBids = useRef<any>(null)
+    const confirmRef = useRef<any>(null)
+
+    let pageSizeTemp = pageSize * indexPage;
+    if (pageSize * indexPage >= total) {
+        pageSizeTemp = total;
+    }
+    let showIndexTemp = 1;
+    if (indexPage > 1) {
+        showIndexTemp = indexPage * pageSize - pageSize;
+    }
+
+    const columns: ColumnsType<PostModel> = [
         {
             title: 'ID',
             dataIndex: 'id',
@@ -89,16 +67,14 @@ export const AuctionsScreen = observer(() => {
             width: 120,
             render: (status) => (
                 <Tag color={
-                    status === 'in_progress' ? 'processing' :
-                    status === 'not_started' ? 'default' :
-                    status === 'ended' ? 'success' :
-                    'error'
+                    Number(status) === Status_Post.Process ? 'success' :
+                        Number(status) === Status_Post.Coming_Soon ? 'warning' :
+                            'error'
                 }>
-                    {status === 'in_progress' ? 'Đang diễn ra' :
-                     status === 'not_started' ? 'Chưa bắt đầu' :
-                     status === 'ended' ? 'Đã kết thúc' :
-                     'Đã hủy'}
-                </Tag>
+                    {Number(status) === Status_Post.Process ? 'Đã duyệt' :
+                        Number(status) === Status_Post.Coming_Soon ? 'Chờ duyệt' :
+                            'Từ chối'}
+                </Tag >
             )
         },
         {
@@ -137,21 +113,21 @@ export const AuctionsScreen = observer(() => {
             width: 120,
             render: (_, record) => (
                 <div className="flex space-x-2">
-                    <ButtonIcon 
-                        icon="eye-outline" 
+                    <ButtonIcon
+                        icon="eye-outline"
                         size="xxs"
                         color={Colors.blue[600]}
                         onClick={() => handleView(record)}
                     />
-                    <ButtonIcon 
-                        icon="time-outline" 
+                    <ButtonIcon
+                        icon="auction-outline"
                         size="xxs"
                         color={Colors.green[600]}
                         onClick={() => handleViewBidHistory(record)}
                     />
-                    {record.status === 'not_started' && (
-                        <ButtonIcon 
-                            icon="close-outline" 
+                    {Number(record.status) === Status_Post.Coming_Soon && (
+                        <ButtonIcon
+                            icon="close-outline"
                             size="xxs"
                             color={Colors.red[600]}
                             onClick={() => handleCancel(record)}
@@ -162,7 +138,7 @@ export const AuctionsScreen = observer(() => {
         },
     ];
 
-    const bidHistoryColumns: ColumnsType<BidHistory> = [
+    const bidHistoryColumns: ColumnsType<BIDModel> = [
         {
             title: 'Người đấu giá',
             dataIndex: 'user_name',
@@ -181,105 +157,127 @@ export const AuctionsScreen = observer(() => {
         },
     ];
 
-    const handleView = (record: AuctionData) => {
+    const handleView = (record: PostModel) => {
         setSelectedAuction(record);
-        // TODO: Navigate to auction detail page
-        console.log('View auction:', record);
+        setShowDetailModal(true)
     };
 
-    const handleViewBidHistory = (record: AuctionData) => {
+    const handleViewBidHistory = async (record: PostModel) => {
         setSelectedAuction(record);
-        // Mock bid history data
-        setBidHistory([
-            {
-                id: 1,
-                user_name: "Nguyễn Văn X",
-                bid_amount: 2500000000,
-                bid_time: "2025-07-15T11:30:00"
-            },
-            {
-                id: 2,
-                user_name: "Trần Văn Y",
-                bid_amount: 2300000000,
-                bid_time: "2025-07-15T11:00:00"
-            }
-        ]);
-        setShowBidHistory(true);
+        const res = await BidsApi.getBids({ id: record.id })
+        if (res.Status) {
+            setBidHistory(res.Data.data)
+        }
+        modalBids.current.open()
     };
 
-    const handleCancel = (record: AuctionData) => {
-        Modal.confirm({
-            title: 'Xác nhận hủy phiên đấu giá',
-            content: 'Bạn có chắc chắn muốn hủy phiên đấu giá này?',
-            okText: 'Xác nhận',
-            cancelText: 'Hủy',
-            onOk: () => {
-                // TODO: Implement cancel auction
-                console.log('Cancel auction:', record);
-            }
-        });
+    const handleCancel = (record: PostModel) => {
+        setSelectedAuction(record)
+        confirmRef.current.open()
     };
 
     return (
         <div className="w-full h-full flex flex-col">
             {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Quản lý đấu giá</h1>
-            </div>
+            <div className="w-full flex flex-col">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold text-gray-900">Quản lý đấu giá</h1>
+                </div>
 
-            {/* Filters */}
-            <div className="flex space-x-4 mb-6">
-                <Input.Search 
-                    placeholder="Tìm kiếm theo tên tài sản..." 
-                    style={{ width: 300 }}
-                    onSearch={(value) => console.log('Search:', value)}
-                />
-                <Select
-                    placeholder="Trạng thái"
-                    style={{ width: 150 }}
-                    options={[
-                        { value: 'all', label: 'Tất cả' },
-                        { value: 'in_progress', label: 'Đang diễn ra' },
-                        { value: 'not_started', label: 'Chưa bắt đầu' },
-                        { value: 'ended', label: 'Đã kết thúc' },
-                        { value: 'cancelled', label: 'Đã hủy' },
-                    ]}
-                    onChange={(value) => console.log('Status:', value)}
-                />
-                <Button type="default" onClick={() => console.log('Reset filters')}>
-                    Đặt lại
-                </Button>
+                {/* Filters */}
+                <div className="flex items-center justify-between px-4">
+                    <div className="flex space-x-4 mb-6">
+                        <div className="w-[300px] h-8 border border-gray-200 flex items-center rounded">
+                            <input type="text" onChange={(e) => { filter.query = e.target.value }} className="w-full h-full text-xs px-3"
+                                placeholder="Tìm kiếm theo địa chỉ"
+                            />
+                            <ButtonIcon icon="search-outline" size="xxs"
+                                color={Colors.gray[300]}
+                                onClick={() => {
+                                    onRefresh()
+                                }} />
+                        </div>
+                        <Select
+                            placeholder="Trạng thái"
+                            style={{ width: 150 }}
+                            options={[
+                                { value: 4, label: 'Tất cả' },
+                                { value: Status_Post.Process, label: 'Đã duyệt' },
+                                { value: Status_Post.Coming_Soon, label: 'Chờ duyệt' },
+                                { value: Status_Post.End, label: 'Từ chối' },
+                            ]}
+                            onChange={(value) => {
+                                filter.status = value === 4 ? undefined : value
+                                onRefresh()
+                            }}
+                        />
+                        <Button type="default" onClick={() => {
+                            filter.status = undefined
+                            filter.query = undefined
+                            onRefresh()
+                        }}>
+                            Đặt lại
+                        </Button>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <ButtonIcon icon="arrowleft" size="xxs" color={Colors.gray[400]} onClick={onPrev} />
+                        <span>{showIndexTemp}-{pageSizeTemp} của {total} phiên đấu giá</span>
+                        <ButtonIcon icon="arrowright" size="xxs" color={Colors.gray[400]} onClick={onPrev} />
+                    </div>
+                </div>
             </div>
-
-            {/* Table */}
-            <Table 
+            <Table
                 columns={columns}
                 dataSource={data}
                 rowKey="id"
                 loading={loading}
-                pagination={{
-                    total: data.length,
-                    pageSize: 10,
-                    showSizeChanger: true,
-                    showTotal: (total) => `Tổng ${total} phiên đấu giá`
-                }}
+                pagination={false}
             />
 
             {/* Bid History Modal */}
-            <Modal
-                title={`Lịch sử đấu giá - ${selectedAuction?.title}`}
-                open={showBidHistory}
-                onCancel={() => setShowBidHistory(false)}
-                footer={null}
-                width={800}
+            <ModalBase
+                ref={modalBids}
             >
-                <Table 
-                    columns={bidHistoryColumns}
-                    dataSource={bidHistory}
-                    rowKey="id"
-                    pagination={false}
-                />
-            </Modal>
+                <div className="w-full h-[600px] flex flex-col min-h-0 bg-white">
+                    <div className="w-full h-12 flex items-center justify-between px-3 border-b border-gray-200">
+                        <span className="text-lg text-gray-900 font-medium">Danh sách lượt đấu giá</span>
+                        <ButtonIcon icon="close-outline" size="xxs" color={Colors.gray[900]} onClick={() => { modalBids.current.close() }} />
+                    </div>
+                    <div className="flex-1 overflow-y-auto">
+                        <Table
+                            columns={bidHistoryColumns}
+                            dataSource={bidHistory}
+                            rowKey="id"
+                            pagination={false}
+                            className="h-full"
+                        />
+                    </div>
+                </div>
+            </ModalBase>
+            <PostDetailModal
+                post={selectedAuction}
+                visible={showDetailModal}
+                onClose={() => {
+                    setShowDetailModal(false);
+                    setSelectedAuction(undefined);
+                }}
+            />
+            <ModalConfirm
+                ref={confirmRef}
+                label={`Bạn có chắc chắn muốn huỷ phiên đấu giá này`}
+                onConfirm={async () => {
+                    if (!selectedAuction) return
+                    selectedAuction.status = Status_Post.End
+                    const res = await PostApi.updatePost(selectedAuction?.id || 0, { status: selectedAuction.status })
+                    if (res.Status) {
+                        toast.success(res.Message)
+                        onRefresh()
+                        return
+                    }
+                    toast.error(res.Message)
+                }
+                }
+            />
         </div>
     );
 });

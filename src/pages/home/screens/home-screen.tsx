@@ -7,7 +7,7 @@ import { LeftSideHome } from "../containers/home/left-side-home";
 export const HomeScreen = observer(() => {
     const { sessionStore } = useCoreStores();
     return (
-        <PostContextProvider>
+        <PostContextProvider home>
             <div className="w-full h-full flex items-center justify-between max-w-[1440px] mx-auto">
                 <div className="w-1/3 max-w-[480px] min-w-[280px] h-full flex-none">
                     <LeftSideHome />

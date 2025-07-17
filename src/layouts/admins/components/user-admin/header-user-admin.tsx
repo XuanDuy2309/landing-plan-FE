@@ -10,7 +10,7 @@ export const HeaderUserAdmin = observer(() => {
         <div className='w-full flex flex-col flex-none'>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">Quản lý người dùng</h1>
-                <ButtonLoading
+                {!isCreate && <ButtonLoading
                     label="Thêm người dùng"
                     iconLeft="add-outline"
                     size="xs"
@@ -18,7 +18,7 @@ export const HeaderUserAdmin = observer(() => {
                     onClick={() => {
                         setCreate(true);
                     }}
-                />
+                />}
             </div>
 
             <Collapse isOpened={isCreate}>

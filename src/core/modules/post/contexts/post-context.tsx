@@ -3,11 +3,12 @@ import { observer } from "mobx-react";
 import React, { useEffect } from "react";
 import { PostApi } from "../../../api";
 import { IBaseContextType, IContextFilter, useBaseContextProvider } from "../../../context";
-import { PostModel, Purpose_Post, Type_Asset_Enum } from "../../../models";
+import { PostModel, Purpose_Post, Status_Post, Type_Asset_Enum } from "../../../models";
 import { PostUseCase } from "../usecase";
 
 
 export class FilterPostContextType extends IContextFilter {
+    @observable status?: Status_Post
     @observable purpose: Purpose_Post[] = []
     @observable type_asset: Type_Asset_Enum[] = []
     @observable price_start?: string
@@ -37,9 +38,11 @@ interface IProps {
     children: React.ReactNode
     id?: number
     following?: boolean
+    purpose?: Purpose_Post
+    home?: boolean
 }
 
-export const PostContextProvider = observer(({ children, id, following }: IProps) => {
+export const PostContextProvider = observer(({ children, id, following, purpose, home }: IProps) => {
     const context = useBaseContextProvider<FilterPostContextType, PostModel>(new FilterPostContextType(), request)
 
 
@@ -57,8 +60,14 @@ export const PostContextProvider = observer(({ children, id, following }: IProps
         if (following) {
             res = await uc.fetchFollowingPost({ ...filter }, index, pageSize)
         }
+        else if (purpose) {
+            res = await uc.fetchInternal({ ...filter, purpose: [Purpose_Post.For_Auction] }, index, pageSize)
+        }
+        else if (home) {
+            res = await uc.fetchInternal({ ...filter, user_id: id, status: Status_Post.Process }, index, pageSize)
+        }
         else {
-            res = await uc.fetchInternal({ ...filter, user_id: id }, index, pageSize)
+            res = await uc.fetchInternal({ ...filter}, index, pageSize)
         }
         return {
             ...res,

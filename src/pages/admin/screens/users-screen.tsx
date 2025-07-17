@@ -2,10 +2,9 @@ import { Form, Input, Modal, Select, Switch, Tag } from "antd";
 import type { ColumnsType } from 'antd/es/table';
 import { observer } from "mobx-react";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Colors } from "src/assets";
 import { ButtonIcon } from "src/components/button-icon";
-import { Type_List } from "src/core/modules";
 import { ListUserContextProvider, useListUserContext } from "src/core/modules/user/context";
 import { HeaderUserAdmin } from "src/layouts/admins/components/user-admin/header-user-admin";
 import { ListAdminUserContainer } from "src/layouts/admins/containers/user-admin/list-admin-user-container";
@@ -30,36 +29,6 @@ export const UsersScreen = observer(() => {
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
     const [form] = Form.useForm();
     const { setCreate, isCreate, data: dataUser } = useListUserContext()
-    // Mock data for testing
-    console.log("Data user:", dataUser);
-    useEffect(() => {
-        setData([
-            {
-                id: 1,
-                fullname: "Nguyễn Văn A",
-                email: "nguyenvana@example.com",
-                phone: "0901234567",
-                status: "active",
-                role: "user",
-                total_posts: 5,
-                total_auctions: 2,
-                created_at: "2025-01-15T10:00:00",
-                last_login: "2025-07-15T09:30:00"
-            },
-            {
-                id: 2,
-                fullname: "Trần Thị B",
-                email: "tranthib@example.com",
-                phone: "0909876543",
-                status: "blocked",
-                role: "user",
-                total_posts: 0,
-                total_auctions: 0,
-                created_at: "2025-02-20T15:00:00",
-                last_login: "2025-06-01T14:20:00"
-            }
-        ]);
-    }, []);
 
     const columns: ColumnsType<UserData> = [
         {
@@ -103,18 +72,6 @@ export const UsersScreen = observer(() => {
             )
         },
         {
-            title: 'Bài đăng',
-            dataIndex: 'total_posts',
-            width: 100,
-            sorter: (a, b) => a.total_posts - b.total_posts,
-        },
-        {
-            title: 'Đấu giá',
-            dataIndex: 'total_auctions',
-            width: 100,
-            sorter: (a, b) => a.total_auctions - b.total_auctions,
-        },
-        {
             title: 'Ngày tạo',
             dataIndex: 'created_at',
             width: 150,
@@ -124,7 +81,7 @@ export const UsersScreen = observer(() => {
             title: 'Đăng nhập cuối',
             dataIndex: 'last_login',
             width: 150,
-            render: (date) => moment(date).format('DD/MM/YYYY HH:mm')
+            render: (date) => date ? moment(date).format('DD/MM/YYYY HH:mm') : "Không xác định"
         },
         {
             title: 'Thao tác',
@@ -191,7 +148,7 @@ export const UsersScreen = observer(() => {
     };
 
     return (
-        <ListUserContextProvider type={Type_List.User}>
+        <ListUserContextProvider>
             <div className="w-full h-full flex flex-col overflow-y-auto min-h-0">
                 {/* Header */}
                 <HeaderUserAdmin />

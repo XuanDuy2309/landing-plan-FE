@@ -14,12 +14,8 @@ export const CreateAdminUserContent = observer(() => {
     };
 
     return (
-        <form
+        <div
             className="w-full flex flex-col gap-4 pb-3"
-            onSubmit={async (e) => {
-                e.preventDefault();
-                await onSubmit();
-            }}
         >
             {/* Thông tin cá nhân */}
             <div className="flex flex-col gap-4">
@@ -173,6 +169,6 @@ export const CreateAdminUserContent = observer(() => {
                     {data.err_confirm_password && <span className="text-red-400 text-[14px] leading-4 ml-40">{data.err_confirm_password}</span>}
                 </>}
             </div>
-        </form>
+        </div>
     );
 });

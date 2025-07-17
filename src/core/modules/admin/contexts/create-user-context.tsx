@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import moment from "moment";
 import React, { useEffect } from "react";
 import { AuthApi } from "src/core/api";
 import { BaseResponse } from "src/core/config";
@@ -42,15 +43,15 @@ export const CreateAdminUserContextProvider = observer(({ children }: IProps) =>
             data.err_username = 'Vui lòng nhập tên đăng nhập';
             isValid = false
         }
-        if (!data.password) {
+        if (!itemUpdate && !data.password) {
             data.err_password = 'Vui lòng nhập mật khẩu';
             isValid = false
         }
-        if (!data.confirm_password) {
+        if (!itemUpdate && !data.confirm_password) {
             data.err_confirm_password = 'Vui lòng xác nhận mật khẩu';
             isValid = false
         }
-        if (data.password !== data.confirm_password) {
+        if (!itemUpdate && data.password !== data.confirm_password) {
             data.err_confirm_password = 'Mật khẩu xác nhận không khớp';
             isValid = false
         }
@@ -61,12 +62,20 @@ export const CreateAdminUserContextProvider = observer(({ children }: IProps) =>
 
     const onSubmit = async () => {
         if (!isValid()) {
+            console.log(data)
             return
         }
-        if (isValid() === false) {
-            return;
-        }
-        const params = { ...data };
+        const params = {
+            gender: data.gender,
+            role: data.role,
+            status: data.status,
+            last_login: data.last_login,
+            fullname: data.fullname,
+            phone_number: data.phone_number,
+            address: data.address,
+            dob: data.dob ? moment(data.dob).format('YYYY-MM-DD') : null,
+            email: data.email
+        };
 
         let res: BaseResponse = {
             Status: false,
@@ -74,9 +83,8 @@ export const CreateAdminUserContextProvider = observer(({ children }: IProps) =>
             Message: "",
             Code: undefined
         }
-
         if (itemUpdate) {
-            res = await AuthApi.register(params);
+            res = await AuthApi.updateUser(data.id, params);
             if (res.Status) {
                 onClear()
             }

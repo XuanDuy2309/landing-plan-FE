@@ -51,6 +51,22 @@ export const HeaderAdminLayout = observer(() => {
 
             <div className="flex items-center space-x-4">
                 <ButtonIcon
+                    icon="map-outline"
+                    size="xxs"
+                    color={Colors.gray[700]}
+                    onClick={() => {
+                        navigate('/')
+                    }}
+                />
+                <ButtonIcon
+                    icon="home-outline"
+                    size="xxs"
+                    color={Colors.gray[700]}
+                    onClick={() => {
+                        navigate('/home')
+                    }}
+                />
+                <ButtonIcon
                     icon="logout-outline"
                     size="xxs"
                     color={Colors.gray[700]}

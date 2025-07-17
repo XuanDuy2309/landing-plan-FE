@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Colors } from "src/assets";
 import { IconBase } from "src/components";
 import { getColorFromId } from "src/core/base";
+import { Role } from "src/core/models";
 import { useCoreStores } from "src/core/stores";
 
 interface IProps {
@@ -21,6 +22,16 @@ export const DropdownSettingHeader = observer(({ onSelect }: IProps) => {
                 onSelect && onSelect()
             }
         },
+        ...sessionStore.profile?.role === Role.admin ? [
+            {
+                icon: 'category-outline',
+                title: 'Trang quản trị',
+                onclick: () => {
+                    navigate('/admin')
+                    onSelect && onSelect()
+                }
+            },
+        ] : [],
         {
             icon: 'logout-outline',
             title: 'Đăng xuất',

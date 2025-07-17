@@ -1,69 +1,42 @@
-import { UploadOutlined } from '@ant-design/icons';
-import { Button, Form, Input, InputNumber, Modal, Select, Table, Tag, Upload } from "antd";
+import { Button, Form, Input, Select, Table, Tag } from "antd";
 import type { ColumnsType } from 'antd/es/table';
 import 'leaflet/dist/leaflet.css';
 import { observer } from "mobx-react";
 import moment from "moment";
-import { useEffect, useState } from "react";
-import { MapContainer, TileLayer } from 'react-leaflet';
+import { useState } from "react";
 import { Colors } from "src/assets";
+import { MapDetailModal } from "src/components";
 import { ButtonIcon } from "src/components/button-icon";
-
-interface MapData {
-    id: number;
-    name: string;
-    description: string;
-    area_name: string;
-    status: 'active' | 'inactive';
-    folder_path: string;
-    opacity: number;
-    zoom_min: number;
-    zoom_max: number;
-    created_at: string;
-    updated_at: string;
-}
+import { LandingPlanModel } from 'src/core/models';
+import { MapContextProvider, useMapContext } from 'src/core/modules';
 
 export const MapsScreen = observer(() => {
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<MapData[]>([]);
+
+    return (
+        <MapContextProvider>
+            <MapsContainer />
+        </MapContextProvider>
+    )
+})
+
+
+const MapsContainer = observer(() => {
+    const { data, loading, pageSize, indexPage, total, onNext, onPrev } = useMapContext()
     const [showAddModal, setShowAddModal] = useState(false);
     const [showPreviewModal, setShowPreviewModal] = useState(false);
-    const [selectedMap, setSelectedMap] = useState<MapData | null>(null);
+    const [selectedMap, setSelectedMap] = useState<LandingPlanModel>();
     const [form] = Form.useForm();
 
-    // Mock data for testing
-    useEffect(() => {
-        setData([
-            {
-                id: 1,
-                name: "Quy hoạch Q7",
-                description: "Bản đồ quy hoạch Quận 7",
-                area_name: "Quận 7",
-                status: "active",
-                folder_path: "/maps/q7",
-                opacity: 0.7,
-                zoom_min: 12,
-                zoom_max: 18,
-                created_at: "2025-01-15T10:00:00",
-                updated_at: "2025-07-15T09:30:00"
-            },
-            {
-                id: 2,
-                name: "Quy hoạch Q2",
-                description: "Bản đồ quy hoạch Quận 2",
-                area_name: "Quận 2",
-                status: "inactive",
-                folder_path: "/maps/q2",
-                opacity: 0.7,
-                zoom_min: 12,
-                zoom_max: 18,
-                created_at: "2025-02-20T15:00:00",
-                updated_at: "2025-06-01T14:20:00"
-            }
-        ]);
-    }, []);
+    let pageSizeTemp = pageSize * indexPage;
+    if (pageSize * indexPage >= total) {
+        pageSizeTemp = total;
+    }
+    let showIndexTemp = 1;
+    if (indexPage > 1) {
+        showIndexTemp = indexPage * pageSize - pageSize;
+    }
 
-    const columns: ColumnsType<MapData> = [
+    const columns: ColumnsType<LandingPlanModel> = [
         {
             title: 'ID',
             dataIndex: 'id',
@@ -73,16 +46,6 @@ export const MapsScreen = observer(() => {
             title: 'Tên bản đồ',
             dataIndex: 'name',
             width: 200,
-        },
-        {
-            title: 'Khu vực',
-            dataIndex: 'area_name',
-            width: 150,
-        },
-        {
-            title: 'Mô tả',
-            dataIndex: 'description',
-            width: 250,
         },
         {
             title: 'Trạng thái',
@@ -95,75 +58,65 @@ export const MapsScreen = observer(() => {
             )
         },
         {
-            title: 'Độ mờ',
-            dataIndex: 'opacity',
-            width: 100,
-            render: (opacity) => `${opacity * 100}%`
-        },
-        {
-            title: 'Zoom',
-            dataIndex: 'zoom_min',
-            width: 120,
-            render: (_, record) => `${record.zoom_min} - ${record.zoom_max}`
-        },
-        {
             title: 'Cập nhật',
             dataIndex: 'updated_at',
             width: 150,
             render: (date) => moment(date).format('DD/MM/YYYY HH:mm')
         },
         {
-            title: 'Thao tác',
+            title: <div className="w-full flex items-center justify-center">
+                <span>Thao tác</span>
+            </div>,
             key: 'action',
             width: 150,
             render: (_, record) => (
-                <div className="flex space-x-2">
-                    <ButtonIcon 
-                        icon="eye-outline" 
+                <div className="flex space-x-2 justify-center">
+                    <ButtonIcon
+                        icon="eye-outline"
                         size="xxs"
                         color={Colors.blue[600]}
                         onClick={() => handlePreview(record)}
                     />
-                    <ButtonIcon 
-                        icon="create-outline" 
+                    {/* <ButtonIcon
+                        icon="create-outline"
                         size="xxs"
                         color={Colors.green[600]}
                         onClick={() => handleEdit(record)}
-                    />
-                    <ButtonIcon 
+                    /> */}
+                    {/* <ButtonIcon 
                         icon={record.status === 'active' ? 'eye-off-outline' : 'eye-outline'}
                         size="xxs"
                         color={record.status === 'active' ? Colors.red[600] : Colors.green[600]}
                         onClick={() => handleToggleStatus(record)}
-                    />
+                    /> */}
                 </div>
             )
         },
     ];
 
-    const handlePreview = (record: MapData) => {
+    const handlePreview = (record: LandingPlanModel) => {
         setSelectedMap(record);
         setShowPreviewModal(true);
     };
 
-    const handleEdit = (record: MapData) => {
+    const handleEdit = (record: LandingPlanModel) => {
         setSelectedMap(record);
         form.setFieldsValue(record);
         setShowAddModal(true);
     };
 
-    const handleToggleStatus = (record: MapData) => {
-        Modal.confirm({
-            title: `Xác nhận ${record.status === 'active' ? 'ẩn' : 'hiển thị'} bản đồ`,
-            content: `Bạn có chắc chắn muốn ${record.status === 'active' ? 'ẩn' : 'hiển thị'} bản đồ này?`,
-            okText: 'Xác nhận',
-            cancelText: 'Hủy',
-            onOk: () => {
-                // TODO: Implement toggle map status
-                console.log('Toggle status:', record);
-            }
-        });
-    };
+    // const handleToggleStatus = (record: LandingPlanModel) => {
+    //     Modal.confirm({
+    //         title: `Xác nhận ${record.status === 'active' ? 'ẩn' : 'hiển thị'} bản đồ`,
+    //         content: `Bạn có chắc chắn muốn ${record.status === 'active' ? 'ẩn' : 'hiển thị'} bản đồ này?`,
+    //         okText: 'Xác nhận',
+    //         cancelText: 'Hủy',
+    //         onOk: () => {
+    //             // TODO: Implement toggle map status
+    //             console.log('Toggle status:', record);
+    //         }
+    //     });
+    // };
 
     const handleSave = async () => {
         try {
@@ -179,58 +132,64 @@ export const MapsScreen = observer(() => {
     return (
         <div className="w-full h-full flex flex-col">
             {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Quản lý bản đồ</h1>
-                <Button 
-                    type="primary"
-                    onClick={() => {
-                        setSelectedMap(null);
-                        form.resetFields();
-                        setShowAddModal(true);
-                    }}
-                >
-                    Thêm bản đồ mới
-                </Button>
-            </div>
+            <div className='w-full flex flex-col'>
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold text-gray-900">Quản lý bản đồ</h1>
+                    {/* <Button
+                        type="primary"
+                        onClick={() => {
+                            setSelectedMap(undefined);
+                            form.resetFields();
+                            setShowAddModal(true);
+                        }}
+                    >
+                        Thêm bản đồ mới
+                    </Button> */}
+                </div>
 
-            {/* Filters */}
-            <div className="flex space-x-4 mb-6">
-                <Input.Search 
-                    placeholder="Tìm kiếm theo tên..." 
-                    style={{ width: 300 }}
-                    onSearch={(value) => console.log('Search:', value)}
-                />
-                <Select
-                    placeholder="Trạng thái"
-                    style={{ width: 150 }}
-                    options={[
-                        { value: 'all', label: 'Tất cả' },
-                        { value: 'active', label: 'Đang hiển thị' },
-                        { value: 'inactive', label: 'Đã ẩn' },
-                    ]}
-                    onChange={(value) => console.log('Status:', value)}
-                />
-                <Button type="default" onClick={() => console.log('Reset filters')}>
-                    Đặt lại
-                </Button>
+                {/* Filters */}
+                <div className='flex items-center justify-between px-4'>
+                    <div className="flex space-x-4 mb-6">
+                        <Input.Search
+                            placeholder="Tìm kiếm theo tên..."
+                            style={{ width: 300 }}
+                            onSearch={(value) => console.log('Search:', value)}
+                        />
+                        <Select
+                            placeholder="Trạng thái"
+                            style={{ width: 150 }}
+                            options={[
+                                { value: 'all', label: 'Tất cả' },
+                                { value: 'active', label: 'Đang hiển thị' },
+                                { value: 'inactive', label: 'Đã ẩn' },
+                            ]}
+                            onChange={(value) => console.log('Status:', value)}
+                        />
+                        <Button type="default" onClick={() => console.log('Reset filters')}>
+                            Đặt lại
+                        </Button>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <ButtonIcon icon="arrowleft" size="xxs" color={Colors.gray[400]} onClick={onPrev} />
+                        <span>{showIndexTemp}-{pageSizeTemp} của {total} bản đồ</span>
+                        <ButtonIcon icon="arrowright" size="xxs" color={Colors.gray[400]} onClick={onNext} />
+                    </div>
+                </div>
             </div>
 
             {/* Table */}
-            <Table 
-                columns={columns}
-                dataSource={data}
-                rowKey="id"
-                loading={loading}
-                pagination={{
-                    total: data.length,
-                    pageSize: 10,
-                    showSizeChanger: true,
-                    showTotal: (total) => `Tổng ${total} bản đồ`
-                }}
-            />
+            <div className="flex-1 overflow-y-auto">
+                <Table
+                    columns={columns}
+                    dataSource={data}
+                    rowKey="id"
+                    loading={loading}
+                    pagination={false}
+                />
+            </div>
 
             {/* Add/Edit Modal */}
-            <Modal
+            {/* <Modal
                 title={selectedMap ? "Chỉnh sửa bản đồ" : "Thêm bản đồ mới"}
                 open={showAddModal}
                 onCancel={() => setShowAddModal(false)}
@@ -273,9 +232,9 @@ export const MapsScreen = observer(() => {
                             label="Độ mờ"
                             className="flex-1"
                         >
-                            <InputNumber 
-                                min={0} 
-                                max={1} 
+                            <InputNumber
+                                min={0}
+                                max={1}
                                 step={0.1}
                                 style={{ width: '100%' }}
                             />
@@ -286,7 +245,7 @@ export const MapsScreen = observer(() => {
                             label="Zoom tối thiểu"
                             className="flex-1"
                         >
-                            <InputNumber 
+                            <InputNumber
                                 min={1}
                                 max={20}
                                 style={{ width: '100%' }}
@@ -298,7 +257,7 @@ export const MapsScreen = observer(() => {
                             label="Zoom tối đa"
                             className="flex-1"
                         >
-                            <InputNumber 
+                            <InputNumber
                                 min={1}
                                 max={20}
                                 style={{ width: '100%' }}
@@ -318,37 +277,15 @@ export const MapsScreen = observer(() => {
                         </Upload.Dragger>
                     </Form.Item>
                 </Form>
-            </Modal>
-
-            {/* Preview Modal */}
-            <Modal
-                title={`Xem trước - ${selectedMap?.name}`}
-                open={showPreviewModal}
-                onCancel={() => setShowPreviewModal(false)}
-                footer={null}
-                width={800}
-            >
-                <div className="h-[500px] w-full">
-                    <MapContainer
-                        center={[10.7769, 106.7009]} // Ho Chi Minh City
-                        zoom={12}
-                        style={{ height: '100%', width: '100%' }}
-                    >
-                        <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        />
-                        {selectedMap && (
-                            <TileLayer
-                                url={`/api/maps/${selectedMap.folder_path}/{z}/{x}/{y}.png`}
-                                opacity={selectedMap.opacity}
-                                minZoom={selectedMap.zoom_min}
-                                maxZoom={selectedMap.zoom_max}
-                            />
-                        )}
-                    </MapContainer>
-                </div>
-            </Modal>
+            </Modal> */}
+            <MapDetailModal
+                map={selectedMap}
+                visible={showPreviewModal}
+                onClose={() => {
+                    setShowPreviewModal(false);
+                    setSelectedMap(undefined);
+                }}
+            />
         </div>
     );
 });

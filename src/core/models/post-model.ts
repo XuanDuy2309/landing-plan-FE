@@ -103,7 +103,7 @@ export class PostModel {
     create_by_phone?: string
     create_by_avatar?: string
     create_by_email?: string
-    create_at?: moment.Moment
+    create_at?: string
     update_at?: moment.Moment
     share_count?: number
     like_by_ids: number[] = []

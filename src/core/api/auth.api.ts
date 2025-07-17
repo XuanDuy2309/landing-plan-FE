@@ -12,6 +12,7 @@ export const AuthApi = {
     getListUploadById: (params?: any) => server.get('/auth/list_upload/' + params.id, params),
     upload: (params?: any) => server.multipartPost('/auth/upload', params),
     updateInfo: (params?: any) => server.put('/user/update', params),
+    updateUser: (id?: number, params?: any) => server.put('/user/update/' + id, params),
     updatePassword: (params?: any) => server.put('/user/change_password', params),
     follow: (params?: any) => server.post('/user/follow', params),
     unfollow: (params?: any) => server.delete('/user/follow/' + params.id, params),

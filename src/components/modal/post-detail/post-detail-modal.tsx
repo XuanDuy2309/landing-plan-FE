@@ -89,7 +89,7 @@ export const PostDetailModal = ({ post, visible, onClose }: PostDetailModalProps
                                 {post.id}
                             </Descriptions.Item>
                             <Descriptions.Item label="Chủ sở hữu">
-                                {post.owner_name}
+                                {post.owner_name || post.create_by_name}
                             </Descriptions.Item>
                             <Descriptions.Item label="Trạng thái">
                                 {renderStatus(post.status)}

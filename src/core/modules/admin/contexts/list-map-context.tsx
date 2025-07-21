@@ -35,7 +35,7 @@ export const MapContextProvider = observer(({ children, id, following, purpose }
         index: number,
         pageSize: number
     ): Promise<{ count: number; list: LandingPlanModel[]; offset: number }> {
-        const res = await LandingMapApi.getListMaps({ ...filter, page: index, pageSize })
+        const res = await LandingMapApi.getListMaps({ ...filter, page: index, page_size: pageSize })
         return {
             list: res.Data?.data,
             count: res.Data?.total,

@@ -4,13 +4,13 @@ import debounce from 'debounce';
 import { observer } from 'mobx-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Colors } from 'src/assets';
-import { LandingPlanModel } from 'src/core/models';
+import { LandingTypeModel } from 'src/core/models';
 import { ListLandingTypeProvider } from 'src/core/modules';
 import { IconBase } from '../icon-base';
 
 interface IProps {
     className?: string;
-    onSelect: (item: LandingPlanModel) => void;
+    onSelect: (item: LandingTypeModel) => void;
     value?: string;
     disabled?: boolean;
     onChange?: (value: string) => void;

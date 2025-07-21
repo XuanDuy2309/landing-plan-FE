@@ -1,9 +1,10 @@
 import { Slider } from 'antd';
 import { observer } from 'mobx-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Collapse } from 'react-collapse';
 import { Colors } from 'src/assets';
 import { IconBase } from 'src/components';
+import { ModalChangeLandType } from 'src/components/modal-note-planing-map/modal-change-land-type-container';
 import { ModalNoteLandingMap } from 'src/components/modal-note-planing-map/modal-note-planing-map-container';
 import { ChatBotModel } from 'src/core/models/chat-bot-model';
 import { useListChatbotContext, useManagementLandingPlan } from 'src/core/modules';
@@ -14,14 +15,27 @@ export const ToolbarLandingMap = observer(() => {
     const { pointsArea, opacity, setOpacity, landingPlanMap } = useManagementLandingPlan()
     const { message, setOpenDropdown, data, handleSendMessage, isOpenDropdown } = useListChatbotContext()
     const modalNoteLandingRef = useRef<any>(null);
-    const handleToggleDraw = () => {
-        pointsArea.isDraw = !pointsArea.isDraw;
-        if (pointsArea.isDraw) {
-            pointsArea.points = [];
-            pointsArea.area = 0;
-            pointsArea.isDraw = true;
+    const modalChangeLandTypeRef = useRef<any>(null);
+    const toggleDrawMode = (changeLandType: boolean) => {
+        const willEnable = !(pointsArea.isDraw && pointsArea.changeLandType === changeLandType);
+
+        // Tắt nếu đang bật đúng mode
+        if (!willEnable) {
+            pointsArea.isDraw = false;
+            pointsArea.changeLandType = false;
+            return;
         }
+
+        // Bật mode tương ứng
+        pointsArea.points = [];
+        pointsArea.area = 0;
+        pointsArea.isDraw = true;
+        pointsArea.changeLandType = changeLandType;
     };
+
+    const handleToggleDraw = () => toggleDrawMode(false);
+    const handleToggleChange = () => toggleDrawMode(true);
+
     const handleReset = () => {
         pointsArea.reset();
     };
@@ -39,12 +53,19 @@ export const ToolbarLandingMap = observer(() => {
     }
 
     const buttons = [
-        { onClick: handleToggleDraw, icon: 'pin-outline', title: 'Đo đạc khu vực', active: pointsArea.isDraw },
+        { onClick: handleToggleDraw, icon: 'pin-outline', title: 'Đo đạc khu vực', active: (pointsArea.isDraw && !pointsArea.changeLandType) },
+        { onClick: handleToggleChange, icon: 'change-outline', title: 'Chuyển đổi loại đất', active: (pointsArea.isDraw && pointsArea.changeLandType) },
         { onClick: handleReset, icon: 'delete-outline', title: 'Đặt lại khu vực', active: false },
         { onClick: handleToggleRouting, icon: 'location-outline', title: 'Chỉ đường', active: pointsArea.isRouting },
         { onClick: handleGoToMyLocation, icon: 'map-outline1', title: 'Định vị', active: false },
         { onClick: () => modalNoteLandingRef.current?.open(), icon: 'note-outline', title: 'Kí hiệu bản đồ quy hoạch', active: false },
     ];
+
+    useEffect(() => {
+        if (!pointsArea.isDraw && pointsArea.changeLandType) {
+            modalChangeLandTypeRef.current?.open()
+        }
+    }, [pointsArea.isDraw, pointsArea.changeLandType])
 
 
     return (
@@ -92,6 +113,12 @@ export const ToolbarLandingMap = observer(() => {
                     if (res.Status) {
                     }
                 }}
+            />
+
+            <ModalChangeLandType
+                ref={modalChangeLandTypeRef}
+                onCancel={() => modalChangeLandTypeRef.current?.close()}
+                centered
             />
         </>
     )

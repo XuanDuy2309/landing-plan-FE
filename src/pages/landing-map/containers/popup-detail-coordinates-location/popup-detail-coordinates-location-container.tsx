@@ -6,7 +6,7 @@ import { useManagementLandingPlan } from 'src/core/modules'
 import { useCoreStores } from 'src/core/stores'
 
 export const PopupDetailCoordinatesLocationContainer = observer(() => {
-    const { coordinates, placementInfo, setPlacementInfo, pointsArea, selectedLocation, landingType } = useManagementLandingPlan()
+    const { coordinates, placementInfo, setPlacementInfo, pointsArea, selectedLocation, landingType, selectedLandTypeChange } = useManagementLandingPlan()
     const [_, forceUpdate] = React.useReducer(x => x + 1, 0)
     const modalRef = useRef<any>(null)
     const { sessionStore } = useCoreStores()
@@ -43,7 +43,7 @@ export const PopupDetailCoordinatesLocationContainer = observer(() => {
                 <div className="flex items-start justify-between">
                     <div className='flex flex-col'>
                         <span className='font-medium text-[15px] line-clamp-2'>{placementInfo.display_name}</span>
-                        <span className='text-[12px] '>Loại đất: {landingType?.code} - {landingType?.name}</span>
+                        <span className='text-[12px] '>Loại đất: {selectedLandTypeChange?.land_type_code || landingType?.code} - {selectedLandTypeChange?.land_type_name || landingType?.name}</span>
                         <span className='text-[12px] text-blue-600'>{selectedLocation.lat}, {selectedLocation.lng}</span>
                     </div>
                     <div className="flex flex-none">

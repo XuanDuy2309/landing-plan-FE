@@ -91,30 +91,32 @@ export const ContentAuctionContainer = observer(() => {
 
     const [auctionStatus, setAuctionStatus] = useState<'not_started' | 'in_progress' | 'ended'>('not_started');
 
+    const getCountdownText = (distance: number, prefix: string) => {
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const time = moment.utc(distance).format("HH:mm:ss");
+        return `${prefix} ${days > 0 ? `${days} ngày ` : ''}${time}`;
+    };
+
     useEffect(() => {
         if (Number(data.purpose) !== Purpose_Post.For_Auction) return;
 
         const interval = setInterval(() => {
             const now = moment();
-            const startDate = moment(data.start_date);
-            const endDate = moment(data.end_date);
+            const start = moment(data.start_date);
+            const end = moment(data.end_date);
 
-            if (now.isBefore(startDate)) {
-                setAuctionStatus('not_started');
-                const distance = startDate.valueOf() - now.valueOf();
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const timeString = moment.utc(distance).format("HH:mm:ss");
-                setTime(`Phiên đấu giá sẽ bắt đầu sau: ${days > 0 ? days + ' ngày ' : ''}${timeString}`);
-            } else if (now.isAfter(endDate)) {
-                setAuctionStatus('ended');
+            if (now.isBefore(start)) {
+                setAuctionStatus("not_started");
+                const distance = start.diff(now);
+                setTime(getCountdownText(distance, "Phiên đấu giá sẽ bắt đầu sau:"));
+            } else if (now.isAfter(end)) {
+                setAuctionStatus("ended");
                 setTime("Phiên đấu giá đã kết thúc");
                 clearInterval(interval);
             } else {
-                setAuctionStatus('in_progress');
-                const distance = endDate.valueOf() - now.valueOf();
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const timeString = moment.utc(distance).format("HH:mm:ss");
-                setTime(`Phiên đấu giá sẽ bắt đầu sau: ${days > 0 ? days + ' ngày ' : ''}${timeString}`);
+                setAuctionStatus("in_progress");
+                const distance = end.diff(now);
+                setTime(getCountdownText(distance, "Phiên đấu giá sẽ kết thúc sau:"));
             }
         }, 1000);
 

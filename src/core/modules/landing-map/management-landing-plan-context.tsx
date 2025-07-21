@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { LandingMapApi, LandingPlanApi, SearchLandingPlanReverseApi } from 'src/core/api'
-import { CoordinateSearchLocationModel, LandingPlanModel, LandingTypeModel, NominatimResult, PointsMapModel, SelectedLocationModel } from 'src/core/models'
+import { CoordinateSearchLocationModel, LandingPlanModel, LandingTypeModel, LandTypeChangeModel, NominatimResult, PointsMapModel, SelectedLocationModel } from 'src/core/models'
 
 export class ManagementLandingPlanContextType {
     setPlacement = (placement: NominatimResult) => { }
@@ -36,6 +36,10 @@ export class ManagementLandingPlanContextType {
     setListCoordinates!: (lisCoordinates: string[]) => void
     detectLandType: (lat: number, lon: number, zoom?: number) => void = async () => { }
     landingType: LandingTypeModel | undefined
+    listLandTypeChange: LandTypeChangeModel[] = []
+    setListLandTypeChange: (listLandTypeChange: LandTypeChangeModel[]) => void = () => { }
+    selectedLandTypeChange: LandTypeChangeModel | undefined
+    setSelectedLandTypeChange: (selectedLandTypeChange: LandTypeChangeModel | undefined) => void = () => { }
 }
 
 export const ManagementLandingPlanContext = createContext<ManagementLandingPlanContextType>(
@@ -68,20 +72,10 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
 
     const [hoveredPostId, setHoveredPostId] = useState<number | null>(null);
 
-    useEffect(() => {
-        if (
-            placement.geojson &&
-            placement.geojson.coordinates &&
-            placement.geojson.coordinates.length > 0 &&
-            Array.isArray(placement.geojson.coordinates) &&
-            Array.isArray(placement.geojson.coordinates[0])
-        ) {
-            const temp = placement.geojson.coordinates[0].map((coord) => [coord[1], coord[0]]);
-            setPolygon(temp);
-        } else {
-            setPolygon(null);
-        }
-    }, [placement]);
+    const [listLandTypeChange, setListLandTypeChange] = useState<LandTypeChangeModel[]>([]);
+    const [selectedLandTypeChange, setSelectedLandTypeChange] = useState<LandTypeChangeModel>();
+
+
 
     const drawCoordinates = (coordinates: any) => {
         if (coordinates && coordinates.length > 0) {
@@ -127,10 +121,23 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
 
     const searchLandingPlan = async (lat: number, lon: number, radius?: number) => {
         try {
-            const [res, res2] = await Promise.all([
+
+            const [res, res2, res3, res4] = await Promise.all([
                 LandingPlanApi.searchLandingPlan({ lat, lon, radius }),
-                LandingPlanApi.searchLandingPlan({ lat, lon })
+                LandingPlanApi.searchLandingPlan({ lat, lon }),
+                LandingMapApi.getListLandTypeChangeByLatLon({ lat, lon, radius }),
+                LandingMapApi.getListLandTypeChangeByLatLon({ lat, lon })
             ]);
+
+            if (res3.Status && res4.Status) {
+                setListLandTypeChange(res3.Data.data);
+                if (res2.Data.data.length > 0) {
+                    setSelectedLandTypeChange(res4.Data.data[0]);
+                }
+            } else {
+                setListLandTypeChange([]);
+                setSelectedLandTypeChange(undefined);
+            }
 
             if (res.Status && res2.Status) {
                 setLandingPlanMap(res.Data.data);
@@ -145,6 +152,8 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
             console.error("searchLandingPlan error:", error);
             setLandingPlanMap([]);
             setSelectedLandingPlan(undefined);
+            setListLandTypeChange([]);
+            setSelectedLandTypeChange(undefined);
         } finally {
             setShouldFlyToLandingPlan(false);
         }
@@ -172,7 +181,22 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
             searchLandingPlan(selectedLocation.lat, selectedLocation.lng, selectedLocation.radius)
             onSearchByLatLon(selectedLocation.lat, selectedLocation.lng)
         }
-    }, [selectedLocation])
+    }, [selectedLocation, selectedLocation.lat, selectedLocation.lng, selectedLocation.radius])
+
+    useEffect(() => {
+        if (
+            placement.geojson &&
+            placement.geojson.coordinates &&
+            placement.geojson.coordinates.length > 0 &&
+            Array.isArray(placement.geojson.coordinates) &&
+            Array.isArray(placement.geojson.coordinates[0])
+        ) {
+            const temp = placement.geojson.coordinates[0].map((coord) => [coord[1], coord[0]]);
+            setPolygon(temp);
+        } else {
+            setPolygon(null);
+        }
+    }, [placement]);
 
     return (
         <ManagementLandingPlanContext.Provider
@@ -208,7 +232,11 @@ export const ManagementLandingPlanProvider = observer(({ children }: IProps) => 
                 listCoordinates,
                 setListCoordinates,
                 detectLandType,
-                landingType
+                landingType,
+                listLandTypeChange,
+                setListLandTypeChange,
+                selectedLandTypeChange,
+                setSelectedLandTypeChange
             }}
         >
             {children}

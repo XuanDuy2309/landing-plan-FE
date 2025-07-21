@@ -58,11 +58,6 @@ export const PostDetailContextProvider = observer(({ children, id }: IProps) => 
             return;
         }
 
-        if (dataAuction.price > ((data.price_current || 0) + (data.max_bid || 0))) {
-            dataAuction.err_price = "Giá đấu giá vượt quá giá tối đa có thể đặt";
-            return;
-        }
-
         const params = {
             "price": dataAuction.price,
             "post_id": id,

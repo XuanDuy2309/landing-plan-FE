@@ -59,12 +59,12 @@ export const ContentDetailPost = observer(() => {
             },
             disabled: Number(data.purpose) !== Purpose_Post.For_Auction
         },
-        {
-            key: '2',
-            label: 'Ẩn bài viết',
-            onClick: () => {
-            },
-        },
+        // {
+        //     key: '2',
+        //     label: 'Ẩn bài viết',
+        //     onClick: () => {
+        //     },
+        // },
         {
             key: '3',
             label: 'Liên hệ ngay',
@@ -178,7 +178,7 @@ export const ContentDetailPost = observer(() => {
                 <span>{data.area} m2</span>
             </div>
 
-            <div className="w-full h-full flex flex-col space-y-2">
+            <div className="w-full h-full flex flex-col space-y-2 overflow-y-auto">
                 <span className="text-xl font-bold text-gray-900">Thông tin BĐS</span>
                 <div className="w-full flex flex-col text-base text-gray-700 space-y-0.5">
                     {Number(data.purpose) === Purpose_Post.For_Auction &&

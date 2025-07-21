@@ -9,7 +9,7 @@ interface IProps {
 
 export const MemberPostContainer = observer(({ id }: IProps) => {
     return (
-        <PostContextProvider id={id}>
+        <PostContextProvider id={id} home>
             <div className="w-full h-full flex items-center justify-between max-w-[1440px] mx-auto relative">
                 <div className="w-1/3 flex-none min-w-[280px] h-full">
                     <LeftSideHome />

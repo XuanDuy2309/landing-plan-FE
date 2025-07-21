@@ -1,22 +1,21 @@
 import { observer } from "mobx-react"
 import { toast } from "react-toastify"
 import { ButtonLoading } from "src/components"
-import { useCreateAdminUserContext } from "src/core/modules"
-import { useListUserContext } from "src/core/modules/user/context"
+import { useCreateLandTypeChangeContext, useLandTypeChangeContext } from "src/core/modules"
 import { hideLoading, showLoading } from "src/core/services"
 
-export const FooterCreateAdminUser = observer(() => {
-    const { setCreate, itemUpdate, onRefresh, isCreate } = useListUserContext()
-    const { onSubmit, onClear, data } = useCreateAdminUserContext()
+export const FooterLandTypeChangeContainer = observer(() => {
+    const { setCreate, itemUpdate, onRefresh, isCreate } = useLandTypeChangeContext()
+    const { onSubmit, onClear, data } = useCreateLandTypeChangeContext()
 
     const handleSubmit = async () => {
         showLoading()
         let res = await onSubmit();
         // console.log('ok')
         if (res?.Status) {
-            onClear();
             onRefresh()
             hideLoading()
+            onClose()
             toast.success(res.Message);
             return
         }
@@ -26,7 +25,6 @@ export const FooterCreateAdminUser = observer(() => {
 
     const onClose = () => {
         onClear();
-        console.log('onClose', isCreate)
         setCreate(false);
     }
 

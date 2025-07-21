@@ -3,6 +3,8 @@ import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { AdminLayout } from "src/layouts/admins/admin-layout";
 import { AuctionsScreen } from "./screens/auctions-screen";
 import { DashboardScreen } from "./screens/dashboard-screen";
+import { LandTypeChangeScreen } from "./screens/land-type-change-screen";
+import { LandTypesScreen } from "./screens/land-type-screen";
 import { MapsScreen } from "./screens/maps-screen";
 import { PostsScreen } from "./screens/posts-screen";
 import { UsersScreen } from "./screens/users-screen";
@@ -24,6 +26,8 @@ export const AdminRoutes = () => {
                 <Route path="posts" element={<PostsScreen />} />
                 <Route path="auctions" element={<AuctionsScreen />} />
                 <Route path="maps" element={<MapsScreen />} />
+                <Route path="land_types" element={<LandTypesScreen />} />
+                <Route path="land_changes" element={<LandTypeChangeScreen />} />
             </Route>
         </Routes>
     );

@@ -5,9 +5,8 @@ import { ButtonIcon } from 'src/components/button-icon'
 import { ActionMap, useCreatePostContext, useManagementLandingPlan } from 'src/core/modules'
 
 export const PopupDetailLocationContainer = observer(() => {
-    const { placementInfo, setPlacementInfo, selectedLocation, landingType } = useManagementLandingPlan()
+    const { placementInfo, setPlacementInfo, selectedLocation, landingType, pointsArea, opacity, setOpacity, selectedLandTypeChange } = useManagementLandingPlan()
     const { data, setOpenMap, action, setAction, setMessage } = useCreatePostContext()
-    const { pointsArea, opacity, setOpacity } = useManagementLandingPlan()
 
     if (!placementInfo) return null
 
@@ -57,7 +56,7 @@ export const PopupDetailLocationContainer = observer(() => {
             <div className="flex items-start justify-between">
                 <div className='flex flex-col'>
                     <span className='font-medium text-[15px] line-clamp-2'>{placementInfo.display_name}</span>
-                    {landingType?.code && <span className='font-medium text-[12px]'>Loại đất {landingType?.code} - {landingType?.name}</span>}
+                    {landingType?.code && <span className='font-medium text-[12px]'>Loại đất {selectedLandTypeChange?.land_type_code || landingType?.code} - {selectedLandTypeChange?.land_type_name || landingType?.name}</span>}
                 </div>
 
                 <div className="flex flex-none">

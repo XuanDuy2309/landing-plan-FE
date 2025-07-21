@@ -6,6 +6,10 @@ export class LandingTypeModel {
     code?: string
     color?: string
 
+    err_name?: string
+    err_code?: string
+    err_color?: string
+
     constructor() {
         makeAutoObservable(this)
     }

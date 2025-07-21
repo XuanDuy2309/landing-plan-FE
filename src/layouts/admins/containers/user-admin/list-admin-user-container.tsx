@@ -212,7 +212,7 @@ export const ListAdminUserContainer = observer(() => {
                     <div className="flex items-center space-x-2">
                         <ButtonIcon icon="arrowleft" size="xxs" color={Colors.gray[400]} onClick={onPrev} />
                         <span>{showIndexTemp}-{pageSizeTemp} của {total} Người dùng</span>
-                        <ButtonIcon icon="arrowright" size="xxs" color={Colors.gray[400]} onClick={onPrev} />
+                        <ButtonIcon icon="arrowright" size="xxs" color={Colors.gray[400]} onClick={onNext} />
                     </div>
                 </div>
 

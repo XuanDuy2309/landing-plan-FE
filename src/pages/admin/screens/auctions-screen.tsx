@@ -146,7 +146,7 @@ const AuctionsContainer = observer(() => {
         },
         {
             title: 'Số tiền',
-            dataIndex: 'bid_amount',
+            dataIndex: 'price',
             width: 200,
             render: (amount) => formatMoney(amount, 1, 'vn') + ' VNĐ'
         },

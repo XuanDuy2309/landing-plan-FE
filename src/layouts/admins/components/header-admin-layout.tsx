@@ -23,23 +23,33 @@ export const HeaderAdminLayout = observer(() => {
         },
         {
             icon: "user-outline",
-            label: "Quản lý người dùng",
+            label: "Người dùng",
             path: "/admin/users"
         },
         {
             icon: "notification-outline",
-            label: "Quản lý bài đăng",
+            label: "Bài đăng",
             path: "/admin/posts"
         },
         {
             icon: "settings-outline",
-            label: "Quản lý đấu giá",
+            label: "Đấu giá",
             path: "/admin/auctions"
         },
         {
             icon: "map-outline",
-            label: "Quản lý bản đồ",
+            label: "Bản đồ",
             path: "/admin/maps"
+        },
+        {
+            icon: "location2-outline",
+            label: "Loại đất",
+            path: "/admin/land_types"
+        },
+        {
+            icon: "layout1colums-outline",
+            label: "Khu vực chuyển đổi",
+            path: "/admin/land_changes"
         }
     ];
 

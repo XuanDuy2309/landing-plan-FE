@@ -7,7 +7,6 @@ import { observer } from 'mobx-react';
 import { useEffect, useMemo, useRef } from 'react';
 import { LayersControl, MapContainer, Marker, Pane, Polygon, Polyline, Popup, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import { useSearchParams } from "react-router-dom";
-import { Colors } from 'src/assets';
 import { isValidPolygon } from 'src/core/base';
 import { baseUrl } from "src/core/config";
 import { LandingPlanModel, NominatimResult, SelectedLocationModel } from 'src/core/models';
@@ -29,7 +28,8 @@ export const LeafletMapContainer = observer(() => {
         landingPlanMap,
         opacity,
         selectedLandingPlan,
-        setHoveredPostId
+        setHoveredPostId,
+        listLandTypeChange
     } = useManagementLandingPlan();
     const { data, filter, onRefresh } = usePostContext()
 
@@ -75,7 +75,8 @@ export const LeafletMapContainer = observer(() => {
                 });
             }
         }
-    }, [searchParams]); // Only run when URL params change
+    }, [searchParams]);
+    // Only run when URL params change
 
 
     return (
@@ -138,16 +139,6 @@ export const LeafletMapContainer = observer(() => {
                     />
                 )}
             </Pane>
-            {/* <TileLayer
-                url={`https://cdn.dandautu.vn/quy-hoach/ha_noi/hoang_mai__ha_noi/{z}/{x}/{y}.png`}
-                // pane="overlayPane"
-                minZoom={12}
-                maxZoom={18}
-                opacity={0.8}
-                zIndex={999}
-                tms={true}
-            // opacity={opacit}
-            /> */}
 
             {selectedLocation.lat && selectedLocation.lng && !pointsArea.isRouting && (
                 <Marker position={[Number(selectedLocation.lat), Number(selectedLocation.lng)]}>
@@ -161,7 +152,36 @@ export const LeafletMapContainer = observer(() => {
                 </Marker>
             )}
             {isValidPolygon(polygon) && <Polygon pathOptions={{ fillColor: 'transparent', weight: 5 }} positions={polygon as any} />}
-            {isValidPolygon(coordinates.points) && <Polygon pathOptions={{ fillColor: Colors.red[200], weight: 5, color: Colors.red[300] }} positions={coordinates.points} />}
+            <Pane name="landTypeChange" style={{ zIndex: 500 }}>
+                {listLandTypeChange.length > 0 && listLandTypeChange.map((item, index) => {
+
+                    return (
+                        <>
+                            <Polygon
+                                key={item.id}
+                                pane="landTypeChange"
+                                positions={item.bounds as any}
+                                pathOptions={{
+                                    fillColor: item.land_type_color,
+                                    color: item.land_type_color, // viền
+                                    weight: 1,
+                                    fillOpacity: 0.8,
+                                }}
+                            >
+                                <Tooltip direction="center"
+                                    permanent
+                                    offset={[0, 0]}
+                                    className="landTypeChange"
+                                >
+
+                                    {item.land_type_code}
+                                </Tooltip>
+                            </Polygon>
+                        </>
+                    )
+                })}
+
+            </Pane>
             <Pane name="areaPane" style={{ zIndex: 500 }}>
                 {pointsArea.points.length >= 2 &&
                     pointsArea.points.slice(0, -1).map((pt, i) => {
@@ -186,7 +206,6 @@ export const LeafletMapContainer = observer(() => {
                                 <Tooltip
                                     direction="center"
                                     permanent
-                                    // position={[pointsArea.areaLabelPosition[0], pointsArea.areaLabelPosition[1]]}
                                     offset={[0, 0]}
                                     className="area-tooltip"
                                 >
@@ -339,7 +358,7 @@ interface IProps3 {
 const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3) => {
     // const { getInfoPlacement } = useManagementLandingPlan()
     const map = useMap();
-    const { searchCoordinatesLocation, pointsArea, setHoveredPostId, setListCoordinates, listCoordinates, detectLandType } = useManagementLandingPlan();
+    const { searchCoordinatesLocation, pointsArea, setHoveredPostId, placementInfo, detectLandType } = useManagementLandingPlan();
     const [searchParams, setSearchParams] = useSearchParams();
     const isInitialMount = useRef(true);
 
@@ -369,7 +388,12 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
                 if (filter) {
                     filter.lat = lat;
                     filter.lng = lng;
-                    filter.range = radius; // truyền bán kính đúng đơn vị
+                    filter.range = radius;
+                    setSelectedLocation({
+                        lat: lat,
+                        lng: lng,
+                        radius: radius // Default radius or calculate based on map bounds
+                    }); // truyền bán kính đúng đơn vị
                     onRefresh && onRefresh();
                 }
             }, 300)();
@@ -381,13 +405,7 @@ const MapEvents = observer(({ setSelectedLocation, filter, onRefresh }: IProps3)
 
             // Khi vẽ xong polygon (isDraw = false) và có ít nhất 3 điểm
             if (!pointsArea.isDraw && pointsArea.points.length >= 3) {
-                const coordinate = pointsArea.points.map((item) => {
-                    return item.join(' ')
-                }).join(', ')
-                console.log('coordinate', coordinate)
-                // Thêm polygon mới vào listCoordinates
-                setListCoordinates([...listCoordinates, 'POLYGON((' + coordinate + '))'])
-                // Reset points để vẽ polygon mới
+                
                 pointsArea.points = [];
                 pointsArea.area = 0;
                 return;
